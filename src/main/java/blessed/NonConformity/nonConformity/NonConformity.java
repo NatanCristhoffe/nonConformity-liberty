@@ -6,6 +6,7 @@ import blessed.NonConformity.sectors.Sector;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,8 +24,17 @@ public class NonConformity {
     private Long id;
     private String title;
     private String description;
+    private Boolean hasAccidentRisk;
+    private NonConformityPriorityLevel priorityLevel;
+    private LocalDateTime dispositionDate;
+    @ManyToOne
+    @JoinColumn(name = "linked_rnc_id")
+    private NonConformity linkedRnc;
     private String urlEvidence;
     private NonConformityStatus status;
+//    private User dispositionOwner;
+//    private User effectivenessAnalyst;
+//    private User userCreated;
 
 
     @OneToMany(
