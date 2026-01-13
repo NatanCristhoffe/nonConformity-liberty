@@ -1,6 +1,7 @@
 package blessed.nonconformity.entity;
 
 
+import blessed.exception.BusinessException;
 import blessed.nonconformity.enums.NonConformityPriorityLevel;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
@@ -9,6 +10,7 @@ import blessed.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -64,6 +66,15 @@ public class NonConformity {
     @JoinColumn(name = "responsible_department_id")
     private Sector responsibleDepartment;
 
+    //Root Cause
+    @OneToOne(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JoinColumn(name = "root_cause_id")
+    private RootCause rootCause;
+
+
     public NonConformity(NonconformityRequestDTO data){
         this.title = data.title();
         this.description = data.description();
@@ -77,6 +88,18 @@ public class NonConformity {
 
     private void addLog(String message){
         logs.add(new NonconformityLog(this, message));
+    }
+
+    public void addRootCause(RootCause rootCause){
+        if(this.status != NonConformityStatus.WAITING_ROOT_CAUSE){
+            throw new BusinessException(
+                    "A causa raiz só pode ser adicionada quando a NC estiver aguardando causa raiz"
+            );
+        }
+
+        this.rootCause = rootCause;
+        this.status = NonConformityStatus.WAITING_ACTIONS;
+        addLog("Causa raiz definida - " + Instant.now());
     }
 
 }
