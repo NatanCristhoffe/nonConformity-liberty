@@ -1,8 +1,11 @@
-package blessed.nonconformity.nonConformity;
+package blessed.nonconformity.entity;
 
 
-import blessed.nonconformity.nonconformityLog.NonconformityLog;
+import blessed.nonconformity.enums.NonConformityPriorityLevel;
+import blessed.nonconformity.enums.NonConformityStatus;
+import blessed.nonconformity.dto.NonconformityRequestDTO;
 import blessed.sector.entity.Sector;
+import blessed.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,9 +35,18 @@ public class NonConformity {
     private NonConformity linkedRnc;
     private String urlEvidence;
     private NonConformityStatus status;
-//    private User dispositionOwner;
-//    private User effectivenessAnalyst;
-//    private User userCreated;
+
+    @ManyToOne
+    @JoinColumn(name = "disposition_owner_id", nullable = false)
+    private User dispositionOwner;
+
+    @ManyToOne
+    @JoinColumn(name = "effectiveness_analyst_id", nullable = false)
+    private User effectivenessAnalyst;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by_user_id", nullable = false)
+    private User createdBy;
 
 
     @OneToMany(
@@ -55,6 +67,9 @@ public class NonConformity {
     public NonConformity(NonconformityRequestDTO data){
         this.title = data.title();
         this.description = data.description();
+        this.hasAccidentRisk = data.hasAccidentRisk();
+        this.priorityLevel = data.priorityLevel();
+        this.dispositionDate = data.dispositionDate();
         this.urlEvidence = data.urlEvidence();
         this.status = NonConformityStatus.WAITING_ROOT_CAUSE;
         addLog("Não conformidade criada - aguardando causa-raiz");

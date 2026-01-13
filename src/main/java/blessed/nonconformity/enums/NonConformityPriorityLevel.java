@@ -1,4 +1,4 @@
-package blessed.nonconformity.nonConformity;
+package blessed.nonconformity.enums;
 
 public enum NonConformityPriorityLevel {
     LOW,

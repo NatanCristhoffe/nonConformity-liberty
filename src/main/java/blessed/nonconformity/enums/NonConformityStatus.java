@@ -1,4 +1,4 @@
-package blessed.nonconformity.nonConformity;
+package blessed.nonconformity.enums;
 
 public enum NonConformityStatus {
     WAITING_ROOT_CAUSE,          // Aguardando causa-raiz

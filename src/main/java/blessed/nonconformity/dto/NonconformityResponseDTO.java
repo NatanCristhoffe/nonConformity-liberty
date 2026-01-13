@@ -1,6 +1,8 @@
-package blessed.nonconformity.nonConformity;
+package blessed.nonconformity.dto;
 
-import blessed.nonconformity.nonconformityLog.NonconformityLogResponseDTO;
+import blessed.nonconformity.entity.NonConformity;
+import blessed.nonconformity.enums.NonConformityPriorityLevel;
+import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.sector.entity.Sector;
 
 import java.time.LocalDateTime;

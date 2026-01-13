@@ -1,4 +1,6 @@
-package blessed.nonconformity.nonconformityLog;
+package blessed.nonconformity.dto;
+
+import blessed.nonconformity.entity.NonconformityLog;
 
 import java.time.Instant;
 

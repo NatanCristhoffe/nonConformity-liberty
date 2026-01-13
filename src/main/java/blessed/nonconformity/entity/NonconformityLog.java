@@ -1,6 +1,5 @@
-package blessed.nonconformity.nonconformityLog;
+package blessed.nonconformity.entity;
 
-import blessed.nonconformity.nonConformity.NonConformity;
 import jakarta.persistence.*;
 import lombok.Getter;
 

@@ -1,10 +1,11 @@
 package blessed.nonconformity.controller;
 
 
-import blessed.nonconformity.nonConformity.NonConformity;
-import blessed.nonconformity.nonConformity.NonconformityRequestDTO;
-import blessed.nonconformity.nonConformity.NonconformityResponseDTO;
+import blessed.nonconformity.entity.NonConformity;
+import blessed.nonconformity.dto.NonconformityRequestDTO;
+import blessed.nonconformity.dto.NonconformityResponseDTO;
 import blessed.nonconformity.service.NonconformityService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class Nonconformity {
     }
 
     @PostMapping
-    public ResponseEntity<NonconformityResponseDTO> createdNonconformity(@RequestBody NonconformityRequestDTO data){
+    public ResponseEntity<NonconformityResponseDTO> createdNonconformity(@Valid @RequestBody NonconformityRequestDTO data){
         NonConformity nonconformityData = service.create(data);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
