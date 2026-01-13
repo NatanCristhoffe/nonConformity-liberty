@@ -1,4 +1,4 @@
-package blessed.nonconformity.exception;
+package blessed.exception;
 
 public class BusinessException extends RuntimeException{
     public BusinessException(String message){

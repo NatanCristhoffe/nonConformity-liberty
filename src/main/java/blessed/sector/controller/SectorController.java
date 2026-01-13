@@ -1,8 +1,9 @@
-package blessed.nonconformity.controller;
-import blessed.nonconformity.sectors.Sector;
-import blessed.nonconformity.sectors.SectorRequestDTO;
-import blessed.nonconformity.sectors.SectorResponseDTO;
+package blessed.sector.controller;
+import blessed.sector.entity.Sector;
+import blessed.sector.dto.SectorRequestDTO;
+import blessed.sector.dto.SectorResponseDTO;
 import blessed.nonconformity.service.SectorService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class SectorController {
     }
 
     @PostMapping
-    public ResponseEntity<SectorResponseDTO> createSector(@RequestBody SectorRequestDTO data){
+    public ResponseEntity<SectorResponseDTO> createSector(@Valid @RequestBody SectorRequestDTO data){
         Sector sector = service.create(data);
         return ResponseEntity
                 .status(HttpStatus.CREATED)

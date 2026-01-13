@@ -1,10 +1,10 @@
 package blessed.nonconformity.service;
 
-import blessed.nonconformity.exception.BusinessException;
-import blessed.nonconformity.sectors.Sector;
-import blessed.nonconformity.sectors.SectorRepository;
-import blessed.nonconformity.sectors.SectorRequestDTO;
-import blessed.nonconformity.sectors.SectorResponseDTO;
+import blessed.exception.BusinessException;
+import blessed.sector.entity.Sector;
+import blessed.sector.repository.SectorRepository;
+import blessed.sector.dto.SectorRequestDTO;
+import blessed.sector.dto.SectorResponseDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

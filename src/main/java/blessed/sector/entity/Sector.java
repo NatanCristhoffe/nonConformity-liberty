@@ -1,5 +1,7 @@
-package blessed.nonconformity.sectors;
+package blessed.sector.entity;
 
+import blessed.common.entity.AuditableEntity;
+import blessed.sector.dto.SectorRequestDTO;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,9 +16,8 @@ import lombok.NoArgsConstructor;
 )
 @Getter
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
-public class Sector {
-
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class Sector extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

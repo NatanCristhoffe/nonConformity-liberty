@@ -1,14 +1,13 @@
 package blessed.user.service;
 
-import blessed.nonconformity.exception.BusinessException;
-import blessed.nonconformity.exception.ResourceNotFoundException;
-import blessed.nonconformity.sectors.Sector;
-import blessed.nonconformity.sectors.SectorRepository;
+import blessed.exception.BusinessException;
+import blessed.exception.ResourceNotFoundException;
+import blessed.sector.entity.Sector;
+import blessed.sector.repository.SectorRepository;
 import blessed.user.dto.UserRequestDTO;
 import blessed.user.dto.UserResponseDTO;
 import blessed.user.entity.User;
 import blessed.user.repository.UserRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +36,11 @@ public class UserService {
     public UserResponseDTO create(UserRequestDTO data){
         if (userRepository.existsByEmail(data.getEmail().toLowerCase())){
             throw new BusinessException("Email já cadastrado");
+        }
+        if (userRepository.existsByPhone(data.getPhone())){
+            throw new BusinessException(
+                    "Já existe um usuário cadastrado com o número de telefone informado."
+                    );
         }
         Sector sector = sectorRepository.findById(data.getSectorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Setor não encontrado"));

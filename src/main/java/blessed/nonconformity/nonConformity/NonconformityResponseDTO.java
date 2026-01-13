@@ -1,7 +1,7 @@
 package blessed.nonconformity.nonConformity;
 
 import blessed.nonconformity.nonconformityLog.NonconformityLogResponseDTO;
-import blessed.nonconformity.sectors.Sector;
+import blessed.sector.entity.Sector;
 
 import java.time.LocalDateTime;
 import java.util.Set;

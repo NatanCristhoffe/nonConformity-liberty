@@ -1,9 +1,12 @@
 package blessed.user.entity;
 
-import blessed.nonconformity.sectors.Sector;
+import blessed.common.entity.AuditableEntity;
+import blessed.sector.entity.Sector;
 import blessed.user.dto.UserRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.Instant;
 
 @Entity
 @Table(
@@ -17,8 +20,8 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
-public class User {
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class User extends AuditableEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)

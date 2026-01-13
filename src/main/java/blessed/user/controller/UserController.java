@@ -4,6 +4,7 @@ import blessed.user.dto.UserRequestDTO;
 import blessed.user.dto.UserResponseDTO;
 import blessed.user.entity.User;
 import blessed.user.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,12 +28,11 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@RequestBody UserRequestDTO data){
+    public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserRequestDTO data){
         UserResponseDTO user = service.create(data);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(user)
                 ;
-
     }
 }

@@ -1,13 +1,13 @@
 package blessed.nonconformity.service;
 
 
-import blessed.nonconformity.exception.ResourceNotFoundException;
+import blessed.exception.ResourceNotFoundException;
 import blessed.nonconformity.nonConformity.NonConformity;
 import blessed.nonconformity.nonConformity.NonconformityRepository;
 import blessed.nonconformity.nonConformity.NonconformityRequestDTO;
 import blessed.nonconformity.nonConformity.NonconformityResponseDTO;
-import blessed.nonconformity.sectors.Sector;
-import blessed.nonconformity.sectors.SectorRepository;
+import blessed.sector.entity.Sector;
+import blessed.sector.repository.SectorRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

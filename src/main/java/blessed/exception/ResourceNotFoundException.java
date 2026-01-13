@@ -1,4 +1,4 @@
-package blessed.nonconformity.exception;
+package blessed.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {

@@ -2,7 +2,7 @@ package blessed.nonconformity.nonConformity;
 
 
 import blessed.nonconformity.nonconformityLog.NonconformityLog;
-import blessed.nonconformity.sectors.Sector;
+import blessed.sector.entity.Sector;
 import jakarta.persistence.*;
 import lombok.*;
 
