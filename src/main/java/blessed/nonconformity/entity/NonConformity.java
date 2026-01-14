@@ -5,6 +5,8 @@ import blessed.exception.BusinessException;
 import blessed.nonconformity.enums.NonConformityPriorityLevel;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
+import blessed.nonconformity.enums.QualityToolType;
+import blessed.nonconformity.tools.FiveWhyTool;
 import blessed.sector.entity.Sector;
 import blessed.user.entity.User;
 import blessed.utils.DataTimeUtils;
@@ -67,16 +69,26 @@ public class NonConformity {
     @JoinColumn(name = "responsible_department_id")
     private Sector responsibleDepartment;
 
+
+    //Tools
+    private Boolean requiresQualityTool;
+
+    @Enumerated(EnumType.STRING)
+    private QualityToolType selectedTool;
+
+
+
     //Root Cause
     @OneToOne(
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+
     @JoinColumn(name = "root_cause_id")
     private RootCause rootCause;
 
-    @OneToOne(mappedBy = "nonConformity", cascade = CascadeType.ALL)
-    private FiveWhy fiveWhyTool;
+    @OneToOne(mappedBy = "nonconformity", cascade = CascadeType.ALL)
+    private FiveWhyTool fiveWhyTool;
 
 
 

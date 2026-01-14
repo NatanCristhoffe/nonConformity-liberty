@@ -3,6 +3,7 @@ package blessed.nonconformity.dto;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityPriorityLevel;
 import blessed.nonconformity.enums.NonConformityStatus;
+import blessed.nonconformity.enums.QualityToolType;
 import blessed.sector.entity.Sector;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,8 @@ public record NonconformityResponseDTO(
         LinkedRncDTO linkedRnc,
         Sector sourceDepartment,
         Sector responsibleDepartment,
+        Boolean requiresQualityTool,
+        QualityToolType selectedTool,
         Set<NonconformityLogResponseDTO> logs
 ) {
 
@@ -37,6 +40,8 @@ public record NonconformityResponseDTO(
                 entity.getLinkedRnc() != null ? new LinkedRncDTO(entity.getLinkedRnc()) : null,
                 entity.getSourceDepartment(),
                 entity.getResponsibleDepartment(),
+                entity.getRequiresQualityTool(),
+                entity.getSelectedTool(),
                 entity.getLogs()
                         .stream()
                         .map(NonconformityLogResponseDTO::new)

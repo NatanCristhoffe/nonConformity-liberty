@@ -1,6 +1,7 @@
 package blessed.nonconformity.dto;
 
 import blessed.nonconformity.enums.NonConformityPriorityLevel;
+import blessed.nonconformity.enums.QualityToolType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -45,6 +46,8 @@ public record NonconformityRequestDTO(
 
         @NotNull(message = "Informe se devera ser feito o uso de alguma ferramenta.")
         Boolean requiresQualityTool,
+
+        QualityToolType selectedTool,
 
         @NotNull(message = "O usuário que criou o registro deve ser informado.")
         Long createdById

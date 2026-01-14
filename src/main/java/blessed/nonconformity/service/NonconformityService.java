@@ -3,6 +3,8 @@ package blessed.nonconformity.service;
 
 import blessed.exception.ResourceNotFoundException;
 import blessed.nonconformity.entity.NonConformity;
+import blessed.nonconformity.enums.NonConformityStatus;
+import blessed.nonconformity.interfaces.QualityToolService;
 import blessed.nonconformity.repository.NonconformityRepository;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
 import blessed.nonconformity.dto.NonconformityResponseDTO;
@@ -10,6 +12,7 @@ import blessed.sector.entity.Sector;
 import blessed.sector.repository.SectorRepository;
 import blessed.user.entity.User;
 import blessed.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,14 +22,17 @@ public class NonconformityService {
     private final NonconformityRepository nonconformityRepository;
     private final  SectorRepository sectorRepository;
     private final UserRepository userRepository;
+    private final QualityToolServiceImpl qualityToolService;
 
     public NonconformityService(
         NonconformityRepository nonconformityRepository,
         SectorRepository sectorRepository,
-        UserRepository userRepository){
+        UserRepository userRepository,
+        QualityToolServiceImpl qualityToolService){
         this.nonconformityRepository = nonconformityRepository;
         this.sectorRepository = sectorRepository;
         this.userRepository = userRepository;
+        this.qualityToolService = qualityToolService;
     }
 
     public List<NonconformityResponseDTO> getAll(){
@@ -39,6 +45,7 @@ public class NonconformityService {
         return nonconformities;
     }
 
+    @Transactional
     public NonConformity create(NonconformityRequestDTO data){
 
         Sector source = sectorRepository.findById(data.sourceDepartmentId())
@@ -61,15 +68,25 @@ public class NonconformityService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Usuário responsável pela criação não encontrado"));
 
-        NonConformity nonconformity = new NonConformity(data);
+        NonConformity nc = new NonConformity(data);
 
-        nonconformity.setSourceDepartment(source);
-        nonconformity.setResponsibleDepartment(responsible);
-        nonconformity.setDispositionOwner(dispositionOwner);
-        nonconformity.setEffectivenessAnalyst(effectivenessAnalyst);
-        nonconformity.setCreatedBy(createdBy);
-        nonconformityRepository.save(nonconformity);
+        nc.setSourceDepartment(source);
+        nc.setResponsibleDepartment(responsible);
+        nc.setDispositionOwner(dispositionOwner);
+        nc.setEffectivenessAnalyst(effectivenessAnalyst);
+        nc.setCreatedBy(createdBy);
 
-        return nonconformity;
+        nc.setRequiresQualityTool(data.requiresQualityTool());
+        nc.setSelectedTool(data.selectedTool());
+
+        if (nc.getRequiresQualityTool() != true){
+            nc.setStatus(NonConformityStatus.WAITING_QUALITY_TOOL);
+        } else {
+            nc.setStatus(NonConformityStatus.WAITING_ROOT_CAUSE);
+        }
+        nonconformityRepository.save(nc);
+        qualityToolService.initializeTool(nc);
+
+        return nc;
     }
 }
