@@ -4,9 +4,11 @@ import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityPriorityLevel;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.enums.QualityToolType;
+import blessed.nonconformity.tools.FiveWhyTool;
 import blessed.sector.entity.Sector;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,7 @@ public record NonconformityResponseDTO(
         Sector responsibleDepartment,
         Boolean requiresQualityTool,
         QualityToolType selectedTool,
+        FiveWhyToolResponseDTO fiveWhyToll,
         Set<NonconformityLogResponseDTO> logs
 ) {
 
@@ -42,6 +45,9 @@ public record NonconformityResponseDTO(
                 entity.getResponsibleDepartment(),
                 entity.getRequiresQualityTool(),
                 entity.getSelectedTool(),
+                entity.getFiveWhyTool() != null
+                        ? new FiveWhyToolResponseDTO(entity.getFiveWhyTool())
+                        : null,
                 entity.getLogs()
                         .stream()
                         .map(NonconformityLogResponseDTO::new)

@@ -79,7 +79,7 @@ public class NonconformityService {
         nc.setRequiresQualityTool(data.requiresQualityTool());
         nc.setSelectedTool(data.selectedTool());
 
-        if (nc.getRequiresQualityTool() != true){
+        if (nc.getRequiresQualityTool() == true){
             nc.setStatus(NonConformityStatus.WAITING_QUALITY_TOOL);
         } else {
             nc.setStatus(NonConformityStatus.WAITING_ROOT_CAUSE);

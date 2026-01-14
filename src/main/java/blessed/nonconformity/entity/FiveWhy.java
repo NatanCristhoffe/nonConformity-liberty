@@ -35,11 +35,11 @@ public class FiveWhy {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         FiveWhy fiveWhy = (FiveWhy) o;
-        return level == fiveWhy.level;
+        return level == fiveWhy.level && Objects.equals(question, fiveWhy.question);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(level);
+        return Objects.hash(level, question);
     }
 }
