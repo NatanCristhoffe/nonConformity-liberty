@@ -1,5 +1,6 @@
 package blessed.nonconformity.controller;
 
+import blessed.nonconformity.dto.FiveWhyAnswerRequestDTO;
 import blessed.nonconformity.dto.FiveWhyRequestDTO;
 import blessed.nonconformity.service.FiveWhyService;
 import jakarta.validation.Valid;
@@ -23,5 +24,15 @@ public class FiveWhyController {
             ){
         service.addWhy(nonConformityId, data);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PutMapping("/nonconformities/{nonConformityId}/five-whys/{fiveWhyId}/answer")
+    public ResponseEntity<Void> addAnswer(
+            @PathVariable Long nonConformityId,
+            @PathVariable Long fiveWhyId,
+            @RequestBody @Valid FiveWhyAnswerRequestDTO data
+            ){
+        service.addAnswer(nonConformityId, fiveWhyId, data);
+        return ResponseEntity.noContent().build();
     }
 }

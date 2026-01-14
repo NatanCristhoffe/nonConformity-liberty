@@ -2,12 +2,16 @@ package blessed.nonconformity.service;
 
 import blessed.exception.BusinessException;
 import blessed.exception.ResourceNotFoundException;
+import blessed.nonconformity.dto.FiveWhyAnswerRequestDTO;
 import blessed.nonconformity.dto.FiveWhyRequestDTO;
 import blessed.nonconformity.entity.FiveWhy;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityStatus;
+import blessed.nonconformity.repository.FiveWhyRepository;
+import blessed.nonconformity.repository.FiveWhyToolRepository;
 import blessed.nonconformity.repository.NonconformityRepository;
 import blessed.nonconformity.tools.FiveWhyTool;
+import blessed.utils.DataTimeUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +19,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class FiveWhyService {
     private final NonconformityRepository ncRepository;
+    private final FiveWhyRepository fiveWhyRepository;
+    private final FiveWhyToolRepository fiveWhyToolRepository;
 
-    public FiveWhyService(NonconformityRepository ncRepository){
+    public FiveWhyService(
+            NonconformityRepository ncRepository,
+            FiveWhyToolRepository fiveWhyToolRepository,
+            FiveWhyRepository fiveWhyRepository
+            ){
+        this.fiveWhyToolRepository = fiveWhyToolRepository;
+        this.fiveWhyRepository = fiveWhyRepository;
         this.ncRepository = ncRepository;
     }
 
@@ -46,5 +58,52 @@ public class FiveWhyService {
         tool.getFiveWhys().add(why);
     }
 
+    @Transactional
+    public void addAnswer(Long nonconformityId, Long fiveWhyId, FiveWhyAnswerRequestDTO answer){
+        NonConformity nc = ncRepository.findById(nonconformityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada."));
+
+        FiveWhy fiveWhy = fiveWhyRepository.findById(fiveWhyId)
+                .orElseThrow(()-> new ResourceNotFoundException("Porquês não encontrado."));
+
+        if (!fiveWhy.getFiveWhyTool().getNonconformity().getId().equals(nc.getId())) {
+            throw new BusinessException("A pergunta Cinco Porquês não pertence a esta categoria de não conformidade.");
+        }
+
+        if (fiveWhy.getAnswer() != null){
+            throw new BusinessException("Esse Porquês já foi respondido.");
+        }
+
+        fiveWhy.setAnswer(answer.answer());
+        fiveWhyRepository.save(fiveWhy);
+
+        boolean allAnswered = fiveWhy.getFiveWhyTool()
+                .getFiveWhys()
+                .stream()
+                .allMatch(w ->
+                        w.getAnswer() != null &&
+                                !w.getAnswer().isBlank()
+                );
+
+        if (allAnswered) {
+            concludeFiveWhyTool(nc);
+        }
+
+    }
+
+    private void concludeFiveWhyTool(NonConformity nc) {
+
+        nc.getFiveWhyTool().setCompleted(true);
+
+        if (nc.getStatus() == NonConformityStatus.WAITING_QUALITY_TOOL) {
+            nc.setStatus(NonConformityStatus.WAITING_ROOT_CAUSE);
+
+            nc.addLog(
+                    "Ferramenta Five Whys concluída | "
+                            + DataTimeUtils.formatNow()
+                            + " | Status: Aguardando causa raiz"
+            );
+        }
+    }
 
 }

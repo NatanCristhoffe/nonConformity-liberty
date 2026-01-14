@@ -29,6 +29,7 @@ public class FiveWhy {
     @JoinColumn(name = "five_why_tool_id")
     private FiveWhyTool fiveWhyTool;
 
+    @Column(nullable = true)
     private String answer;
 
     @Override

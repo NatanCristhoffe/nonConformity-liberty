@@ -107,7 +107,8 @@ public class NonConformity {
         );
     }
 
-    private void addLog(String message){
+    public void addLog(String message){
+
         logs.add(new NonconformityLog(this, message));
     }
 
