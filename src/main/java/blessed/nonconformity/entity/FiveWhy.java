@@ -1,10 +1,13 @@
 package blessed.nonconformity.entity;
 
+import blessed.nonconformity.tools.FiveWhyTool;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -23,6 +26,19 @@ public class FiveWhy {
     private String question;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "root_cause_id")
-    private RootCause rootCause;
+    @JoinColumn(name = "five_why_tool_id")
+    private FiveWhyTool fiveWhyTool;
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        FiveWhy fiveWhy = (FiveWhy) o;
+        return level == fiveWhy.level;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(level);
+    }
 }

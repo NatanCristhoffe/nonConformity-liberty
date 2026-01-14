@@ -1,4 +1,4 @@
-package blessed.nonconformity.service;
+package blessed.sector.service;
 
 import blessed.exception.BusinessException;
 import blessed.sector.entity.Sector;

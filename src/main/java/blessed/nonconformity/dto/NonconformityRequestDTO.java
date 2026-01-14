@@ -43,8 +43,13 @@ public record NonconformityRequestDTO(
         @NotNull(message = "O usuário responsável pela análise de eficácia deve ser informado.")
         Long effectivenessAnalystId,
 
+        @NotNull(message = "Informe se devera ser feito o uso de alguma ferramenta.")
+        Boolean requiresQualityTool,
+
         @NotNull(message = "O usuário que criou o registro deve ser informado.")
         Long createdById
+
+
 
         ) {
         }

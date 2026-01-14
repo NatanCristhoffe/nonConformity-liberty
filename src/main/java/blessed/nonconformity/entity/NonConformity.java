@@ -7,6 +7,7 @@ import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
 import blessed.sector.entity.Sector;
 import blessed.user.entity.User;
+import blessed.utils.DataTimeUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -74,6 +75,10 @@ public class NonConformity {
     @JoinColumn(name = "root_cause_id")
     private RootCause rootCause;
 
+    @OneToOne(mappedBy = "nonConformity", cascade = CascadeType.ALL)
+    private FiveWhy fiveWhyTool;
+
+
 
     public NonConformity(NonconformityRequestDTO data){
         this.title = data.title();
@@ -83,7 +88,11 @@ public class NonConformity {
         this.dispositionDate = data.dispositionDate();
         this.urlEvidence = data.urlEvidence();
         this.status = NonConformityStatus.WAITING_ROOT_CAUSE;
-        addLog("Não conformidade criada - aguardando causa-raiz");
+        addLog(
+                "Não conformidade criada | "
+                + DataTimeUtils.formatNow()
+                + " | Status: Aguardando causa-raiz"
+        );
     }
 
     private void addLog(String message){
@@ -99,7 +108,11 @@ public class NonConformity {
 
         this.rootCause = rootCause;
         this.status = NonConformityStatus.WAITING_ACTIONS;
-        addLog("Causa raiz definida - " + Instant.now());
+        addLog(
+                "Causa raiz definida | " +
+                DataTimeUtils.formatNow() +
+                " | Status: Aguardando ações"
+        );
     }
 
 }

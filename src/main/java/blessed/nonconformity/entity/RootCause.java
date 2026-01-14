@@ -20,11 +20,8 @@ public class RootCause {
     @Column(nullable = false)
     private String description;
 
-    @OneToMany(
-            mappedBy = "rootCau",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private Set<FiveWhy> fiveWhys = new HashSet<>();
+    @OneToOne
+    @JoinColumn(name = "nonconformity_id")
+    private NonConformity nonconformity;
 
 }

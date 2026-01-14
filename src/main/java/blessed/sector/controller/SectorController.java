@@ -2,7 +2,7 @@ package blessed.sector.controller;
 import blessed.sector.entity.Sector;
 import blessed.sector.dto.SectorRequestDTO;
 import blessed.sector.dto.SectorResponseDTO;
-import blessed.nonconformity.service.SectorService;
+import blessed.sector.service.SectorService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
