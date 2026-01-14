@@ -14,10 +14,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/nonconformity")
-public class Nonconformity {
+public class NonconformityController {
 
     private final NonconformityService service;
-    public Nonconformity(NonconformityService service){
+    public NonconformityController(NonconformityService service){
         this.service = service;
     }
 

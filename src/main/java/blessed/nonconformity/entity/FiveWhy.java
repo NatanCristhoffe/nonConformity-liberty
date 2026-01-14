@@ -29,6 +29,7 @@ public class FiveWhy {
     @JoinColumn(name = "five_why_tool_id")
     private FiveWhyTool fiveWhyTool;
 
+    private String answer;
 
     @Override
     public boolean equals(Object o) {
