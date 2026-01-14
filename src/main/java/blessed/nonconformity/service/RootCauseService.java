@@ -36,7 +36,7 @@ public class RootCauseService {
         }
 
         RootCause rootCause = new RootCause(data);
-        rootCause.setNonconformity(nc);
+        nc.setRootCause(rootCause);
 
         rcRepository.save(rootCause);
         return rootCause;

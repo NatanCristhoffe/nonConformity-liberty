@@ -27,6 +27,7 @@ public record NonconformityResponseDTO(
         Boolean requiresQualityTool,
         QualityToolType selectedTool,
         FiveWhyToolResponseDTO fiveWhyToll,
+        RootCauseResponseDTO rootCause,
         Set<NonconformityLogResponseDTO> logs
 ) {
 
@@ -47,6 +48,9 @@ public record NonconformityResponseDTO(
                 entity.getSelectedTool(),
                 entity.getFiveWhyTool() != null
                         ? new FiveWhyToolResponseDTO(entity.getFiveWhyTool())
+                        : null,
+                entity.getRootCause() != null
+                        ? new RootCauseResponseDTO(entity.getRootCause())
                         : null,
                 entity.getLogs()
                         .stream()
