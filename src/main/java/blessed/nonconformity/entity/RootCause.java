@@ -1,5 +1,6 @@
 package blessed.nonconformity.entity;
 
+import blessed.nonconformity.dto.RootCauseRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,5 +24,9 @@ public class RootCause {
     @OneToOne
     @JoinColumn(name = "nonconformity_id")
     private NonConformity nonconformity;
+
+    public RootCause(RootCauseRequestDTO data){
+        this.description = data.description();
+    }
 
 }
