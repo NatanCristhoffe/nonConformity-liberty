@@ -28,6 +28,7 @@ public record NonconformityResponseDTO(
         QualityToolType selectedTool,
         FiveWhyToolResponseDTO fiveWhyToll,
         RootCauseResponseDTO rootCause,
+        Set<ActionResponseDTO> actions,
         Set<NonconformityLogResponseDTO> logs
 ) {
 
@@ -52,6 +53,12 @@ public record NonconformityResponseDTO(
                 entity.getRootCause() != null
                         ? new RootCauseResponseDTO(entity.getRootCause())
                         : null,
+                entity.getActions() != null
+                        ? entity.getActions()
+                                .stream()
+                                .map(ActionResponseDTO::new)
+                                .collect(Collectors.toSet())
+                        : Set.of(),
                 entity.getLogs()
                         .stream()
                         .map(NonconformityLogResponseDTO::new)

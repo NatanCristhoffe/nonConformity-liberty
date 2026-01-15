@@ -1,10 +1,8 @@
 package blessed.nonconformity.controller;
 
-import blessed.nonconformity.dto.ActionCompletedRequestDTO;
-import blessed.nonconformity.dto.ActionNotExecutedRequestDTO;
-import blessed.nonconformity.dto.ActionRequestDTO;
-import blessed.nonconformity.dto.ActionResponseDTO;
+import blessed.nonconformity.dto.*;
 import blessed.nonconformity.entity.Action;
+import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.service.ActionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
@@ -60,4 +58,12 @@ public class ActionController {
 
     }
 
+    @PutMapping("/closed/{ncId}")
+    public ResponseEntity<NonconformityResponseDTO> closedActions(@PathVariable Long ncId){
+        NonConformity nc = service.closeActionStage(ncId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new NonconformityResponseDTO(nc));
+    }
 }

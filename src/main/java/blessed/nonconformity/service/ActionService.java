@@ -16,6 +16,7 @@ import blessed.user.entity.User;
 import blessed.user.repository.UserRepository;
 import blessed.utils.DataTimeUtils;
 import jakarta.transaction.Transactional;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,15 +24,18 @@ public class ActionService {
     private final ActionRepository actionRepository;
     private final NonconformityRepository ncRepository;
     private final UserRepository userRepository;
+    private final QualityToolServiceImpl qualityService;
 
     public ActionService(
             ActionRepository actionRepository,
             NonconformityRepository ncRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            QualityToolServiceImpl qualityService
             ){
         this.actionRepository = actionRepository;
         this.ncRepository = ncRepository;
         this.userRepository = userRepository;
+        this.qualityService = qualityService;
     }
 
     @Transactional
@@ -88,5 +92,18 @@ public class ActionService {
         action.markAsNotExecuted(data);
 
         return action;
+    }
+
+    @Transactional
+    public NonConformity closeActionStage(Long ncId){
+        NonConformity nc = ncRepository.findById(ncId)
+                .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada. Verifique o ID informado e tente novamente."));
+        if (nc.getStatus() != NonConformityStatus.WAITING_ACTIONS){
+            throw new BusinessException("A não conformidade não está no status esperado para esta operação.");
+        }
+
+        qualityService.closedFiveWhyTool(nc);
+        nc.setStatus(NonConformityStatus.WAITING_EFFECTIVENESS_CHECK);
+        return nc;
     }
 }
