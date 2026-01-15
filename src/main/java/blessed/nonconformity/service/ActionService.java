@@ -1,0 +1,92 @@
+package blessed.nonconformity.service;
+
+
+import blessed.exception.BusinessException;
+import blessed.exception.ResourceNotFoundException;
+import blessed.nonconformity.dto.ActionCompletedRequestDTO;
+import blessed.nonconformity.dto.ActionNotExecutedRequestDTO;
+import blessed.nonconformity.dto.ActionRequestDTO;
+import blessed.nonconformity.entity.Action;
+import blessed.nonconformity.entity.NonConformity;
+import blessed.nonconformity.enums.ActionStatus;
+import blessed.nonconformity.enums.NonConformityStatus;
+import blessed.nonconformity.repository.ActionRepository;
+import blessed.nonconformity.repository.NonconformityRepository;
+import blessed.user.entity.User;
+import blessed.user.repository.UserRepository;
+import blessed.utils.DataTimeUtils;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ActionService {
+    private final ActionRepository actionRepository;
+    private final NonconformityRepository ncRepository;
+    private final UserRepository userRepository;
+
+    public ActionService(
+            ActionRepository actionRepository,
+            NonconformityRepository ncRepository,
+            UserRepository userRepository
+            ){
+        this.actionRepository = actionRepository;
+        this.ncRepository = ncRepository;
+        this.userRepository = userRepository;
+    }
+
+    @Transactional
+    public Action create(Long ncId, ActionRequestDTO data){
+        NonConformity nc = ncRepository.findById(ncId)
+                .orElseThrow(() -> new BusinessException(
+                        "Não conformidade não encontrada. Verifique o ID informado e tente novamente."
+                ));
+
+        User user = userRepository.findById(data.responsibleUserId())
+                .orElseThrow(() -> new BusinessException("Usuário não encontrado. Verifique o ID informado e tente novamente."));
+
+        if (nc.getStatus() != NonConformityStatus.WAITING_ACTIONS){
+            throw new BusinessException(
+                    "A não conformidade não está em um status que permita o cadastro de ações."
+            );
+        }
+
+        Action action = new Action(data);
+        actionRepository.save(action);
+
+        action.setNonconformity(nc);
+        action.setResponsibleUser(user);
+        nc.getActions().add(action);
+        nc.addLog("Ação adicionada: " + action.getTitle() + " | "
+                + DataTimeUtils.formatNow());
+
+        return action;
+    }
+
+    @Transactional
+    public Action completedAction(Long actionId, ActionCompletedRequestDTO data){
+        Action action = actionRepository.findById(actionId)
+                .orElseThrow(() -> new ResourceNotFoundException("A ação informada não foi encontrada."));
+
+        if (action.getStatus() != ActionStatus.PENDING){
+            throw  new BusinessException("A ação já foi finalizada e não pode ser modificada.");
+        }
+
+        action.complete(data);
+
+        return action;
+    }
+
+    @Transactional
+    public Action notExecutedAction(Long notExecutedId, ActionNotExecutedRequestDTO data){
+        Action action = actionRepository.findById(notExecutedId)
+                .orElseThrow(() -> new ResourceNotFoundException("A ação informada não foi encontrada."));
+
+        if (action.getStatus() != ActionStatus.PENDING){
+            throw  new BusinessException("A ação já foi finalizada e não pode ser modificada.");
+        }
+
+        action.markAsNotExecuted(data);
+
+        return action;
+    }
+}

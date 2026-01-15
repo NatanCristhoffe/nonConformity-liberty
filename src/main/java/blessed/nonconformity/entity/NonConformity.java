@@ -90,6 +90,13 @@ public class NonConformity {
     @OneToOne(mappedBy = "nonconformity", cascade = CascadeType.ALL)
     private FiveWhyTool fiveWhyTool;
 
+    @OneToMany(
+            mappedBy = "nonconformity",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<Action> actions = new HashSet<>();
+
 
 
     public NonConformity(NonconformityRequestDTO data){
