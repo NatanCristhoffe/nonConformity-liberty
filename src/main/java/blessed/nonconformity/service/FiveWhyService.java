@@ -84,26 +84,10 @@ public class FiveWhyService {
                         w.getAnswer() != null &&
                                 !w.getAnswer().isBlank()
                 );
-
         if (allAnswered) {
-            concludeFiveWhyTool(nc);
-        }
-
-    }
-
-    private void concludeFiveWhyTool(NonConformity nc) {
-
-        nc.getFiveWhyTool().setCompleted(true);
-
-        if (nc.getStatus() == NonConformityStatus.WAITING_QUALITY_TOOL) {
-            nc.setStatus(NonConformityStatus.WAITING_ROOT_CAUSE);
-
-            nc.addLog(
-                    "Ferramenta Five Whys concluída | "
-                            + DataTimeUtils.formatNow()
-                            + " | Status: Aguardando causa raiz"
-            );
+            nc.concludeFiveWhyTool();
         }
     }
+
 
 }

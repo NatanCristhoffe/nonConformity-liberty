@@ -116,8 +116,22 @@ public class NonConformity {
     }
 
     public void addLog(String message){
-
         logs.add(new NonconformityLog(this, message));
+    }
+
+    public void concludeFiveWhyTool() {
+        if (this.status != NonConformityStatus.WAITING_QUALITY_TOOL) {
+            throw new BusinessException(
+                    "A ferramenta dos 5 Porquês só pode ser concluída quando a NC estiver aguardando ferramenta de qualidade."
+            );
+        }
+        this.fiveWhyTool.setCompleted(true);
+        this.status = NonConformityStatus.WAITING_ROOT_CAUSE;
+        addLog(
+                "Ferramenta dos 5 Porquês concluída | " +
+                        DataTimeUtils.formatNow() +
+                        " | Status: Aguardando causa raiz"
+        );
     }
 
     public void addRootCause(RootCause rootCause){
