@@ -1,0 +1,52 @@
+package blessed.nonconformity.entity;
+
+
+import blessed.nonconformity.dto.EffectivenessAnalysisRequestDTO;
+import blessed.user.entity.User;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "EffectivenessAnalysis")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+public class EffectivenessAnalysis {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private Boolean effective;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String effectivenessDescription;
+
+    @Column(nullable = false)
+    private LocalDateTime analyzedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "analyzed_by_id", nullable = false)
+    private User analyzedByUser;
+
+
+    @OneToOne
+    @JoinColumn(
+            name = "non_conformity_id",
+            nullable = false,
+            unique = true
+    )
+    private NonConformity nonConformity;
+
+    public EffectivenessAnalysis(EffectivenessAnalysisRequestDTO data){
+        this.effective = data.effective();
+        this.effectivenessDescription = data.effectivenessDescription();
+        this.analyzedAt = LocalDateTime.now();
+    }
+
+
+}

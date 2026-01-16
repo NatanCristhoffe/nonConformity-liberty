@@ -97,7 +97,8 @@ public class NonConformity {
     )
     private Set<Action> actions = new HashSet<>();
 
-
+    @OneToOne(mappedBy = "nonConformity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private EffectivenessAnalysis effectivenessAnalysis;
 
     public NonConformity(NonconformityRequestDTO data){
         this.title = data.title();
@@ -134,5 +135,23 @@ public class NonConformity {
                 " | Status: Aguardando ações"
         );
     }
+
+    public void addEffectivenessAnalysis(EffectivenessAnalysis analysis) {
+        if (this.status != NonConformityStatus.WAITING_EFFECTIVENESS_CHECK) {
+            throw new BusinessException(
+                    "A análise de eficácia só pode ser realizada quando a NC estiver aguardando verificação de eficácia."
+            );
+        }
+
+        this.effectivenessAnalysis = analysis;
+        this.status = NonConformityStatus.APPROVED;
+
+        addLog(
+                "Análise de eficácia registrada | " +
+                        DataTimeUtils.formatNow() +
+                        " | Status: Aprovada"
+        );
+    }
+
 
 }

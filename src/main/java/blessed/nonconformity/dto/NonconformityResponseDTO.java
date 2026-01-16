@@ -1,5 +1,6 @@
 package blessed.nonconformity.dto;
 
+import blessed.nonconformity.entity.EffectivenessAnalysis;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityPriorityLevel;
 import blessed.nonconformity.enums.NonConformityStatus;
@@ -29,6 +30,7 @@ public record NonconformityResponseDTO(
         FiveWhyToolResponseDTO fiveWhyToll,
         RootCauseResponseDTO rootCause,
         Set<ActionResponseDTO> actions,
+        EffectivenessAnalysisResponseDTO effectivenessAnalysis,
         Set<NonconformityLogResponseDTO> logs
 ) {
 
@@ -59,6 +61,9 @@ public record NonconformityResponseDTO(
                                 .map(ActionResponseDTO::new)
                                 .collect(Collectors.toSet())
                         : Set.of(),
+                entity.getEffectivenessAnalysis() != null
+                        ? new EffectivenessAnalysisResponseDTO(entity.getEffectivenessAnalysis())
+                        : null,
                 entity.getLogs()
                         .stream()
                         .map(NonconformityLogResponseDTO::new)
