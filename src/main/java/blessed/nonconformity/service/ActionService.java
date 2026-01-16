@@ -45,7 +45,7 @@ public class ActionService {
                         "Não conformidade não encontrada. Verifique o ID informado e tente novamente."
                 ));
 
-        User user = userRepository.findById(data.responsibleUserId())
+        User responsibleUser = userRepository.findById(data.responsibleUserId())
                 .orElseThrow(() -> new BusinessException("Usuário não encontrado. Verifique o ID informado e tente novamente."));
 
         if (nc.getStatus() != NonConformityStatus.WAITING_ACTIONS){
@@ -55,15 +55,9 @@ public class ActionService {
         }
 
         Action action = new Action(data);
-        actionRepository.save(action);
+        nc.addAction(action, responsibleUser);
 
-        action.setNonconformity(nc);
-        action.setResponsibleUser(user);
-        nc.getActions().add(action);
-        nc.addLog("Ação adicionada: " + action.getTitle() + " | "
-                + DataTimeUtils.formatNow());
-
-        return action;
+        return actionRepository.save(action);
     }
 
     @Transactional

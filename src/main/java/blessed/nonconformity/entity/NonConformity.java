@@ -150,6 +150,23 @@ public class NonConformity {
         );
     }
 
+    public void addAction(Action action, User responsibleUser){
+        if (this.status != NonConformityStatus.WAITING_ACTIONS) {
+            throw new BusinessException(
+                    "Ação só pode ser adicionada quando a NC estiver aguardando ações."
+            );
+        }
+
+        action.setNonconformity(this);
+        action.setResponsibleUser(responsibleUser);
+
+        this.actions.add(action);
+        addLog(
+                "Ação adicionada: " + action.getTitle() + " | " +
+                        DataTimeUtils.formatNow()
+        );
+    }
+
     public void addEffectivenessAnalysis(EffectivenessAnalysis analysis) {
         if (this.status != NonConformityStatus.WAITING_EFFECTIVENESS_CHECK) {
             throw new BusinessException(
