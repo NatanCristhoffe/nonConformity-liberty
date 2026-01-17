@@ -84,7 +84,6 @@ public class ActionService {
         }
 
         action.markAsNotExecuted(data);
-
         return action;
     }
 
