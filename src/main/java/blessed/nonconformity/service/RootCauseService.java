@@ -36,11 +36,7 @@ public class RootCauseService {
         }
 
         RootCause rootCause = new RootCause(data);
-        nc.setRootCause(rootCause);
-        if (nc.getStatus() == NonConformityStatus.WAITING_ROOT_CAUSE){
-            nc.setStatus(NonConformityStatus.WAITING_ACTIONS);
-        }
-
+        nc.addRootCause(rootCause);
 
         rcRepository.save(rootCause);
         return rootCause;
