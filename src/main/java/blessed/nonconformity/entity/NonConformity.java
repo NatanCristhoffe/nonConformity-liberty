@@ -142,6 +142,7 @@ public class NonConformity {
         }
 
         this.rootCause = rootCause;
+        rootCause.setNonconformity(this);
         this.status = NonConformityStatus.WAITING_ACTIONS;
         addLog(
                 "Causa raiz definida | " +

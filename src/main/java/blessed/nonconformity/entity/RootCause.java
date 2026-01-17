@@ -1,6 +1,8 @@
 package blessed.nonconformity.entity;
 
+import blessed.exception.ResourceNotFoundException;
 import blessed.nonconformity.dto.RootCauseRequestDTO;
+import blessed.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,12 +23,17 @@ public class RootCause {
     @Column(nullable = false)
     private String description;
 
-    @OneToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_created_roote_cause_id", nullable = false)
+    private User userCreated;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "nonconformity_id")
     private NonConformity nonconformity;
 
-    public RootCause(RootCauseRequestDTO data){
+    public RootCause(RootCauseRequestDTO data, User user){
         this.description = data.description();
+        this.userCreated = user;
     }
 
 }
