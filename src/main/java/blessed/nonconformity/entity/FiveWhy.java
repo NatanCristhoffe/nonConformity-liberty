@@ -1,5 +1,6 @@
 package blessed.nonconformity.entity;
 
+import blessed.nonconformity.dto.FiveWhyRequestDTO;
 import blessed.nonconformity.tools.FiveWhyTool;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,14 @@ public class FiveWhy {
 
     @Column(nullable = true)
     private String answer;
+
+    public FiveWhy(FiveWhyRequestDTO why,FiveWhyTool tool){
+        this.level = why.level();
+        this.question = why.question();
+        this.fiveWhyTool = tool;
+
+    }
+
 
     @Override
     public boolean equals(Object o) {

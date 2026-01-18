@@ -70,7 +70,6 @@ public class NonConformity {
     private Sector responsibleDepartment;
 
 
-    //Tools
     private Boolean requiresQualityTool;
 
     @Enumerated(EnumType.STRING)
@@ -78,7 +77,6 @@ public class NonConformity {
 
 
 
-    //Root Cause
     @OneToOne(
             cascade = CascadeType.ALL,
             orphanRemoval = true

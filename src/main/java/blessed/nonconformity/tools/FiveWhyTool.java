@@ -1,5 +1,6 @@
 package blessed.nonconformity.tools;
 
+import blessed.exception.BusinessException;
 import blessed.nonconformity.entity.FiveWhy;
 import blessed.nonconformity.entity.NonConformity;
 import jakarta.persistence.*;
@@ -34,4 +35,17 @@ public class FiveWhyTool {
     private Set<FiveWhy> fiveWhys = new HashSet<>();
 
     private boolean completed;
+
+    public void addWhy(FiveWhy why){
+        if (fiveWhys.size() >= 5){
+            throw new BusinessException("Não é permitido mais de 5 porquês");
+        }
+
+        if (fiveWhys.contains(why)){
+            throw new BusinessException("Já existe um porquê para este nível");
+        }
+
+        fiveWhys.add(why);
+    }
+
 }

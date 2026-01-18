@@ -37,25 +37,19 @@ public class FiveWhyService {
         NonConformity nc = ncRepository.findById(ncId)
                 .orElseThrow(() -> new ResourceNotFoundException("NC não encontrada"));
 
+        if (nc.getRequiresQualityTool() != true){
+            throw new BusinessException(
+                    "Não é possível adicionar ferramentas da qualidade a esta não conformidade"
+            );
+
+        }
         if (nc.getStatus() != NonConformityStatus.WAITING_QUALITY_TOOL){
             throw new BusinessException("Não é possível adicionar porquês neste status");
         }
 
         FiveWhyTool tool = nc.getFiveWhyTool();
-        if (tool.getFiveWhys().size() >= 5){
-            throw new BusinessException("Não é permitido mais de 5 porquês");
-        }
-
-        FiveWhy why = new FiveWhy();
-        why.setLevel(data.level());
-        why.setQuestion(data.question());
-        why.setFiveWhyTool(tool);
-
-        if(tool.getFiveWhys().contains(why)){
-            throw new BusinessException("Já existe um porquê para este nível");
-        }
-
-        tool.getFiveWhys().add(why);
+        FiveWhy why = new FiveWhy(data, tool);
+        tool.addWhy(why);
     }
 
     @Transactional
