@@ -1,5 +1,6 @@
 package blessed.nonconformity.entity;
 
+import blessed.exception.BusinessException;
 import blessed.nonconformity.dto.ActionCompletedRequestDTO;
 import blessed.nonconformity.dto.ActionNotExecutedRequestDTO;
 import blessed.nonconformity.dto.ActionRequestDTO;
@@ -80,20 +81,26 @@ public class Action {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void complete(ActionCompletedRequestDTO data) {
+    public void complete(ActionCompletedRequestDTO data, User user) {
         if (this.status != ActionStatus.PENDING) {
-            throw new IllegalStateException("A ação não pode ser concluída neste estado.");
+            throw new BusinessException("A ação só pode ser concluída quando o status estiver PENDING.");
+        }
+
+        if (!this.responsibleUser.getId().equals(user.getId())) {
+            throw new BusinessException("Somente o usuário responsável pode concluir esta ação.");
         }
 
         this.status = ActionStatus.COMPLETED;
         this.evidenceUrl = data.evidenceUrl();
         this.observation = data.observation();
         this.completedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
+
 
     public void markAsNotExecuted(ActionNotExecutedRequestDTO data) {
         if (this.status != ActionStatus.PENDING) {
-            throw new IllegalStateException("A ação não pode ser marcada como não executada.");
+            throw new BusinessException("A ação não pode ser marcada como não executada.");
         }
 
         this.status = ActionStatus.NOT_EXECUTED;

@@ -1,5 +1,7 @@
 package blessed.nonconformity.entity;
 
+import blessed.exception.BusinessException;
+import blessed.nonconformity.dto.FiveWhyAnswerRequestDTO;
 import blessed.nonconformity.dto.FiveWhyRequestDTO;
 import blessed.nonconformity.tools.FiveWhyTool;
 import jakarta.persistence.*;
@@ -12,7 +14,6 @@ import java.util.Objects;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class FiveWhy {
@@ -39,6 +40,31 @@ public class FiveWhy {
         this.fiveWhyTool = tool;
 
     }
+
+    public void addAnswer(FiveWhyAnswerRequestDTO data, NonConformity nc){
+        if (!this.fiveWhyTool.getNonconformity().getId().equals(nc.getId())) {
+            throw new BusinessException("A pergunta Cinco Porquês não pertence a esta categoria de não conformidade.");
+        }
+
+        if (this.answer != null){
+            throw new BusinessException("Esse Porquês já foi respondido.");
+        }
+
+        this.answer = data.answer();
+    }
+
+    public boolean areAllWhysAnswered(){
+        boolean allAnswered = this.getFiveWhyTool()
+                .getFiveWhys()
+                .stream()
+                .allMatch(w ->
+                        w.getAnswer() != null &&
+                                !w.getAnswer().isBlank()
+                );
+
+        return  allAnswered;
+    }
+
 
 
     @Override

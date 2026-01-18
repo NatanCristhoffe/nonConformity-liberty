@@ -30,13 +30,14 @@ public class ActionController {
                 .body(new ActionResponseDTO(action));
     }
 
-    @PutMapping("/competed/{actionId}")
+    @PutMapping("/competed/{actionId}/user/{completedById}")
     public ResponseEntity<ActionResponseDTO> completedAction(
             @PathVariable Long actionId,
+            @PathVariable Long completedById,
             @RequestBody @Valid ActionCompletedRequestDTO data
             ){
 
-        Action actionCompleted = service.completedAction(actionId, data);
+        Action actionCompleted = service.completedAction(actionId, data, completedById);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

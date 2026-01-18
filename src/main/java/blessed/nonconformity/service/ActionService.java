@@ -61,16 +61,19 @@ public class ActionService {
     }
 
     @Transactional
-    public Action completedAction(Long actionId, ActionCompletedRequestDTO data){
+    public Action completedAction(Long actionId, ActionCompletedRequestDTO data, Long completedById){
         Action action = actionRepository.findById(actionId)
                 .orElseThrow(() -> new ResourceNotFoundException("A ação informada não foi encontrada."));
+
+        User user = userRepository.findById(completedById)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         if (action.getStatus() != ActionStatus.PENDING){
             throw  new BusinessException("A ação já foi finalizada e não pode ser modificada.");
         }
 
-        action.complete(data);
-
+        NonConformity nonConformity = action.getNonconformity();
+        nonConformity.completeAction(action, data, user);
         return action;
     }
 

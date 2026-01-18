@@ -44,4 +44,6 @@ public class User extends AuditableEntity {
         this.phone = data.getPhone();
     }
 
+
+
 }

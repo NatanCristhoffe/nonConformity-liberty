@@ -2,6 +2,7 @@ package blessed.nonconformity.entity;
 
 
 import blessed.exception.BusinessException;
+import blessed.nonconformity.dto.ActionCompletedRequestDTO;
 import blessed.nonconformity.enums.NonConformityPriorityLevel;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
@@ -165,6 +166,23 @@ public class NonConformity {
                         DataTimeUtils.formatNow()
         );
     }
+
+    public void completeAction(Action action, ActionCompletedRequestDTO data, User user) {
+
+        if (!this.actions.contains(action)) {
+            throw new BusinessException("A ação não pertence a esta não conformidade.");
+        }
+
+        action.complete(data, user);
+
+        addLog(
+                "Ação concluída: " + action.getTitle() +
+                " | " +
+                DataTimeUtils.formatNow()
+        );
+    }
+
+
 
     public void addEffectivenessAnalysis(EffectivenessAnalysis analysis) {
         if (this.status != NonConformityStatus.WAITING_EFFECTIVENESS_CHECK) {

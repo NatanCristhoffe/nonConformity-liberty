@@ -60,24 +60,10 @@ public class FiveWhyService {
         FiveWhy fiveWhy = fiveWhyRepository.findById(fiveWhyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Porquês não encontrado."));
 
-        if (!fiveWhy.getFiveWhyTool().getNonconformity().getId().equals(nc.getId())) {
-            throw new BusinessException("A pergunta Cinco Porquês não pertence a esta categoria de não conformidade.");
-        }
-
-        if (fiveWhy.getAnswer() != null){
-            throw new BusinessException("Esse Porquês já foi respondido.");
-        }
-
-        fiveWhy.setAnswer(answer.answer());
+        fiveWhy.addAnswer(answer, nc);
         fiveWhyRepository.save(fiveWhy);
 
-        boolean allAnswered = fiveWhy.getFiveWhyTool()
-                .getFiveWhys()
-                .stream()
-                .allMatch(w ->
-                        w.getAnswer() != null &&
-                                !w.getAnswer().isBlank()
-                );
+        boolean allAnswered = fiveWhy.areAllWhysAnswered();
         if (allAnswered) {
             nc.concludeFiveWhyTool();
         }
