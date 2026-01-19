@@ -45,13 +45,14 @@ public class ActionController {
 
     }
 
-    @PutMapping("/not-executed/{notExecutedId}")
+    @PutMapping("/not-executed/{actionId}/user/{notExecutedById}")
     public ResponseEntity<ActionResponseDTO> notExecutedAction(
-            @PathVariable Long notExecutedId,
+            @PathVariable Long actionId,
+            @PathVariable Long notExecutedById,
             @RequestBody @Valid ActionNotExecutedRequestDTO data
     ){
 
-        Action actionCompleted = service.notExecutedAction(notExecutedId, data);
+        Action actionCompleted = service.notExecutedAction(actionId, notExecutedById, data);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

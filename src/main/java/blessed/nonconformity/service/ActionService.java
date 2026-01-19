@@ -78,15 +78,20 @@ public class ActionService {
     }
 
     @Transactional
-    public Action notExecutedAction(Long notExecutedId, ActionNotExecutedRequestDTO data){
-        Action action = actionRepository.findById(notExecutedId)
+    public Action notExecutedAction(Long actionId,Long notExecutedById, ActionNotExecutedRequestDTO data){
+        Action action = actionRepository.findById(actionId)
                 .orElseThrow(() -> new ResourceNotFoundException("A ação informada não foi encontrada."));
+
+        User user = userRepository.findById(notExecutedById)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         if (action.getStatus() != ActionStatus.PENDING){
             throw  new BusinessException("A ação já foi finalizada e não pode ser modificada.");
         }
 
-        action.markAsNotExecuted(data);
+        NonConformity nonConformity = action.getNonconformity();
+        nonConformity.notExecutedAction(action, data, user);
+
         return action;
     }
 

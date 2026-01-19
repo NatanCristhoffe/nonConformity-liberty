@@ -98,14 +98,19 @@ public class Action {
     }
 
 
-    public void markAsNotExecuted(ActionNotExecutedRequestDTO data) {
+    public void markAsNotExecuted(ActionNotExecutedRequestDTO data, User user) {
         if (this.status != ActionStatus.PENDING) {
             throw new BusinessException("A ação não pode ser marcada como não executada.");
+        }
+
+        if (!this.responsibleUser.getId().equals(user.getId())) {
+            throw new BusinessException("Somente o usuário responsável pode concluir esta ação.");
         }
 
         this.status = ActionStatus.NOT_EXECUTED;
         this.nonExecutionReason = data.nonExecutionReason();
         this.completedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
 
