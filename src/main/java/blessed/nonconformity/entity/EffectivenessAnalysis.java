@@ -42,9 +42,11 @@ public class EffectivenessAnalysis {
     )
     private NonConformity nonConformity;
 
-    public EffectivenessAnalysis(EffectivenessAnalysisRequestDTO data){
+    public EffectivenessAnalysis(EffectivenessAnalysisRequestDTO data, NonConformity nc, User user){
         this.effective = data.effective();
         this.effectivenessDescription = data.effectivenessDescription();
+        this.nonConformity = nc;
+        this.analyzedByUser = user;
         this.analyzedAt = LocalDateTime.now();
     }
 

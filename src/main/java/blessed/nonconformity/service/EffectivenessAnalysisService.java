@@ -49,10 +49,7 @@ public class EffectivenessAnalysisService {
                         "Usuário não encontrado. Verifique o ID informado e tente novamente."
                 ));
 
-        EffectivenessAnalysis effectiveness = new EffectivenessAnalysis(data);
-        effectiveness.setNonConformity(nc);
-        effectiveness.setAnalyzedByUser(user);
-
+        EffectivenessAnalysis effectiveness = new EffectivenessAnalysis(data, nc, user);
         nc.addEffectivenessAnalysis(effectiveness);
 
         efRepository.save(effectiveness);
