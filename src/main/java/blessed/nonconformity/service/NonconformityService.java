@@ -14,6 +14,7 @@ import blessed.user.entity.User;
 import blessed.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class NonconformityService {
     }
 
     @Transactional
-    public NonConformity create(NonconformityRequestDTO data){
+    public NonConformity create(NonconformityRequestDTO data, List<MultipartFile> evidence){
 
         Sector source = sectorRepository.findById(data.sourceDepartmentId())
                         .orElseThrow(() ->

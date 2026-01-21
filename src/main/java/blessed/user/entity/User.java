@@ -8,7 +8,7 @@ import lombok.*;
 
 import java.time.Instant;
 
-@Entity
+@Entity(name = "users")
 @Table(
         name = "users",
         uniqueConstraints = {
@@ -22,8 +22,8 @@ import java.time.Instant;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id", callSuper = false)
 public class User extends AuditableEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
     @Column(nullable = false)
     private String firstName;
     @Column(nullable = false)

@@ -9,9 +9,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@CrossOrigin()
 @RestController
 @RequestMapping("/nonconformity")
 public class NonconformityController {
@@ -27,11 +29,15 @@ public class NonconformityController {
         return  nonconformities;
     }
 
-    @PostMapping
-    public ResponseEntity<NonconformityResponseDTO> createdNonconformity(@Valid @RequestBody NonconformityRequestDTO data){
-        NonConformity nonconformityData = service.create(data);
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<NonconformityResponseDTO> create(
+            @RequestPart("data") @Valid NonconformityRequestDTO data,
+            @RequestPart(value = "evidences", required = false) List<MultipartFile> evidences
+    ) {
+        NonConformity nonconformity = service.create(data, evidences);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new NonconformityResponseDTO(nonconformityData));
+                .body(new NonconformityResponseDTO(nonconformity));
     }
+
 }

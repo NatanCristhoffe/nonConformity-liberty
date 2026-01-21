@@ -10,7 +10,7 @@ import java.time.Instant;
 @Getter
 @Setter
 public class UserResponseDTO {
-    private Long id;
+    private String id;
     private String fullName;
     private String email;
     private String phone;
