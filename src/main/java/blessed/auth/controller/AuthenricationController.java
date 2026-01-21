@@ -41,16 +41,28 @@ public class AuthenricationController {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
-        String token = tokenService.generateToken((User) auth.getPrincipal());
+        User user = (User) auth.getPrincipal();
+        String token = tokenService.generateToken(user);
 
+        LoginResponseDTO response = new LoginResponseDTO(
+                token,
+                user.getEmail(),
+                user.getFirstName() + " " + user.getLastName(),
+                user.getRole(),
+                user.getSector(),
+                user.getIsActivated()
+        );
 
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody @Valid RegisterDTO data){
         if (this.userRepository.findByEmail(data.email()) != null){
-            throw new BusinessException("E-mai já consta na base de dados.");
+            throw new BusinessException("E-mail informado já está em uso.");
+        }
+        if (this.userRepository.existsByPhone(data.phone())){
+            throw new BusinessException("Telefone informado já está em uso.");
         }
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
