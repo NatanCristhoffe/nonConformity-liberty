@@ -27,12 +27,4 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserRequestDTO data){
-        UserResponseDTO user = service.create(data);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(user)
-                ;
-    }
 }

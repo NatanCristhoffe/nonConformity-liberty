@@ -9,7 +9,7 @@ public record EffectivenessAnalysisResponseDTO(
         Boolean effective,
         String effectivenessDescription,
         LocalDateTime analyzedAt,
-        Long analyzedByUserId
+        String analyzedByUserId
 ) {
     public EffectivenessAnalysisResponseDTO(EffectivenessAnalysis entity) {
         this(

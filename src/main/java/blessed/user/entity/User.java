@@ -1,12 +1,22 @@
 package blessed.user.entity;
 
-import blessed.common.entity.AuditableEntity;
+import blessed.auth.dto.AuthenticationDTO;
+import blessed.auth.dto.RegisterDTO;
+import blessed.user.enums.UserRole;
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import blessed.sector.entity.Sector;
 import blessed.user.dto.UserRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Collection;
+import java.util.List;
 
 @Entity(name = "users")
 @Table(
@@ -21,7 +31,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id", callSuper = false)
-public class User extends AuditableEntity {
+public class User implements UserDetails{
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     @Column(nullable = false)
@@ -31,19 +41,67 @@ public class User extends AuditableEntity {
     @Column(nullable = false)
     private String email;
     @Column(nullable = false)
+    private String password;
+    @Column(nullable = false)
     private String phone;
+    @Column(nullable = false)
+    private UserRole role;
+    @Column(nullable = false)
+    private Boolean isActivated;
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+    @Column(nullable = false)
+    private LocalDateTime updateAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sector_id", nullable = false)
+    @JoinColumn(name = "sector_id", nullable = true)
     private Sector sector;
 
-    public User(UserRequestDTO data){
-        this.firstName = data.getFirstName();
-        this.lastName = data.getLastName();
-        this.email = data.getEmail();
-        this.phone = data.getPhone();
+    public User(RegisterDTO data, String encryptedPassword){
+        this.email = data.email();
+        this.password = encryptedPassword;
+        this.firstName = data.firstName();
+        this.lastName = data.lastName();
+        this.phone = data.phone();
+        this.role=data.role();
+        this.isActivated = true;
+        this.createdAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
     }
 
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (this.role == UserRole.ADMIN){
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("ROLE_USER")
+            );
+        } else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
 
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ public class UserResponseDTO {
     private String email;
     private String phone;
     private Sector sector;
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     public UserResponseDTO(User user){
         this.id = user.getId();
