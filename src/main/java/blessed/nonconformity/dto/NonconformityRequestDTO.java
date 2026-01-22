@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record NonconformityRequestDTO(
         @NotBlank(message = "O título é obrigatório.")
@@ -39,10 +40,10 @@ public record NonconformityRequestDTO(
         Long responsibleDepartmentId,
 
         @NotNull(message = "O usuário responsável pela disposição deve ser informado.")
-        Long dispositionOwnerId,
+        UUID dispositionOwnerId,
 
         @NotNull(message = "O usuário responsável pela análise de eficácia deve ser informado.")
-        Long effectivenessAnalystId,
+        UUID effectivenessAnalystId,
 
         @NotNull(message = "Informe se devera ser feito o uso de alguma ferramenta.")
         Boolean requiresQualityTool,
@@ -50,9 +51,6 @@ public record NonconformityRequestDTO(
         QualityToolType selectedTool,
 
         @NotNull(message = "O usuário que criou o registro deve ser informado.")
-        Long createdById
-
-
-
+        UUID createdById
         ) {
         }

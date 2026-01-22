@@ -3,6 +3,8 @@ package blessed.user.entity;
 import blessed.auth.dto.AuthenticationDTO;
 import blessed.auth.dto.RegisterDTO;
 import blessed.user.enums.UserRole;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Entity(name = "users")
 @Table(
@@ -33,7 +36,8 @@ import java.util.List;
 @EqualsAndHashCode(of = "id", callSuper = false)
 public class User implements UserDetails{
     @Id @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @JdbcTypeCode(SqlTypes.CHAR)
+    private UUID id;
     @Column(nullable = false)
     private String firstName;
     @Column(nullable = false)

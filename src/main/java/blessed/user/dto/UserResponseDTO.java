@@ -7,11 +7,12 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
 public class UserResponseDTO {
-    private String id;
+    private UUID id;
     private String fullName;
     private String email;
     private String phone;

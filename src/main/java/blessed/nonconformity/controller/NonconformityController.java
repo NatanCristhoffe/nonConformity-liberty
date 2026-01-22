@@ -29,12 +29,20 @@ public class NonconformityController {
         return  nonconformities;
     }
 
-    @PostMapping(consumes = "multipart/form-data")
+    @GetMapping(params = "title")
+    public ResponseEntity<List<NonconformityResponseDTO>> getByTitle(@RequestParam String title){
+        List<NonconformityResponseDTO> nonConformities = service.findByTitleStartingWithIgnoreCase(title);
+
+        return ResponseEntity.ok(nonConformities);
+    }
+
+
+    @PostMapping()
     public ResponseEntity<NonconformityResponseDTO> create(
-            @RequestPart("data") @Valid NonconformityRequestDTO data,
-            @RequestPart(value = "evidences", required = false) List<MultipartFile> evidences
+            @RequestBody @Valid NonconformityRequestDTO data
+//            @RequestPart(value = "evidences", required = false) List<MultipartFile> evidences
     ) {
-        NonConformity nonconformity = service.create(data, evidences);
+        NonConformity nonconformity = service.create(data);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new NonconformityResponseDTO(nonconformity));

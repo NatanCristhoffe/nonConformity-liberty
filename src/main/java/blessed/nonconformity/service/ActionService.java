@@ -19,6 +19,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class ActionService {
     private final ActionRepository actionRepository;
@@ -61,7 +63,7 @@ public class ActionService {
     }
 
     @Transactional
-    public Action completedAction(Long actionId, ActionCompletedRequestDTO data, Long completedById){
+    public Action completedAction(Long actionId, ActionCompletedRequestDTO data, UUID completedById){
         Action action = actionRepository.findById(actionId)
                 .orElseThrow(() -> new ResourceNotFoundException("A ação informada não foi encontrada."));
 
@@ -78,7 +80,7 @@ public class ActionService {
     }
 
     @Transactional
-    public Action notExecutedAction(Long actionId,Long notExecutedById, ActionNotExecutedRequestDTO data){
+    public Action notExecutedAction(Long actionId,UUID notExecutedById, ActionNotExecutedRequestDTO data){
         Action action = actionRepository.findById(actionId)
                 .orElseThrow(() -> new ResourceNotFoundException("A ação informada não foi encontrada."));
 

@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/action")
 public class ActionController {
@@ -33,7 +35,7 @@ public class ActionController {
     @PutMapping("/competed/{actionId}/user/{completedById}")
     public ResponseEntity<ActionResponseDTO> completedAction(
             @PathVariable Long actionId,
-            @PathVariable Long completedById,
+            @PathVariable UUID completedById,
             @RequestBody @Valid ActionCompletedRequestDTO data
             ){
 
@@ -48,7 +50,7 @@ public class ActionController {
     @PutMapping("/not-executed/{actionId}/user/{notExecutedById}")
     public ResponseEntity<ActionResponseDTO> notExecutedAction(
             @PathVariable Long actionId,
-            @PathVariable Long notExecutedById,
+            @PathVariable UUID notExecutedById,
             @RequestBody @Valid ActionNotExecutedRequestDTO data
     ){
 

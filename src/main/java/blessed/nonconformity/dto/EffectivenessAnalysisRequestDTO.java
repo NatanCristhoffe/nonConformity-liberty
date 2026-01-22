@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.UUID;
+
 public record EffectivenessAnalysisRequestDTO(
 
         @NotNull(message = "Você deve informar se a não conformidade foi eficaz.")
@@ -14,6 +16,6 @@ public record EffectivenessAnalysisRequestDTO(
         String effectivenessDescription,
 
         @NotNull(message = "O ID do usuário que está realizando a analise de eficacia deve ser informado")
-        Long analyzedById
+        UUID analyzedById
 ) {
 }

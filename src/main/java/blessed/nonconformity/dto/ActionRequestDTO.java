@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record ActionRequestDTO(
 
@@ -27,5 +28,5 @@ public record ActionRequestDTO(
         LocalDateTime dueDate,
 
         @NotNull(message = "O responsável pela ação é obrigatório.")
-        Long responsibleUserId
+        UUID responsibleUserId
 ){}

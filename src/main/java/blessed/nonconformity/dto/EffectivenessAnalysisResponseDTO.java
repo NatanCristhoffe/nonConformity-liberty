@@ -3,13 +3,14 @@ package blessed.nonconformity.dto;
 import blessed.nonconformity.entity.EffectivenessAnalysis;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record EffectivenessAnalysisResponseDTO(
         Long id,
         Boolean effective,
         String effectivenessDescription,
         LocalDateTime analyzedAt,
-        String analyzedByUserId
+        UUID analyzedByUserId
 ) {
     public EffectivenessAnalysisResponseDTO(EffectivenessAnalysis entity) {
         this(

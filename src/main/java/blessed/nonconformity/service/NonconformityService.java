@@ -13,6 +13,7 @@ import blessed.sector.repository.SectorRepository;
 import blessed.user.entity.User;
 import blessed.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,7 +48,7 @@ public class NonconformityService {
     }
 
     @Transactional
-    public NonConformity create(NonconformityRequestDTO data, List<MultipartFile> evidence){
+    public NonConformity create(NonconformityRequestDTO data){
 
         Sector source = sectorRepository.findById(data.sourceDepartmentId())
                         .orElseThrow(() ->
@@ -90,4 +91,20 @@ public class NonconformityService {
 
         return nc;
     }
+
+
+    public List<NonconformityResponseDTO> findByTitleStartingWithIgnoreCase(String title) {
+
+        List<NonConformity> nonConformities = nonconformityRepository
+                .findTop5ByTitleStartingWithIgnoreCase(title);
+
+        List<NonconformityResponseDTO> responseNonConformities = nonConformities
+                .stream()
+                .map(NonconformityResponseDTO::new)
+                .toList();
+
+        return responseNonConformities;
+    }
+
+
 }
