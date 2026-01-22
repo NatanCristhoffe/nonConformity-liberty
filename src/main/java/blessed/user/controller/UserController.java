@@ -27,4 +27,11 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping(params = "firstName")
+    public ResponseEntity<List<UserResponseDTO>> getByFirstName(@RequestParam String firstName){
+        List<UserResponseDTO> users = service.findByFirstName(firstName);
+
+        return ResponseEntity.ok(users);
+    }
+
 }
