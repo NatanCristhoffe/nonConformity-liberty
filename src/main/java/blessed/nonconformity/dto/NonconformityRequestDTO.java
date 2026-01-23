@@ -48,9 +48,6 @@ public record NonconformityRequestDTO(
         @NotNull(message = "Informe se devera ser feito o uso de alguma ferramenta.")
         Boolean requiresQualityTool,
 
-        QualityToolType selectedTool,
-
-        @NotNull(message = "O usuário que criou o registro deve ser informado.")
-        UUID createdById
+        QualityToolType selectedTool
         ) {
         }

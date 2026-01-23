@@ -41,6 +41,8 @@ public class NonConformity {
     @JoinColumn(name = "linked_rnc_id")
     private NonConformity linkedRnc;
     private String urlEvidence;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private NonConformityStatus status;
 
     @ManyToOne
@@ -54,6 +56,9 @@ public class NonConformity {
     @ManyToOne
     @JoinColumn(name = "created_by_user_id", nullable = false)
     private User createdBy;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
 
     @OneToMany(
@@ -107,7 +112,8 @@ public class NonConformity {
         this.priorityLevel = data.priorityLevel();
         this.dispositionDate = data.dispositionDate();
         this.urlEvidence = data.urlEvidence();
-        this.status = NonConformityStatus.WAITING_ROOT_CAUSE;
+        this.status = NonConformityStatus.PENDING;
+        this.createdAt = LocalDateTime.now();
         addLog(
                 "Não conformidade criada | "
                 + DataTimeUtils.formatNow()

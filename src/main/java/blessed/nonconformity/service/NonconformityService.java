@@ -1,6 +1,7 @@
 package blessed.nonconformity.service;
 
 
+import blessed.exception.BusinessException;
 import blessed.exception.ResourceNotFoundException;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityStatus;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class NonconformityService {
@@ -37,6 +39,12 @@ public class NonconformityService {
         this.qualityToolService = qualityToolService;
     }
 
+    public NonconformityResponseDTO getNcById(Long ncId){
+        NonConformity nonConformity = nonconformityRepository.findById(ncId)
+                .orElseThrow(() -> new BusinessException("Não conformidade não encontrada."));
+        return new NonconformityResponseDTO(nonConformity);
+    }
+
     public List<NonconformityResponseDTO> getAll(){
         List<NonconformityResponseDTO> nonconformities = nonconformityRepository
                 .findAll()
@@ -48,11 +56,15 @@ public class NonconformityService {
     }
 
     @Transactional
-    public NonConformity create(NonconformityRequestDTO data){
+    public NonConformity create(NonconformityRequestDTO data, User createdByNc){
 
         Sector source = sectorRepository.findById(data.sourceDepartmentId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("Departamento de origem não encontrado"));
+
+        User createBy = userRepository.findById(createdByNc.getId())
+                .orElseThrow(() -> new BusinessException("Usuário de criação não encontrado."));
+
 
         Sector responsible = sectorRepository.findById(data.responsibleDepartmentId())
                 .orElseThrow(() ->
@@ -66,26 +78,24 @@ public class NonconformityService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Usuário responsável pela análise de eficácia não encontrado"));
 
-        User createdBy = userRepository.findById(data.createdById())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Usuário responsável pela criação não encontrado"));
-
         NonConformity nc = new NonConformity(data);
 
         nc.setSourceDepartment(source);
         nc.setResponsibleDepartment(responsible);
         nc.setDispositionOwner(dispositionOwner);
         nc.setEffectivenessAnalyst(effectivenessAnalyst);
-        nc.setCreatedBy(createdBy);
 
         nc.setRequiresQualityTool(data.requiresQualityTool());
         nc.setSelectedTool(data.selectedTool());
+        nc.setCreatedBy(createBy);
 
-        if (nc.getRequiresQualityTool() == true){
-            nc.setStatus(NonConformityStatus.WAITING_QUALITY_TOOL);
-        } else {
-            nc.setStatus(NonConformityStatus.WAITING_ROOT_CAUSE);
-        }
+        nc.setStatus(NonConformityStatus.PENDING);
+
+//        if (nc.getRequiresQualityTool() == true){
+//            nc.setStatus(NonConformityStatus.WAITING_QUALITY_TOOL);
+//        } else {
+//            nc.setStatus(NonConformityStatus.WAITING_ROOT_CAUSE);
+//        }
         nonconformityRepository.save(nc);
         qualityToolService.initializeTool(nc);
 
@@ -95,15 +105,20 @@ public class NonconformityService {
 
     public List<NonconformityResponseDTO> findByTitleStartingWithIgnoreCase(String title) {
 
-        List<NonConformity> nonConformities = nonconformityRepository
-                .findTop5ByTitleStartingWithIgnoreCase(title);
+        return nonconformityRepository
+                .findTop5ByTitleStartingWithIgnoreCase(title)
+                .stream()
+                .map(NonconformityResponseDTO::new)
+                .toList();
+    }
 
-        List<NonconformityResponseDTO> responseNonConformities = nonConformities
+    public List<NonconformityResponseDTO> getAllNonConformityPending(){
+        List<NonconformityResponseDTO> nonConformitiesPending = nonconformityRepository.findAllByStatus(NonConformityStatus.PENDING)
                 .stream()
                 .map(NonconformityResponseDTO::new)
                 .toList();
 
-        return responseNonConformities;
+        return nonConformitiesPending;
     }
 
 
