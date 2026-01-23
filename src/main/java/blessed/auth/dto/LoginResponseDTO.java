@@ -1,6 +1,8 @@
 package blessed.auth.dto;
 
+import blessed.sector.dto.SectorResponseDTO;
 import blessed.sector.entity.Sector;
+import blessed.user.entity.User;
 import blessed.user.enums.UserRole;
 
 public record LoginResponseDTO(
@@ -8,7 +10,21 @@ public record LoginResponseDTO(
         String email,
         String name,
         UserRole role,
-        Sector sector,
+        SectorResponseDTO sector,
         Boolean isActivated
-) {}
+) {
+    public LoginResponseDTO(String token, User user){
+        this(
+                token,
+                user.getEmail(),
+                user.getFirstName() + " " + user.getLastName(),
+                user.getRole(),
+                user.getSector() != null
+                    ? new SectorResponseDTO(user.getSector())
+                    : null,
+                user.getIsActivated()
+        );
+    }
+
+}
 

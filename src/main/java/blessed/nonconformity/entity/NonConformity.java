@@ -42,7 +42,7 @@ public class NonConformity {
     private NonConformity linkedRnc;
     private String urlEvidence;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(length = 50, nullable = false)
     private NonConformityStatus status;
 
     @ManyToOne
@@ -57,7 +57,7 @@ public class NonConformity {
     @JoinColumn(name = "created_by_user_id", nullable = false)
     private User createdBy;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
 
@@ -120,6 +120,28 @@ public class NonConformity {
                 + " | Status: Aguardando causa-raiz"
         );
     }
+
+    public void approvedNonConformity(User user){
+        if (this.status != NonConformityStatus.PENDING){
+            throw new BusinessException("Não conformidade não pode ser aprovada no status atual.");
+        }
+
+        if (this.requiresQualityTool) {
+            this.status = NonConformityStatus.WAITING_QUALITY_TOOL;
+            this.selectedTool = null;
+            this.rootCause = null;
+        } else {
+            this.status = NonConformityStatus.WAITING_ROOT_CAUSE;
+            this.rootCause = null;
+            this.selectedTool = null;
+        }
+        addLog(
+                "Não conformidade aprovada | " +
+                "Data: " + DataTimeUtils.formatNow() +
+                " | Responsável: " + user.getFirstName() + " " + user.getLastName()
+        );
+    }
+
 
     public void addLog(String message){
         logs.add(new NonconformityLog(this, message));

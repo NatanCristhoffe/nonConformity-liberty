@@ -25,6 +25,18 @@ public class NonconformityController {
         this.service = service;
     }
 
+    @PostMapping()
+    public ResponseEntity<NonconformityResponseDTO> create(
+            @RequestBody @Valid NonconformityRequestDTO data,
+            Authentication authentication
+    ) {
+        User user = (User) authentication.getPrincipal();
+        NonConformity nonconformity = service.create(data, user);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new NonconformityResponseDTO(nonconformity));
+    }
+
     @GetMapping
     public List<NonconformityResponseDTO> getAll(){
         List<NonconformityResponseDTO> nonconformities = service.getAll();
@@ -44,22 +56,22 @@ public class NonconformityController {
     }
 
 
-    @PostMapping()
-    public ResponseEntity<NonconformityResponseDTO> create(
-            @RequestBody @Valid NonconformityRequestDTO data,
-            Authentication authentication
-    ) {
-        User user = (User) authentication.getPrincipal();
-        NonConformity nonconformity = service.create(data, user);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new NonconformityResponseDTO(nonconformity));
-    }
-
     @GetMapping("/admin/status-pending")
     public ResponseEntity<List<NonconformityResponseDTO>> getAllNcPending(){
         return ResponseEntity
                 .ok(service.getAllNonConformityPending());
     }
+
+    @PutMapping("/admin/{id}/approve")
+    public ResponseEntity<Void> approvedNc(
+            @PathVariable Long id,
+            Authentication authentication)
+    {
+        User user = (User) authentication.getPrincipal();
+        service.approve(id, user);
+
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

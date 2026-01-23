@@ -32,7 +32,6 @@ public class AuthenricationController {
     @Autowired
     private TokenService tokenService;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
@@ -41,21 +40,14 @@ public class AuthenricationController {
         User user = (User) auth.getPrincipal();
         String token = tokenService.generateToken(user);
 
-        LoginResponseDTO response = new LoginResponseDTO(
-                token,
-                user.getEmail(),
-                user.getFirstName() + " " + user.getLastName(),
-                user.getRole(),
-                user.getSector(),
-                user.getIsActivated()
-        );
+        LoginResponseDTO response = new LoginResponseDTO(token,user);
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody @Valid RegisterDTO data){
-        if (this.userRepository.findByEmail(data.email()) != null){
+        if (this.userRepository.existsByEmail(data.email())){
             throw new BusinessException("E-mail informado já está em uso.");
         }
         if (this.userRepository.existsByPhone(data.phone())){

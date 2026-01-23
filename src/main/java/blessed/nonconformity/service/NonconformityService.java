@@ -90,16 +90,18 @@ public class NonconformityService {
         nc.setCreatedBy(createBy);
 
         nc.setStatus(NonConformityStatus.PENDING);
-
-//        if (nc.getRequiresQualityTool() == true){
-//            nc.setStatus(NonConformityStatus.WAITING_QUALITY_TOOL);
-//        } else {
-//            nc.setStatus(NonConformityStatus.WAITING_ROOT_CAUSE);
-//        }
         nonconformityRepository.save(nc);
         qualityToolService.initializeTool(nc);
 
         return nc;
+    }
+
+    @Transactional
+    public void approve(Long id, User user){
+        NonConformity nonConformity = nonconformityRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada."));
+
+        nonConformity.approvedNonConformity(user);
     }
 
 
