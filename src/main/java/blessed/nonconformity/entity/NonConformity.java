@@ -121,24 +121,33 @@ public class NonConformity {
         );
     }
 
-    public void approvedNonConformity(User user){
+    public void approve(User user){
         if (this.status != NonConformityStatus.PENDING){
             throw new BusinessException("Não conformidade não pode ser aprovada no status atual.");
         }
 
         if (this.requiresQualityTool) {
             this.status = NonConformityStatus.WAITING_QUALITY_TOOL;
-            this.selectedTool = null;
-            this.rootCause = null;
         } else {
             this.status = NonConformityStatus.WAITING_ROOT_CAUSE;
-            this.rootCause = null;
-            this.selectedTool = null;
         }
         addLog(
                 "Não conformidade aprovada | " +
                 "Data: " + DataTimeUtils.formatNow() +
                 " | Responsável: " + user.getFirstName() + " " + user.getLastName()
+        );
+    }
+
+    public void correction(User user){
+        if (this.status != NonConformityStatus.PENDING){
+            throw new BusinessException("Não conformidade não pode ser enviada para correção no status atual.");
+        }
+
+        this.status = NonConformityStatus.RETURNED_FOR_CORRECTION;
+        addLog(
+                "Não conformidade enviada para correção | " +
+                        "Data: " + DataTimeUtils.formatNow() +
+                        " | Responsável: " + user.getFirstName() + " " + user.getLastName()
         );
     }
 

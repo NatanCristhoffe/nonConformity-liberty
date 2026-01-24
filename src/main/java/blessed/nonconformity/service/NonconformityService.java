@@ -101,7 +101,15 @@ public class NonconformityService {
         NonConformity nonConformity = nonconformityRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada."));
 
-        nonConformity.approvedNonConformity(user);
+        nonConformity.approve(user);
+    }
+
+    @Transactional
+    public  void sendToCorrection(Long id, User user){
+        NonConformity nonConformity = nonconformityRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada."));
+
+        nonConformity.correction(user);
     }
 
 
@@ -115,7 +123,7 @@ public class NonconformityService {
     }
 
     public List<NonconformityResponseDTO> getAllNonConformityPending(){
-        List<NonconformityResponseDTO> nonConformitiesPending = nonconformityRepository.findAllByStatus(NonConformityStatus.PENDING)
+        List<NonconformityResponseDTO> nonConformitiesPending = nonconformityRepository.findTop20AllByStatus(NonConformityStatus.PENDING)
                 .stream()
                 .map(NonconformityResponseDTO::new)
                 .toList();

@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface NonconformityRepository extends JpaRepository<NonConformity, Long> {
     List<NonConformity> findTop5ByTitleStartingWithIgnoreCase(String title);
-    List<NonConformity> findAllByStatus(NonConformityStatus status);
+    List<NonConformity> findTop20AllByStatus(NonConformityStatus status);
 }
