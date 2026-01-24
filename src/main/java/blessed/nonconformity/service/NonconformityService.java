@@ -133,5 +133,14 @@ public class NonconformityService {
         return nonConformitiesPending;
     }
 
+    public List<NonconformityResponseDTO> getAllQualityTool(){
+        List<NonconformityResponseDTO> ncQualityTool = nonconformityRepository.findTop20AllByStatus(NonConformityStatus.WAITING_QUALITY_TOOL)
+                .stream()
+                .map(NonconformityResponseDTO::new)
+                .toList();
+
+        return ncQualityTool;
+    }
+
 
 }

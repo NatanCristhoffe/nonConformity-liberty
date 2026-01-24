@@ -55,7 +55,14 @@ public class NonconformityController {
         return ResponseEntity.ok(nonConformities);
     }
 
+    @GetMapping("/status-quality-tool")
+    public ResponseEntity<List<NonconformityResponseDTO>> getAllNcQualityTool(){
+        return ResponseEntity
+                .ok(service.getAllQualityTool());
+    }
 
+
+    //Routes Admin
     @GetMapping("/admin/status-pending")
     public ResponseEntity<List<NonconformityResponseDTO>> getAllNcPending(){
         return ResponseEntity
