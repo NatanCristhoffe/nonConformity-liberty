@@ -91,8 +91,6 @@ public class NonconformityService {
 
         nc.setStatus(NonConformityStatus.PENDING);
         nonconformityRepository.save(nc);
-        qualityToolService.initializeTool(nc);
-
         return nc;
     }
 
@@ -102,6 +100,10 @@ public class NonconformityService {
                 .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada."));
 
         nonConformity.approve(user);
+
+        if (nonConformity.getRequiresQualityTool()){
+            qualityToolService.initializeTool(nonConformity);
+        }
     }
 
     @Transactional

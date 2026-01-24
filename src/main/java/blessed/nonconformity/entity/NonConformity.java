@@ -128,9 +128,25 @@ public class NonConformity {
 
         if (this.requiresQualityTool) {
             this.status = NonConformityStatus.WAITING_QUALITY_TOOL;
+
+            switch (this.selectedTool){
+                case FIVE_WHYS -> {
+                    addLog(
+                            "Adicionando ferramenta de qualidade | " +
+                            "Data: " + DataTimeUtils.formatNow() +
+                            " | Responsável: " + user.getFirstName() + " " + user.getLastName()
+                    );
+                }
+                case ISHIKAWA -> {
+                    throw new BusinessException("Ferramenta não disponível");
+                }
+                default -> throw new BusinessException("Ferramenta de qualidade não encontrada");
+            }
+
         } else {
             this.status = NonConformityStatus.WAITING_ROOT_CAUSE;
         }
+
         addLog(
                 "Não conformidade aprovada | " +
                 "Data: " + DataTimeUtils.formatNow() +

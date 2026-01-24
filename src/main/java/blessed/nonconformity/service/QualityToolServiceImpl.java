@@ -3,13 +3,17 @@ package blessed.nonconformity.service;
 import blessed.exception.BusinessException;
 import blessed.exception.ResourceNotFoundException;
 import blessed.nonconformity.entity.Action;
+import blessed.nonconformity.entity.FiveWhy;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.ActionStatus;
+import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.interfaces.QualityToolService;
 import blessed.nonconformity.repository.FiveWhyToolRepository;
 import blessed.nonconformity.tools.FiveWhyTool;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -21,9 +25,10 @@ public class QualityToolServiceImpl implements QualityToolService {
     }
 
     @Override
+    @Transactional
     public void initializeTool(NonConformity nc){
-            if (nc.getRequiresQualityTool() != true){
-                return;
+            if (nc.getSelectedTool() == null){
+                throw new BusinessException("Ferramenta de qualidade não definida");
             }
 
             switch (nc.getSelectedTool()){
@@ -31,7 +36,24 @@ public class QualityToolServiceImpl implements QualityToolService {
                     FiveWhyTool tool = new FiveWhyTool();
                     tool.setNonconformity(nc);
                     tool.setCompleted(false);
-                    repository.save(tool);
+
+                    List<String> defaultQuestions = List.of(
+                            "Por que o problema ocorreu?",
+                            "Por que essa causa aconteceu?",
+                            "Por que essa causa não foi detectada anteriormente?",
+                            "Por que o processo permitiu que o problema acontecesse?",
+                            "Por que não existe um controle eficaz para evitar esse problema?"
+                    );
+
+                    for(int i =0; i < defaultQuestions.size(); i++){
+                        FiveWhy why = new FiveWhy(
+                                i+1,
+                                defaultQuestions.get(i),
+                                tool);
+                        tool.getFiveWhys().add(why);
+                    }
+
+                    nc.setFiveWhyTool(tool);
                 }
 
                 case ISHIKAWA -> {
@@ -40,6 +62,7 @@ public class QualityToolServiceImpl implements QualityToolService {
                 default -> throw new IllegalStateException("Ferramenta não suportada");
             }
     }
+
 
     @Transactional
     public void closedFiveWhyTool(NonConformity nc){

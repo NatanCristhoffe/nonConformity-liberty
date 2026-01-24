@@ -15,6 +15,8 @@ import blessed.utils.DataTimeUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class FiveWhyService {
@@ -32,25 +34,6 @@ public class FiveWhyService {
         this.ncRepository = ncRepository;
     }
 
-    @Transactional
-    public void addWhy(Long ncId, FiveWhyRequestDTO data){
-        NonConformity nc = ncRepository.findById(ncId)
-                .orElseThrow(() -> new ResourceNotFoundException("NC não encontrada"));
-
-        if (nc.getRequiresQualityTool() != true){
-            throw new BusinessException(
-                    "Não é possível adicionar ferramentas da qualidade a esta não conformidade"
-            );
-
-        }
-        if (nc.getStatus() != NonConformityStatus.WAITING_QUALITY_TOOL){
-            throw new BusinessException("Não é possível adicionar porquês neste status");
-        }
-
-        FiveWhyTool tool = nc.getFiveWhyTool();
-        FiveWhy why = new FiveWhy(data, tool);
-        tool.addWhy(why);
-    }
 
     @Transactional
     public void addAnswer(Long nonconformityId, Long fiveWhyId, FiveWhyAnswerRequestDTO answer){

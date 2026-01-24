@@ -14,6 +14,7 @@ import java.util.Objects;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class FiveWhy {
@@ -34,9 +35,9 @@ public class FiveWhy {
     @Column(nullable = true)
     private String answer;
 
-    public FiveWhy(FiveWhyRequestDTO why,FiveWhyTool tool){
-        this.level = why.level();
-        this.question = why.question();
+    public FiveWhy(int level, String question,FiveWhyTool tool){
+        this.level = level;
+        this.question = question;
         this.fiveWhyTool = tool;
 
     }
