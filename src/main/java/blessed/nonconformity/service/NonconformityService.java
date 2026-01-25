@@ -124,23 +124,13 @@ public class NonconformityService {
                 .toList();
     }
 
-    public List<NonconformityResponseDTO> getAllNonConformityPending(){
-        List<NonconformityResponseDTO> nonConformitiesPending = nonconformityRepository.findTop20AllByStatus(NonConformityStatus.PENDING)
+    public List<NonconformityResponseDTO> getAllByStatus(NonConformityStatus status){
+        List<NonconformityResponseDTO> nonConformitiesPending = nonconformityRepository.findTop20AllByStatus(status)
                 .stream()
                 .map(NonconformityResponseDTO::new)
                 .toList();
 
         return nonConformitiesPending;
     }
-
-    public List<NonconformityResponseDTO> getAllQualityTool(){
-        List<NonconformityResponseDTO> ncQualityTool = nonconformityRepository.findTop20AllByStatus(NonConformityStatus.WAITING_QUALITY_TOOL)
-                .stream()
-                .map(NonconformityResponseDTO::new)
-                .toList();
-
-        return ncQualityTool;
-    }
-
 
 }

@@ -1,15 +1,18 @@
 package blessed.nonconformity.controller;
 
 
+import blessed.exception.BusinessException;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
 import blessed.nonconformity.dto.NonconformityResponseDTO;
+import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.service.NonconformityService;
 import blessed.user.entity.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,19 +58,27 @@ public class NonconformityController {
         return ResponseEntity.ok(nonConformities);
     }
 
-    @GetMapping("/status-quality-tool")
-    public ResponseEntity<List<NonconformityResponseDTO>> getAllNcQualityTool(){
+    @GetMapping(value = "/get-by", params = "status")
+    public ResponseEntity<List<NonconformityResponseDTO>> getAllByStatus(
+            @RequestParam NonConformityStatus status,
+            Authentication authentication
+            ){
+        if (status == null){
+            throw new BusinessException("Status invalido.");
+        }
+        if (status == NonConformityStatus.PENDING){
+            boolean isAdmin = authentication.getAuthorities()
+                    .contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+            if(!isAdmin){
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        }
+
         return ResponseEntity
-                .ok(service.getAllQualityTool());
+                .ok(service.getAllByStatus(status));
     }
-
-
     //Routes Admin
-    @GetMapping("/admin/status-pending")
-    public ResponseEntity<List<NonconformityResponseDTO>> getAllNcPending(){
-        return ResponseEntity
-                .ok(service.getAllNonConformityPending());
-    }
 
     @PutMapping("/admin/{id}/approve")
     public ResponseEntity<Void> approve(

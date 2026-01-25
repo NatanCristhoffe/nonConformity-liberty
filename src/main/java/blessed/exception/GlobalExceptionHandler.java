@@ -1,15 +1,16 @@
 package blessed.exception;
 
-import blessed.nonconformity.dto.ApiError;
+import blessed.exception.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import tools.jackson.databind.exc.InvalidFormatException;
 
@@ -20,87 +21,161 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /* =========================
+       Business
+       ========================= */
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<?> handleBusiness(BusinessException ex) {
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(Map.of("error", ex.getMessage()));
-    }
-
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> handleNotFound(ResourceNotFoundException ex) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(Map.of("error", ex.getMessage()));
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidation(
-            MethodArgumentNotValidException ex
-    ) {
-        Map<String, String> errors = new HashMap<>();
-
-        ex.getBindingResult()
-                .getFieldErrors()
-                .forEach(error ->
-                        errors.put(error.getField(), error.getDefaultMessage())
-                );
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(errors);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGeneric(Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Erro interno do servidor"));
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<?> handleInvalidFormat(HttpMessageNotReadableException ex) {
-
-        if (ex.getCause() instanceof InvalidFormatException invalidFormat) {
-            if (invalidFormat.getTargetType().equals(LocalDateTime.class)) {
-                return ResponseEntity
-                        .status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of(
-                                "error", "Formato de data inválido",
-                                "expectedFormat", "yyyy-MM-dd'T'HH:mm"
-                        ));
-            }
-        }
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", "Requisição mal formatada"));
-    }
-
-    @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ApiError> handleNoResourceFound(
-            NoResourceFoundException ex,
+    public ResponseEntity<ErrorResponse> handleBusiness(
+            BusinessException ex,
             HttpServletRequest request
     ) {
-        ApiError error = new ApiError(
+        ErrorResponse error = new ErrorResponse(
+                ex.getMessage(),
+                HttpStatus.CONFLICT.value(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    /* =========================
+       Resource Not Found
+       ========================= */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(
+            ResourceNotFoundException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse error = new ErrorResponse(
+                ex.getMessage(),
                 HttpStatus.NOT_FOUND.value(),
-                "Endpoint não encontrado",
-                "A rota solicitada não existe ou está incorreta.",
                 request.getRequestURI()
         );
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    /* =========================
+       Validation (@Valid)
+       ========================= */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse error = new ErrorResponse(
+                "Erro de validação",
+                HttpStatus.BAD_REQUEST.value(),
+                request.getRequestURI()
+        );
+
+        Map<String, String> fields = new HashMap<>();
+        ex.getBindingResult()
+                .getFieldErrors()
+                .forEach(e -> fields.put(e.getField(), e.getDefaultMessage()));
+
+        error.setDetails(Map.of("fields", fields));
+
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    /* =========================
+       Enum / Tipo inválido
+       ========================= */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse error = new ErrorResponse(
+                "Valor inválido para o parâmetro",
+                HttpStatus.BAD_REQUEST.value(),
+                request.getRequestURI()
+        );
+
+        error.setDetails(Map.of(
+                "parameter", ex.getName(),
+                "value", ex.getValue()
+        ));
+
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    /* =========================
+       JSON mal formatado
+       ========================= */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidFormat(
+            HttpMessageNotReadableException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse error = new ErrorResponse(
+                "Requisição mal formatada",
+                HttpStatus.BAD_REQUEST.value(),
+                request.getRequestURI()
+        );
+
+        if (ex.getCause() instanceof InvalidFormatException invalidFormat) {
+            error.setDetails(Map.of(
+                    "field", invalidFormat.getPathReference(),
+                    "expectedType", invalidFormat.getTargetType().getSimpleName()
+            ));
+        }
+
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    /* =========================
+       Endpoint inexistente
+       ========================= */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFound(
+            NoResourceFoundException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse error = new ErrorResponse(
+                "Endpoint não encontrado",
+                HttpStatus.NOT_FOUND.value(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    /* =========================
+       Authentication
+       ========================= */
     @ExceptionHandler({
             BadCredentialsException.class,
             UsernameNotFoundException.class
     })
-    public ResponseEntity<?> handleAuthentication(Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("error", "Email ou senha inválidos"));
+    public ResponseEntity<ErrorResponse> handleAuthentication(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse error = new ErrorResponse(
+                "Email ou senha inválidos",
+                HttpStatus.UNAUTHORIZED.value(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
+    /* =========================
+       Fallback (500)
+       ========================= */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneric(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse error = new ErrorResponse(
+                "Erro interno do servidor",
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                request.getRequestURI()
+        );
 
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
 }
