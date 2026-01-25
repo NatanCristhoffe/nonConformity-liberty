@@ -16,7 +16,7 @@ public record NonconformityRequestDTO(
         String title,
 
         @NotBlank(message = "A descrição é obrigatória.")
-        @Size(min = 5, max = 350, message = "A descrição deve ter entre 5 e 350 caracteres.")
+        @Size(min = 5, max = 500, message = "A descrição deve ter entre 5 e 500 caracteres.")
         String description,
 
         @NotNull(message = "É obrigatório informar se há risco de acidente.")

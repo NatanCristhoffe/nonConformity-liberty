@@ -13,6 +13,7 @@ import blessed.sector.entity.Sector;
 import blessed.user.entity.User;
 import blessed.utils.DataTimeUtils;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.Instant;
@@ -32,7 +33,12 @@ public class NonConformity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(length = 150, nullable = false)
+    @Size(max = 150)
     private String title;
+
+    @Column(nullable = false)
+    @Size(max = 500)
     private String description;
     private Boolean hasAccidentRisk;
     private NonConformityPriorityLevel priorityLevel;
