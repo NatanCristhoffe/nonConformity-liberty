@@ -5,6 +5,7 @@ import blessed.nonconformity.dto.FiveWhyAnswerRequestDTO;
 import blessed.nonconformity.dto.FiveWhyRequestDTO;
 import blessed.nonconformity.tools.FiveWhyTool;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,7 @@ public class FiveWhy {
     private FiveWhyTool fiveWhyTool;
 
     @Column(nullable = true)
+    @Size(min = 10, max = 500)
     private String answer;
 
     public FiveWhy(int level, String question,FiveWhyTool tool){
