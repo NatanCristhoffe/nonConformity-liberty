@@ -30,13 +30,9 @@ public class RootCauseService {
     }
 
     @Transactional
-    public RootCause create(Long ncId, RootCauseRequestDTO data){
+    public RootCause create(Long ncId, RootCauseRequestDTO data, User user){
         NonConformity nc = ncRepository.findById(ncId)
                 .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada para o ID informado."));
-
-        User user = userRepository.findById(data.createById())
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado para o ID informado."));
-        System.out.println("User ID: " + user.getId());
 
         if(nc.getStatus() != NonConformityStatus.WAITING_ROOT_CAUSE){
             throw new BusinessException(
