@@ -13,43 +13,29 @@ import blessed.nonconformity.enums.ActionStatus;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.repository.ActionRepository;
 import blessed.nonconformity.repository.NonconformityRepository;
+import blessed.nonconformity.service.query.ActionQuery;
+import blessed.nonconformity.service.query.NonConformityQuery;
+import blessed.user.service.query.UserQuery;
 import blessed.user.entity.User;
 import blessed.user.repository.UserRepository;
-import blessed.utils.DataTimeUtils;
 import jakarta.transaction.Transactional;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 public class ActionService {
-    private final ActionRepository actionRepository;
-    private final NonconformityRepository ncRepository;
-    private final UserRepository userRepository;
-    private final QualityToolServiceImpl qualityService;
 
-    public ActionService(
-            ActionRepository actionRepository,
-            NonconformityRepository ncRepository,
-            UserRepository userRepository,
-            QualityToolServiceImpl qualityService
-            ){
-        this.actionRepository = actionRepository;
-        this.ncRepository = ncRepository;
-        this.userRepository = userRepository;
-        this.qualityService = qualityService;
-    }
+    @Autowired
+    UserQuery userQuery;
+    @Autowired
+    ActionQuery actionQuery;
+    @Autowired
+    NonConformityQuery nonConformityQuery;
 
     @Transactional
     public Action create(Long ncId, ActionRequestDTO data){
-        NonConformity nc = ncRepository.findById(ncId)
-                .orElseThrow(() -> new BusinessException(
-                        "Não conformidade não encontrada. Verifique o ID informado e tente novamente."
-                ));
-
-        User responsibleUser = userRepository.findById(data.responsibleUserId())
-                .orElseThrow(() -> new BusinessException("Usuário não encontrado. Verifique o ID informado e tente novamente."));
+        NonConformity nc = nonConformityQuery.byId(ncId);
+        User responsibleUser = userQuery.byId(data.responsibleUserId());
 
         if (nc.getStatus() != NonConformityStatus.WAITING_ACTIONS){
             throw new BusinessException(
@@ -59,21 +45,14 @@ public class ActionService {
 
         Action action = new Action(data);
         nc.addAction(action, responsibleUser);
-
-        return actionRepository.save(action);
+        actionQuery.save(action);
+        return action;
     }
 
     @Transactional
     public ActionResponseDTO completedAction(Long actionId, ActionCompletedRequestDTO data, User completedBy){
-        User managedUser = userRepository.findById(completedBy.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
-
-        Action action = actionRepository.findById(actionId)
-                .orElseThrow(() -> new ResourceNotFoundException("A ação informada não foi encontrada."));
-
-        if (action.getStatus() != ActionStatus.PENDING){
-            throw  new BusinessException("A ação já foi finalizada e não pode ser modificada.");
-        }
+        User managedUser = userQuery.byId(completedBy.getId());
+        Action action = actionQuery.getActionPendingById(actionId);
 
         NonConformity nonConformity = action.getNonconformity();
         nonConformity.completeAction(action, data, managedUser);
@@ -83,15 +62,8 @@ public class ActionService {
     @Transactional
     public Action notExecutedAction(Long actionId, User userRequest, ActionNotExecutedRequestDTO data){
 
-        User user = userRepository.findById(userRequest.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
-
-        Action action = actionRepository.findById(actionId)
-                .orElseThrow(() -> new ResourceNotFoundException("A ação informada não foi encontrada."));
-
-        if (action.getStatus() != ActionStatus.PENDING){
-            throw  new BusinessException("A ação já foi finalizada e não pode ser modificada.");
-        }
+        User user = userQuery.byId(userRequest.getId());
+        Action action = actionQuery.getActionPendingById(actionId);
 
         NonConformity nonConformity = action.getNonconformity();
         nonConformity.notExecutedAction(action, data, user);
@@ -101,9 +73,7 @@ public class ActionService {
 
     @Transactional
     public NonConformity closeActionStage(Long ncId, User userRequest){
-        NonConformity nc = ncRepository.findById(ncId)
-                .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada. Verifique o ID informado e tente novamente."));
-
+        NonConformity nc = nonConformityQuery.byId(ncId);
         nc.closedAction(userRequest);
         return nc;
     }
