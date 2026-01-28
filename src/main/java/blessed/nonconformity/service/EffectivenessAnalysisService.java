@@ -8,50 +8,39 @@ import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.repository.EffectivenessRepository;
 import blessed.nonconformity.repository.NonconformityRepository;
+import blessed.nonconformity.service.query.EffectivenessAnalysisQuery;
+import blessed.nonconformity.service.query.NonConformityQuery;
 import blessed.user.entity.User;
 import blessed.user.repository.UserRepository;
+import blessed.user.service.query.UserQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EffectivenessAnalysisService {
 
-    private final EffectivenessRepository efRepository;
-    private final NonconformityRepository ncRepository;
-    private final UserRepository userRepository;
+    private final EffectivenessAnalysisQuery effectivenessAnalysisQuery;
+    private final NonConformityQuery nonConformityQuery;
+    private final UserQuery userQuery;
 
     public EffectivenessAnalysisService(
-            EffectivenessRepository efRepository,
-            NonconformityRepository ncRepository,
-            UserRepository userRepository
+            EffectivenessAnalysisQuery effectivenessAnalysisQuery,
+            NonConformityQuery nonConformityQuery,
+            UserQuery userQuery
     ) {
-        this.efRepository = efRepository;
-        this.ncRepository = ncRepository;
-        this.userRepository = userRepository;
+        this.effectivenessAnalysisQuery = effectivenessAnalysisQuery;
+        this.nonConformityQuery = nonConformityQuery;
+        this.userQuery = userQuery;
     }
 
     @Transactional
-    public void addEffectivenessAnalysis(
-            Long ncId,
-            EffectivenessAnalysisRequestDTO data
-    ) {
-        NonConformity nc = ncRepository.findById(ncId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Não conformidade não encontrada. Verifique o ID informado e tente novamente."
-                ));
-        if (nc.getStatus() != NonConformityStatus.WAITING_EFFECTIVENESS_CHECK) {
-            throw new BusinessException("A não conformidade não está no status esperado para esta operação.");
-        }
-
-
-        User user = userRepository.findById(data.analyzedById())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Usuário não encontrado. Verifique o ID informado e tente novamente."
-                ));
+    public void addEffectivenessAnalysis(Long ncId,EffectivenessAnalysisRequestDTO data) {
+        NonConformity nc = nonConformityQuery.byId(ncId);
+        User user = userQuery.byId(data.analyzedById());
 
         EffectivenessAnalysis effectiveness = new EffectivenessAnalysis(data, nc, user);
         nc.addEffectivenessAnalysis(effectiveness);
 
-        efRepository.save(effectiveness);
+        effectivenessAnalysisQuery.save(effectiveness);
     }
 }
