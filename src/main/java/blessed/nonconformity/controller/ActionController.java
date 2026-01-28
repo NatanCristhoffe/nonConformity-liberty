@@ -42,11 +42,11 @@ public class ActionController {
             ){
 
         User userRequest = (User) authentication.getPrincipal();
-        Action actionCompleted = service.completedAction(actionId, data, userRequest);
+        ActionResponseDTO actionCompleted = service.completedAction(actionId, data, userRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ActionResponseDTO(actionCompleted));
+                .body(actionCompleted);
 
     }
 
@@ -66,8 +66,12 @@ public class ActionController {
     }
 
     @PutMapping("/closed/{ncId}")
-    public ResponseEntity<NonconformityResponseDTO> closedActions(@PathVariable Long ncId){
-        NonConformity nc = service.closeActionStage(ncId);
+    public ResponseEntity<NonconformityResponseDTO> closedActions(
+            @PathVariable Long ncId,
+            Authentication authentication
+        ){
+        User userRequest = (User) authentication.getPrincipal();
+        NonConformity nc = service.closeActionStage(ncId, userRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

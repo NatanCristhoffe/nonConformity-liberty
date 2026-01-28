@@ -18,6 +18,8 @@ public record ActionResponseDTO(
         LocalDateTime dueDate,
 
         UserResponseDTO responsibleUser,
+        UserResponseDTO finalizedBy,
+        Boolean finalizedByAdmin,
 
         String evidenceUrl,
         String observation,
@@ -40,6 +42,10 @@ public record ActionResponseDTO(
                 action.getResponsibleUser() != null
                         ? new UserResponseDTO(action.getResponsibleUser())
                         : null,
+                action.getFinalizedBy() != null
+                        ? new UserResponseDTO(action.getFinalizedBy())
+                        : null,
+                isFinalizedByAdmin(action),
                 action.getEvidenceUrl(),
                 action.getObservation(),
                 action.getNonExecutionReason(),
@@ -48,4 +54,13 @@ public record ActionResponseDTO(
                 action.getCompletedAt()
         );
     }
+    private static Boolean isFinalizedByAdmin(Action action) {
+        if (action.getFinalizedBy() == null || action.getResponsibleUser() == null) {
+            return false;
+        }
+
+        return !action.getFinalizedBy().getId()
+                .equals(action.getResponsibleUser().getId());
+    }
+
 }

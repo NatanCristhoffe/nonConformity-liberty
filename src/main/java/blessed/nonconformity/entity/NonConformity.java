@@ -4,6 +4,7 @@ package blessed.nonconformity.entity;
 import blessed.exception.BusinessException;
 import blessed.nonconformity.dto.ActionCompletedRequestDTO;
 import blessed.nonconformity.dto.ActionNotExecutedRequestDTO;
+import blessed.nonconformity.enums.ActionStatus;
 import blessed.nonconformity.enums.NonConformityPriorityLevel;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
@@ -254,6 +255,27 @@ public class NonConformity {
                 "Ação não concluída: " + action.getTitle() +
                         " | " +
                         DataTimeUtils.formatNow()
+        );
+    }
+
+    public void closedAction(User user){
+        if (this.status != NonConformityStatus.WAITING_ACTIONS){
+            throw new BusinessException("A não conformidade não está no status esperado para esta operação.");
+        }
+
+        for(Action action : this.actions){
+            if (action.getStatus() == ActionStatus.PENDING){
+                throw new BusinessException(
+                        "Existem ações pendentes. Todas as ações devem ser marcadas como concluídas ou não executadas antes de prosseguir."
+                );
+            }
+        }
+
+        this.status = NonConformityStatus.WAITING_EFFECTIVENESS_CHECK;
+        addLog(
+                "Ações concluídas" +
+                " | Usuário : " + user.getFirstName() + " " + user.getLastName() +
+                DataTimeUtils.formatNow()
         );
     }
 

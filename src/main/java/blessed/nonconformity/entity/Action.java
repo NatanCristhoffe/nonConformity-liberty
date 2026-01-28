@@ -7,6 +7,7 @@ import blessed.nonconformity.dto.ActionRequestDTO;
 import blessed.nonconformity.enums.ActionStatus;
 import blessed.nonconformity.enums.ActionType;
 import blessed.user.entity.User;
+import blessed.user.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -70,6 +71,10 @@ public class Action {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "finalized_by_user_id")
+    private User finalizedBy;
+
 
     public Action(ActionRequestDTO data){
         this.title = data.title();
@@ -86,16 +91,21 @@ public class Action {
             throw new BusinessException("A ação só pode ser concluída quando o status estiver PENDING.");
         }
 
-        if (!this.responsibleUser.getId().equals(user.getId())) {
-            throw new BusinessException("Somente o usuário responsável pode concluir esta ação.");
+        boolean isResponsible = this.responsibleUser.getId().equals(user.getId());
+        boolean isAdmin = user.getRole() == UserRole.ADMIN;
+
+        if (!isResponsible && !isAdmin) {
+            throw new BusinessException("Você não tem permissão para concluir esta ação.");
         }
 
         this.status = ActionStatus.COMPLETED;
         this.evidenceUrl = data.evidenceUrl();
         this.observation = data.observation();
         this.completedAt = LocalDateTime.now();
+        this.finalizedBy = user;
         this.updatedAt = LocalDateTime.now();
     }
+
 
 
     public void markAsNotExecuted(ActionNotExecutedRequestDTO data, User user) {
@@ -103,16 +113,17 @@ public class Action {
             throw new BusinessException("A ação não pode ser marcada como não executada.");
         }
 
-        if (!this.responsibleUser.getId().equals(user.getId())) {
-            throw new BusinessException("Somente o usuário responsável pode concluir esta ação.");
+        boolean isResponsible = this.responsibleUser.getId().equals(user.getId());
+        boolean isAdmin = user.getRole() == UserRole.ADMIN;
+
+        if (!isResponsible && !isAdmin) {
+            throw new BusinessException("Você não tem permissão para marcar esta ação como não executada.");
         }
 
         this.status = ActionStatus.NOT_EXECUTED;
         this.nonExecutionReason = data.nonExecutionReason();
         this.completedAt = LocalDateTime.now();
+        this.finalizedBy = user;
         this.updatedAt = LocalDateTime.now();
     }
-
-
-
 }

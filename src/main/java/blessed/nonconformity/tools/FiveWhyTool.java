@@ -1,8 +1,10 @@
 package blessed.nonconformity.tools;
 
 import blessed.exception.BusinessException;
+import blessed.nonconformity.entity.Action;
 import blessed.nonconformity.entity.FiveWhy;
 import blessed.nonconformity.entity.NonConformity;
+import blessed.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

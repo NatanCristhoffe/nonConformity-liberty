@@ -6,6 +6,7 @@ import blessed.exception.ResourceNotFoundException;
 import blessed.nonconformity.dto.ActionCompletedRequestDTO;
 import blessed.nonconformity.dto.ActionNotExecutedRequestDTO;
 import blessed.nonconformity.dto.ActionRequestDTO;
+import blessed.nonconformity.dto.ActionResponseDTO;
 import blessed.nonconformity.entity.Action;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.ActionStatus;
@@ -63,7 +64,10 @@ public class ActionService {
     }
 
     @Transactional
-    public Action completedAction(Long actionId, ActionCompletedRequestDTO data, User completedBy){
+    public ActionResponseDTO completedAction(Long actionId, ActionCompletedRequestDTO data, User completedBy){
+        User managedUser = userRepository.findById(completedBy.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
         Action action = actionRepository.findById(actionId)
                 .orElseThrow(() -> new ResourceNotFoundException("A ação informada não foi encontrada."));
 
@@ -72,12 +76,16 @@ public class ActionService {
         }
 
         NonConformity nonConformity = action.getNonconformity();
-        nonConformity.completeAction(action, data, completedBy);
-        return action;
+        nonConformity.completeAction(action, data, managedUser);
+        return new ActionResponseDTO(action);
     }
 
     @Transactional
-    public Action notExecutedAction(Long actionId,User user, ActionNotExecutedRequestDTO data){
+    public Action notExecutedAction(Long actionId, User userRequest, ActionNotExecutedRequestDTO data){
+
+        User user = userRepository.findById(userRequest.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
         Action action = actionRepository.findById(actionId)
                 .orElseThrow(() -> new ResourceNotFoundException("A ação informada não foi encontrada."));
 
@@ -92,15 +100,11 @@ public class ActionService {
     }
 
     @Transactional
-    public NonConformity closeActionStage(Long ncId){
+    public NonConformity closeActionStage(Long ncId, User userRequest){
         NonConformity nc = ncRepository.findById(ncId)
                 .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada. Verifique o ID informado e tente novamente."));
-        if (nc.getStatus() != NonConformityStatus.WAITING_ACTIONS){
-            throw new BusinessException("A não conformidade não está no status esperado para esta operação.");
-        }
 
-        qualityService.closedFiveWhyTool(nc);
-        nc.setStatus(NonConformityStatus.WAITING_EFFECTIVENESS_CHECK);
+        nc.closedAction(userRequest);
         return nc;
     }
 }
