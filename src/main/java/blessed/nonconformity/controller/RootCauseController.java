@@ -9,7 +9,9 @@ import blessed.user.entity.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,14 +22,12 @@ public class RootCauseController {
     public RootCauseController(RootCauseService service){
         this.service = service;
     }
-
     @PostMapping(params = "ncId")
     public ResponseEntity<RootCauseResponseDTO> addRootCauseNc(
             @RequestParam Long ncId,
             @RequestBody @Valid RootCauseRequestDTO data,
-            Authentication authentication
+            @AuthenticationPrincipal User user
             ){
-        User user = (User) authentication.getPrincipal();
         RootCause rootCause = service.create(ncId, data, user);
 
         return ResponseEntity

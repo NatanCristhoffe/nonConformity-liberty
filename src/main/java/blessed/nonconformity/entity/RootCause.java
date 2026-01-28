@@ -4,6 +4,7 @@ import blessed.exception.ResourceNotFoundException;
 import blessed.nonconformity.dto.RootCauseRequestDTO;
 import blessed.user.entity.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.HashSet;
@@ -21,6 +22,7 @@ public class RootCause {
     private Long id;
 
     @Column(nullable = false)
+    @Size(min = 10, max = 2000)
     private String description;
 
     @ManyToOne(optional = false)
