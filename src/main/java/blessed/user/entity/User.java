@@ -62,10 +62,10 @@ public class User implements UserDetails{
     private Sector sector;
 
     public User(RegisterDTO data, String encryptedPassword){
-        this.email = data.email();
+        this.email = data.email().toLowerCase();
         this.password = encryptedPassword;
-        this.firstName = data.firstName();
-        this.lastName = data.lastName();
+        this.firstName = data.firstName().toLowerCase();
+        this.lastName = data.lastName().toLowerCase();
         this.phone = data.phone();
         this.role=data.role();
         this.isActivated = true;

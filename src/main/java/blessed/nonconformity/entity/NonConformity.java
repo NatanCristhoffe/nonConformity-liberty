@@ -9,6 +9,7 @@ import blessed.nonconformity.enums.NonConformityPriorityLevel;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
 import blessed.nonconformity.enums.QualityToolType;
+import blessed.nonconformity.interfaces.QualityToolService;
 import blessed.nonconformity.tools.FiveWhyTool;
 import blessed.sector.entity.Sector;
 import blessed.user.entity.User;
@@ -16,6 +17,7 @@ import blessed.utils.DataTimeUtils;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -42,6 +44,8 @@ public class NonConformity {
     @Size(max = 500)
     private String description;
     private Boolean hasAccidentRisk;
+
+    @Enumerated(EnumType.STRING)
     private NonConformityPriorityLevel priorityLevel;
     private LocalDateTime dispositionDate;
     @ManyToOne
@@ -112,14 +116,24 @@ public class NonConformity {
     @OneToOne(mappedBy = "nonConformity", cascade = CascadeType.ALL, orphanRemoval = true)
     private EffectivenessAnalysis effectivenessAnalysis;
 
-    public NonConformity(NonconformityRequestDTO data){
-        this.title = data.title();
+    public NonConformity(
+            NonconformityRequestDTO data, Sector source, Sector responsibleDepartment,
+            User createBy, User dispositionOwner, User effectivenessAnalyst
+            ){
+        this.title = data.title().toLowerCase();
         this.description = data.description();
         this.hasAccidentRisk = data.hasAccidentRisk();
         this.priorityLevel = data.priorityLevel();
         this.dispositionDate = data.dispositionDate();
         this.urlEvidence = data.urlEvidence();
+        this.sourceDepartment = source;
+        this.responsibleDepartment = responsibleDepartment;
+        this.dispositionOwner = dispositionOwner;
+        this.effectivenessAnalyst = effectivenessAnalyst;
+        this.requiresQualityTool = data.requiresQualityTool();
+        this.selectedTool = data.selectedTool();
         this.status = NonConformityStatus.PENDING;
+        this.createdBy = createBy;
         this.createdAt = LocalDateTime.now();
         addLog(
                 "Não conformidade criada | "
@@ -153,6 +167,10 @@ public class NonConformity {
         } else {
             this.status = NonConformityStatus.WAITING_ROOT_CAUSE;
         }
+
+//        if (this.requiresQualityTool){
+//
+//        }
 
         addLog(
                 "Não conformidade aprovada | " +

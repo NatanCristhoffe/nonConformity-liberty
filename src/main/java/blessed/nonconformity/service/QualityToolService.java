@@ -6,8 +6,6 @@ import blessed.nonconformity.entity.Action;
 import blessed.nonconformity.entity.FiveWhy;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.ActionStatus;
-import blessed.nonconformity.enums.NonConformityStatus;
-import blessed.nonconformity.interfaces.QualityToolService;
 import blessed.nonconformity.repository.FiveWhyToolRepository;
 import blessed.nonconformity.tools.FiveWhyTool;
 import jakarta.transaction.Transactional;
@@ -17,10 +15,10 @@ import java.util.List;
 
 
 @Service
-public class QualityToolServiceImpl implements QualityToolService {
+public class QualityToolService implements blessed.nonconformity.interfaces.QualityToolService {
     private final FiveWhyToolRepository repository;
 
-    public QualityToolServiceImpl(FiveWhyToolRepository repository){
+    public QualityToolService(FiveWhyToolRepository repository){
         this.repository = repository;
     }
 

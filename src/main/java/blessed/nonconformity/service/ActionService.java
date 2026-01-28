@@ -25,12 +25,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class ActionService {
 
-    @Autowired
-    UserQuery userQuery;
-    @Autowired
-    ActionQuery actionQuery;
-    @Autowired
-    NonConformityQuery nonConformityQuery;
+    private final UserQuery userQuery;
+    private final ActionQuery actionQuery;
+    private final NonConformityQuery nonConformityQuery;
+
+    public ActionService(
+            UserQuery userQuery,
+            ActionQuery actionQuery,
+            NonConformityQuery nonConformityQuery
+    ) {
+        this.userQuery = userQuery;
+        this.actionQuery = actionQuery;
+        this.nonConformityQuery = nonConformityQuery;
+    }
+
 
     @Transactional
     public Action create(Long ncId, ActionRequestDTO data){

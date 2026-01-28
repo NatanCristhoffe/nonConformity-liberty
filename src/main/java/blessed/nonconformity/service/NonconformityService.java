@@ -1,103 +1,72 @@
 package blessed.nonconformity.service;
 
-
-import blessed.exception.BusinessException;
-import blessed.exception.ResourceNotFoundException;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityStatus;
-import blessed.nonconformity.interfaces.QualityToolService;
-import blessed.nonconformity.repository.NonconformityRepository;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
 import blessed.nonconformity.dto.NonconformityResponseDTO;
+import blessed.nonconformity.service.query.NonConformityQuery;
+import blessed.nonconformity.service.query.SectorQuery;
 import blessed.sector.entity.Sector;
-import blessed.sector.repository.SectorRepository;
 import blessed.user.entity.User;
-import blessed.user.repository.UserRepository;
+import blessed.user.service.query.UserQuery;
 import jakarta.transaction.Transactional;
-import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class NonconformityService {
-    private final NonconformityRepository nonconformityRepository;
-    private final  SectorRepository sectorRepository;
-    private final UserRepository userRepository;
-    private final QualityToolServiceImpl qualityToolService;
+
+    private final QualityToolService qualityToolService;
+    private final NonConformityQuery nonConformityQuery;
+    private final UserQuery userQuery;
+    private final SectorQuery sectorQuery;
 
     public NonconformityService(
-        NonconformityRepository nonconformityRepository,
-        SectorRepository sectorRepository,
-        UserRepository userRepository,
-        QualityToolServiceImpl qualityToolService){
-        this.nonconformityRepository = nonconformityRepository;
-        this.sectorRepository = sectorRepository;
-        this.userRepository = userRepository;
+            QualityToolService qualityToolService,
+            NonConformityQuery nonConformityQuery,
+            UserQuery userQuery,
+            SectorQuery sectorQuery
+    ) {
         this.qualityToolService = qualityToolService;
+        this.nonConformityQuery = nonConformityQuery;
+        this.userQuery = userQuery;
+        this.sectorQuery = sectorQuery;
     }
 
+
     public NonconformityResponseDTO getNcById(Long ncId){
-        NonConformity nonConformity = nonconformityRepository.findById(ncId)
-                .orElseThrow(() -> new BusinessException("Não conformidade não encontrada."));
+        NonConformity nonConformity = nonConformityQuery.byId(ncId);
         return new NonconformityResponseDTO(nonConformity);
     }
 
     public List<NonconformityResponseDTO> getAll(){
-        List<NonconformityResponseDTO> nonconformities = nonconformityRepository
-                .findAll()
+        return nonConformityQuery.getAll()
                 .stream()
                 .map(NonconformityResponseDTO::new)
                 .toList();
-
-        return nonconformities;
     }
 
     @Transactional
     public NonConformity create(NonconformityRequestDTO data, User createdByNc){
+        Sector source = sectorQuery.byId(data.sourceDepartmentId());
+        Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId());
 
-        Sector source = sectorRepository.findById(data.sourceDepartmentId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Departamento de origem não encontrado"));
+        User createBy = userQuery.byId(createdByNc.getId());
+        User dispositionOwner = userQuery.byId(data.dispositionOwnerId());
+        User effectivenessAnalyst = userQuery.byId(data.effectivenessAnalystId());
 
-        User createBy = userRepository.findById(createdByNc.getId())
-                .orElseThrow(() -> new BusinessException("Usuário de criação não encontrado."));
-
-
-        Sector responsible = sectorRepository.findById(data.responsibleDepartmentId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Departamento de origem não encontrado"));
-
-        User dispositionOwner = userRepository.findById(data.dispositionOwnerId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Usuário responsável pela disposição não encontrado"));
-
-        User effectivenessAnalyst = userRepository.findById(data.effectivenessAnalystId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Usuário responsável pela análise de eficácia não encontrado"));
-
-        NonConformity nc = new NonConformity(data);
-
-        nc.setSourceDepartment(source);
-        nc.setResponsibleDepartment(responsible);
-        nc.setDispositionOwner(dispositionOwner);
-        nc.setEffectivenessAnalyst(effectivenessAnalyst);
-
-        nc.setRequiresQualityTool(data.requiresQualityTool());
-        nc.setSelectedTool(data.selectedTool());
-        nc.setCreatedBy(createBy);
-
-        nc.setStatus(NonConformityStatus.PENDING);
-        nonconformityRepository.save(nc);
+        NonConformity nc = new NonConformity(
+                data, source, responsibleDepartment, createBy,
+                dispositionOwner,effectivenessAnalyst
+        );
+        nonConformityQuery.save(nc);
         return nc;
     }
 
     @Transactional
     public void approve(Long id, User user){
-        NonConformity nonConformity = nonconformityRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada."));
+        NonConformity nonConformity = nonConformityQuery.byId(id);
 
         nonConformity.approve(user);
 
@@ -108,29 +77,22 @@ public class NonconformityService {
 
     @Transactional
     public  void sendToCorrection(Long id, User user){
-        NonConformity nonConformity = nonconformityRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada."));
-
+        NonConformity nonConformity = nonConformityQuery.byId(id);
         nonConformity.correction(user);
     }
 
 
     public List<NonconformityResponseDTO> findByTitleStartingWithIgnoreCase(String title) {
-
-        return nonconformityRepository
-                .findTop5ByTitleStartingWithIgnoreCase(title)
+        return  nonConformityQuery.findByTitle(title)
                 .stream()
                 .map(NonconformityResponseDTO::new)
                 .toList();
     }
 
     public List<NonconformityResponseDTO> getAllByStatus(NonConformityStatus status){
-        List<NonconformityResponseDTO> nonConformitiesPending = nonconformityRepository.findTop20AllByStatus(status)
+        return  nonConformityQuery.getTwentyByStatus(status)
                 .stream()
                 .map(NonconformityResponseDTO::new)
                 .toList();
-
-        return nonConformitiesPending;
     }
-
 }
