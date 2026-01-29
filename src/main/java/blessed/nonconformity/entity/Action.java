@@ -9,6 +9,7 @@ import blessed.nonconformity.enums.ActionType;
 import blessed.user.entity.User;
 import blessed.user.enums.UserRole;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -41,6 +42,7 @@ public class Action {
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
+    @Size(min = 5, max = 1000)
     private String description;
 
     @Enumerated(EnumType.STRING)

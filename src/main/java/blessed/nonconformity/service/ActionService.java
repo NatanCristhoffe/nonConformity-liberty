@@ -45,12 +45,6 @@ public class ActionService {
         NonConformity nc = nonConformityQuery.byId(ncId);
         User responsibleUser = userQuery.byId(data.responsibleUserId());
 
-        if (nc.getStatus() != NonConformityStatus.WAITING_ACTIONS){
-            throw new BusinessException(
-                    "A não conformidade não está em um status que permita o cadastro de ações."
-            );
-        }
-
         Action action = new Action(data);
         nc.addAction(action, responsibleUser);
         actionQuery.save(action);

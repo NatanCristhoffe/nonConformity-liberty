@@ -17,7 +17,7 @@ public record ActionRequestDTO(
         String title,
 
         @NotBlank(message = "A descrição da ação é obrigatória.")
-        @Size(min = 10, max = 300, message = "A descrição da ação deve ter no máximo 300 caracteres.")
+        @Size(min = 10, max = 1000, message = "A descrição da ação deve ter no máximo 1000 caracteres.")
         String description,
 
         @NotNull(message = "O tipo da ação é obrigatório.")
