@@ -22,9 +22,9 @@ public class RootCauseController {
     public RootCauseController(RootCauseService service){
         this.service = service;
     }
-    @PostMapping(params = "ncId")
+    @PostMapping("/{ncId}")
     public ResponseEntity<RootCauseResponseDTO> addRootCauseNc(
-            @RequestParam Long ncId,
+            @PathVariable Long ncId,
             @RequestBody @Valid RootCauseRequestDTO data,
             @AuthenticationPrincipal User user
             ){
