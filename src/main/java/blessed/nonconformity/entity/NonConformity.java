@@ -116,6 +116,8 @@ public class NonConformity {
     @OneToOne(mappedBy = "nonConformity", cascade = CascadeType.ALL, orphanRemoval = true)
     private EffectivenessAnalysis effectivenessAnalysis;
 
+    private LocalDateTime closedAt;
+
     public NonConformity(
             NonconformityRequestDTO data, Sector source, Sector responsibleDepartment,
             User createBy, User dispositionOwner, User effectivenessAnalyst
@@ -308,6 +310,7 @@ public class NonConformity {
 
         this.effectivenessAnalysis = analysis;
         this.status = NonConformityStatus.APPROVED;
+        this.closedAt = LocalDateTime.now();
 
         addLog(
                 "Análise de eficácia registrada | " +
