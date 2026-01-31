@@ -41,7 +41,7 @@ public class NonConformity {
     private String title;
 
     @Column(nullable = false)
-    @Size(max = 500)
+    @Size(max = 2000)
     private String description;
     private Boolean hasAccidentRisk;
 
