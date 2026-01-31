@@ -34,15 +34,14 @@ public class SecurityConfigurations {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()                        .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("ADMIN")
-//                      .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/sectors").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/sectors").hasRole("ADMIN")
-
-                                .requestMatchers(HttpMethod.GET, "/nonconformity/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/nonconformity/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
 
@@ -64,7 +63,8 @@ public class SecurityConfigurations {
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+
 
         configuration.setAllowCredentials(true);
 
