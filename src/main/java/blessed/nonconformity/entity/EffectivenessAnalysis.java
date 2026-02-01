@@ -4,6 +4,7 @@ package blessed.nonconformity.entity;
 import blessed.nonconformity.dto.EffectivenessAnalysisRequestDTO;
 import blessed.user.entity.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ public class EffectivenessAnalysis {
     private Boolean effective;
 
     @Column(columnDefinition = "TEXT", nullable = false)
+    @Size(min = 10, max = 5000)
     private String effectivenessDescription;
 
     @Column(nullable = false)

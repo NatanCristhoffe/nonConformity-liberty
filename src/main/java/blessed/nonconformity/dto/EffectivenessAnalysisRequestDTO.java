@@ -12,10 +12,7 @@ public record EffectivenessAnalysisRequestDTO(
         Boolean effective,
 
         @NotBlank(message = "A descrição de eficacia é obrigatória.")
-        @Size(min = 2, max = 1000)
-        String effectivenessDescription,
-
-        @NotNull(message = "O ID do usuário que está realizando a analise de eficacia deve ser informado")
-        UUID analyzedById
+        @Size(min = 2, max = 5000)
+        String effectivenessDescription
 ) {
 }
