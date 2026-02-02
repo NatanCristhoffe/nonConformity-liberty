@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/effectiveness-analysis")
 public class EffectivenessAnalysisController {
@@ -28,7 +30,7 @@ public class EffectivenessAnalysisController {
         User user = (User) authentication.getPrincipal();
         service.addEffectivenessAnalysis(ncId, data, user);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Análise de eficácia criada com sucesso"));
     }
 
 }
