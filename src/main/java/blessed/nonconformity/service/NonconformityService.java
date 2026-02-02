@@ -35,9 +35,13 @@ public class NonconformityService {
     }
 
 
-    public NonconformityResponseDTO getNcById(Long ncId){
-        NonConformity nonConformity = nonConformityQuery.byId(ncId);
-        return new NonconformityResponseDTO(nonConformity);
+    public NonconformityResponseDTO getNcById(Long ncId, boolean includeAll){
+
+        NonConformity nonConformity = includeAll
+                ? nonConformityQuery.byIdWithAll(ncId)
+                : nonConformityQuery.byId(ncId);
+
+        return new NonconformityResponseDTO(nonConformity, includeAll);
     }
 
     public List<NonconformityResponseDTO> getAll(){

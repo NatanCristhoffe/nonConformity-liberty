@@ -1,16 +1,14 @@
 package blessed.nonconformity.dto;
 
-import blessed.nonconformity.entity.EffectivenessAnalysis;
+
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityPriorityLevel;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.enums.QualityToolType;
-import blessed.nonconformity.tools.FiveWhyTool;
 import blessed.sector.entity.Sector;
 import blessed.user.dto.UserResponseDTO;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,7 +46,14 @@ public record NonconformityResponseDTO(
 
         Set<NonconformityLogResponseDTO> logs
 ) {
+
+    /** 🔹 Construtor LEVE (default) */
     public NonconformityResponseDTO(NonConformity entity) {
+        this(entity, false);
+    }
+
+    /** 🔹 Construtor COMPLETO (includeAll = true) */
+    public NonconformityResponseDTO(NonConformity entity, boolean includeAll) {
         this(
                 entity.getId(),
                 entity.getTitle(),
@@ -73,22 +78,22 @@ public record NonconformityResponseDTO(
                 entity.getRequiresQualityTool(),
                 entity.getSelectedTool(),
 
-                entity.getFiveWhyTool() != null
+                includeAll && entity.getFiveWhyTool() != null
                         ? new FiveWhyToolResponseDTO(entity.getFiveWhyTool())
                         : null,
 
-                entity.getRootCause() != null
+                includeAll && entity.getRootCause() != null
                         ? new RootCauseResponseDTO(entity.getRootCause())
                         : null,
 
-                entity.getActions() != null
+                includeAll && entity.getActions() != null
                         ? entity.getActions()
                         .stream()
                         .map(ActionResponseDTO::new)
                         .collect(Collectors.toSet())
                         : Set.of(),
 
-                entity.getEffectivenessAnalysis() != null
+                includeAll && entity.getEffectivenessAnalysis() != null
                         ? new EffectivenessAnalysisResponseDTO(entity.getEffectivenessAnalysis())
                         : null,
 
@@ -104,13 +109,14 @@ public record NonconformityResponseDTO(
                         ? new UserResponseDTO(entity.getEffectivenessAnalyst())
                         : null,
 
-                entity.getLogs()
+                includeAll
+                        ? entity.getLogs()
                         .stream()
                         .map(NonconformityLogResponseDTO::new)
                         .collect(Collectors.toSet())
+                        : Set.of()
         );
-}
-
+    }
 
     public record LinkedRncDTO(Long id, String title) {
         public LinkedRncDTO(NonConformity linkedRnc) {
@@ -118,4 +124,3 @@ public record NonconformityResponseDTO(
         }
     }
 }
-

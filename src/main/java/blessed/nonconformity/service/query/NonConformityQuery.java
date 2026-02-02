@@ -12,14 +12,26 @@ import java.util.List;
 @Service
 public class NonConformityQuery {
 
-    @Autowired
-    NonconformityRepository nonconformityRepository;
+    private final NonconformityRepository nonconformityRepository;
+
+    public NonConformityQuery(
+            NonconformityRepository nonconformityRepository
+    ){
+        this.nonconformityRepository =nonconformityRepository;
+    }
 
     public NonConformity byId(Long id){
         return  nonconformityRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada. Verifique o ID informado e tente novamente."));
 
     };
+
+    public NonConformity byIdWithAll(Long id){
+        return nonconformityRepository.findByIdWithAll(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Não conformidade não encontrada.")
+                );
+    }
 
     public List<NonConformity> getAll(){
          return nonconformityRepository.findAll();

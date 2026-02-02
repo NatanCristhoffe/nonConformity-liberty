@@ -6,8 +6,10 @@ import blessed.nonconformity.enums.NonConformityStatus;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface NonconformityRepository extends JpaRepository<NonConformity, Long> {
     List<NonConformity> findTop5ByTitleStartingWithIgnoreCase(String title);
@@ -50,4 +52,15 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     WHERE nc.closedAt IS NOT NULL
     """)
     Double averageResolutionDays();
+
+    @Query("""
+    select distinct nc
+    from NonConformity nc
+    left join fetch nc.actions a
+    left join fetch a.responsibleUser
+    left join fetch a.finalizedBy
+    left join fetch nc.effectivenessAnalysis
+    where nc.id = :id
+    """)
+    Optional<NonConformity> findByIdWithAll(@Param("id") Long id);
 }

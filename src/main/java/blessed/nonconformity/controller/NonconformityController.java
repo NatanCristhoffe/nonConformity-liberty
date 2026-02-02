@@ -46,9 +46,12 @@ public class NonconformityController {
         return  nonconformities;
     }
 
-    @GetMapping(params = "id")
-    public ResponseEntity<NonconformityResponseDTO> getNcById(@RequestParam Long id){
-        return ResponseEntity.ok(service.getNcById(id));
+    @GetMapping("/{id}")
+    public ResponseEntity<NonconformityResponseDTO> getNcById(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "false") boolean includeAll
+        ){
+        return ResponseEntity.ok(service.getNcById(id, includeAll));
     }
 
     @GetMapping(params = "title")
