@@ -4,6 +4,7 @@ package blessed.auth.controller;
 import blessed.auth.dto.AuthenticationDTO;
 import blessed.auth.dto.LoginResponseDTO;
 import blessed.auth.dto.RegisterDTO;
+import blessed.auth.service.AuthenricationService;
 import blessed.auth.service.TokenService;
 import blessed.exception.BusinessException;
 import blessed.sector.entity.Sector;
@@ -13,6 +14,7 @@ import blessed.user.entity.User;
 import blessed.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,14 +25,20 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthenricationController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private SectorRepository sectorRepository;
-    @Autowired
-    private TokenService tokenService;
+    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
+    private final AuthenricationService service;
+
+    public  AuthenricationController(
+    AuthenticationManager authenticationManager,
+    TokenService tokenService,
+    AuthenricationService service
+    ){
+        this.authenticationManager = authenticationManager;
+        this.tokenService = tokenService;
+        this.service = service;
+    }
+
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
@@ -46,23 +54,9 @@ public class AuthenricationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody @Valid RegisterDTO data){
-        if (this.userRepository.existsByEmail(data.email())){
-            throw new BusinessException("E-mail informado já está em uso.");
-        }
-        if (this.userRepository.existsByPhone(data.phone())){
-            throw new BusinessException("Telefone informado já está em uso.");
-        }
-
-        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        User newUser = new User(data, encryptedPassword);
-        Sector sectorUser = sectorRepository.findById(data.sectorId())
-                .orElseThrow(() -> new BusinessException("Setor não encontrado."));
-
-        newUser.setSector(sectorUser);
-        this.userRepository.save(newUser);
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> register(@RequestBody @Valid RegisterDTO data){
+        service.register(data);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
 

@@ -2,6 +2,7 @@ package blessed.user.entity;
 
 import blessed.auth.dto.AuthenticationDTO;
 import blessed.auth.dto.RegisterDTO;
+import blessed.exception.BusinessException;
 import blessed.user.enums.UserRole;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -38,22 +39,31 @@ public class User implements UserDetails{
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     @JdbcTypeCode(SqlTypes.CHAR)
     private UUID id;
+
     @Column(nullable = false)
     private String firstName;
+
     @Column(nullable = false)
     private String lastName;
+
     @Column(nullable = false)
     private String email;
+
     @Column(nullable = false)
     private String password;
+
     @Column(nullable = false)
     private String phone;
+
     @Column(nullable = false)
     private UserRole role;
+
     @Column(nullable = false)
     private Boolean isActivated;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
     @Column(nullable = false)
     private LocalDateTime updateAt;
 
@@ -62,6 +72,14 @@ public class User implements UserDetails{
     private Sector sector;
 
     public User(RegisterDTO data, String encryptedPassword){
+        if (encryptedPassword == null || encryptedPassword.isBlank()) {
+            throw new BusinessException("Senha inválida.");
+        }
+
+        if (data.email() == null || !data.email().contains("@")) {
+            throw new BusinessException("E-mail inválido.");
+        }
+
         this.email = data.email().toLowerCase();
         this.password = encryptedPassword;
         this.firstName = data.firstName().toLowerCase();
