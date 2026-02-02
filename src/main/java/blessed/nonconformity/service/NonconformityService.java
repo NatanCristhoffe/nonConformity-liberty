@@ -10,8 +10,11 @@ import blessed.sector.entity.Sector;
 import blessed.user.entity.User;
 import blessed.user.service.query.UserQuery;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -93,10 +96,24 @@ public class NonconformityService {
                 .toList();
     }
 
-    public List<NonconformityResponseDTO> getAllByStatus(NonConformityStatus status){
-        return  nonConformityQuery.getTwentyByStatus(status)
-                .stream()
-                .map(NonconformityResponseDTO::new)
-                .toList();
+    public Page<NonconformityResponseDTO> getMyNonconformitiesByStatus(
+            NonConformityStatus status,
+            User user,
+            boolean includeAll,
+            Pageable pageable
+    ) {
+        boolean isAdmin = user.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (includeAll && isAdmin) {
+            return nonConformityQuery
+                    .findAllByStatus(status, pageable)
+                    .map(NonconformityResponseDTO::new);
+        }
+
+        return nonConformityQuery
+                .findMyByStatus(status, user.getId(), pageable)
+                .map(NonconformityResponseDTO::new);
     }
+
 }

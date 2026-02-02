@@ -1,13 +1,17 @@
 package blessed.nonconformity.service.query;
 
 import blessed.exception.ResourceNotFoundException;
+import blessed.nonconformity.dto.NonconformityResponseDTO;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.repository.NonconformityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class NonConformityQuery {
@@ -41,9 +45,23 @@ public class NonConformityQuery {
         return  nonconformityRepository.findTop5ByTitleStartingWithIgnoreCase(title);
     }
 
-    public List<NonConformity> getTwentyByStatus(NonConformityStatus status){
-        return nonconformityRepository.findTop20AllByStatus(status);
+    public Page<NonConformity> findAllByStatus(
+            NonConformityStatus status,
+            Pageable pageable
+    ) {
+        return nonconformityRepository.findByStatus(status, pageable);
     }
 
+
     public void save(NonConformity nc){nonconformityRepository.save(nc);}
+
+
+    public Page<NonConformity> findMyByStatus(
+            NonConformityStatus status,
+            UUID userId,
+            Pageable pageable
+    ) {
+        return nonconformityRepository
+                .findMyNonconformitiesByStatus(status, userId, pageable);
+    }
 }

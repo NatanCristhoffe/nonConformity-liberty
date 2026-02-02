@@ -9,6 +9,9 @@ import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.service.NonconformityService;
 import blessed.user.entity.User;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin()
 @RestController
@@ -61,26 +65,26 @@ public class NonconformityController {
         return ResponseEntity.ok(nonConformities);
     }
 
-    @GetMapping(value = "/get-by", params = "status")
-    public ResponseEntity<List<NonconformityResponseDTO>> getAllByStatus(
+    @GetMapping("/by-status")
+    public ResponseEntity<Page<NonconformityResponseDTO>> getByStatus(
             @RequestParam NonConformityStatus status,
+            @RequestParam(defaultValue = "false") boolean includeAll,
+            @PageableDefault(size = 20) Pageable pageable,
             Authentication authentication
-            ){
-        if (status == null){
-            throw new BusinessException("Status invalido.");
-        }
-        if (status == NonConformityStatus.PENDING){
-            boolean isAdmin = authentication.getAuthorities()
-                    .contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+    ) {
+        User userRequest = (User) authentication.getPrincipal();
 
-            if(!isAdmin){
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-        }
-
-        return ResponseEntity
-                .ok(service.getAllByStatus(status));
+        return ResponseEntity.ok(
+                service.getMyNonconformitiesByStatus(
+                        status,
+                        userRequest,
+                        includeAll,
+                        pageable
+                )
+        );
     }
+
+
     //Routes Admin
 
     @PutMapping("/admin/{id}/approve")

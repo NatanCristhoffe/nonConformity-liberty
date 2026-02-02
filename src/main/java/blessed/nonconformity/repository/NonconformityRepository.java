@@ -4,16 +4,23 @@ import blessed.nonconformity.dto.NonconformityResponseDTO;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityStatus;
 import org.springframework.data.domain.Limit;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface NonconformityRepository extends JpaRepository<NonConformity, Long> {
     List<NonConformity> findTop5ByTitleStartingWithIgnoreCase(String title);
-    List<NonConformity> findTop20AllByStatus(NonConformityStatus status);
+
+    Page<NonConformity> findByStatus(
+            NonConformityStatus status,
+            Pageable pageable
+    );
 
     @Query("""
     SELECT nc.status, COUNT(nc)
@@ -63,4 +70,20 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     where nc.id = :id
     """)
     Optional<NonConformity> findByIdWithAll(@Param("id") Long id);
+
+    @Query("""
+    select distinct nc
+    from NonConformity nc
+    where nc.status = :status
+    and (
+        nc.createdBy.id = :userId
+        or nc.dispositionOwner.id = :userId
+        or nc.effectivenessAnalyst.id = :userId
+    )
+    """)
+    Page<NonConformity> findMyNonconformitiesByStatus(
+            @Param("status") NonConformityStatus status,
+            @Param("userId") UUID userId,
+            Pageable pageable
+    );
 }
