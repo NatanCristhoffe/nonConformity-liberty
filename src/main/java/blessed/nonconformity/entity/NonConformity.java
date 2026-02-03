@@ -140,7 +140,7 @@ public class NonConformity {
         addLog(
                 "Não conformidade criada | "
                 + DataTimeUtils.formatNow()
-                + " | Status: Aguardando causa-raiz"
+                + " | Status: Aguardando aprovação"
         );
     }
 
