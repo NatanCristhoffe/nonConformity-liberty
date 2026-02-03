@@ -6,9 +6,11 @@ import blessed.user.entity.User;
 import blessed.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Limit;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -51,5 +53,8 @@ public class UserQuery {
         return repository.existsByPhone(phone);
     }
 
+    public Optional<User> byEmail(String email){
+        return repository.findByEmail(email);
+    }
 
 }
