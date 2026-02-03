@@ -11,7 +11,7 @@ public record LoginResponseDTO(
         String name,
         UserRole role,
         SectorResponseDTO sector,
-        Boolean isActivated
+        Boolean isEnable
 ) {
     public LoginResponseDTO(String token, User user){
         this(
@@ -22,7 +22,7 @@ public record LoginResponseDTO(
                 user.getSector() != null
                     ? new SectorResponseDTO(user.getSector())
                     : null,
-                user.getIsActivated()
+                user.isEnabled()
         );
     }
 

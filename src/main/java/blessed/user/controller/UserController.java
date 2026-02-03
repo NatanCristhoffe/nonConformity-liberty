@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -34,4 +36,15 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @PutMapping("/admin/{id}/enable")
+    public ResponseEntity<Map<String, String>> enable(@PathVariable UUID id) {
+        service.enable(id);
+        return ResponseEntity.ok(Map.of("success", "Usuário habilitado."));
+    }
+
+    @PutMapping("/admin/{id}/disable")
+    public ResponseEntity<Map<String, String>> disable(@PathVariable UUID id) {
+        service.disable(id);
+        return ResponseEntity.ok(Map.of("success", "Usuário desabilitado."));
+    }
 }

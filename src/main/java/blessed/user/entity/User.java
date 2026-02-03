@@ -56,10 +56,11 @@ public class User implements UserDetails{
     private String phone;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private UserRole role;
 
     @Column(nullable = false)
-    private Boolean isActivated;
+    private boolean enabled;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -86,11 +87,20 @@ public class User implements UserDetails{
         this.lastName = data.lastName().toLowerCase();
         this.phone = data.phone();
         this.role=data.role();
-        this.isActivated = true;
+        this.enabled = true;
         this.createdAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
     }
 
+    public void enable(){
+        this.enabled = true;
+        this.updateAt = LocalDateTime.now();
+    }
+
+    public void disable(){
+        this.enabled = false;
+        this.updateAt = LocalDateTime.now();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -124,6 +134,6 @@ public class User implements UserDetails{
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.enabled;
     }
 }
