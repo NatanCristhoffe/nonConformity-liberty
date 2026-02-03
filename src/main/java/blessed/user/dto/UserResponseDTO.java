@@ -17,6 +17,7 @@ public class UserResponseDTO {
     private String email;
     private String phone;
     private Sector sector;
+    private boolean enable;
     private LocalDateTime createdAt;
 
     public UserResponseDTO(User user){
@@ -25,6 +26,7 @@ public class UserResponseDTO {
         this.email = user.getEmail();
         this.phone = user.getPhone();
         this.sector = user.getSector();
+        this.enable = user.isEnabled();
         this.createdAt = user.getCreatedAt();
     }
 }

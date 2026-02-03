@@ -11,7 +11,7 @@ public record LoginResponseDTO(
         String name,
         UserRole role,
         SectorResponseDTO sector,
-        Boolean isEnable
+        Boolean enable
 ) {
     public LoginResponseDTO(String token, User user){
         this(
