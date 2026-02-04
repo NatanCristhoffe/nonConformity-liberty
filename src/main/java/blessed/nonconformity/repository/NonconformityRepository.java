@@ -81,13 +81,18 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     @Query("""
     select distinct nc
     from NonConformity nc
+    left join nc.actions a
     where nc.status = :status
     and (
         nc.createdBy.id = :userId
         or nc.dispositionOwner.id = :userId
         or nc.effectivenessAnalyst.id = :userId
+        or (
+            a.responsibleUser.id = :userId
+            and a.status = 'PENDING'
+        )
     )
-    """)
+""")
     Page<NonConformity> findMyNonconformitiesByStatus(
             @Param("status") NonConformityStatus status,
             @Param("userId") UUID userId,
