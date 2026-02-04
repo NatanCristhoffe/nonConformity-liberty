@@ -5,7 +5,7 @@ import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
 import blessed.nonconformity.dto.NonconformityResponseDTO;
 import blessed.nonconformity.service.query.NonConformityQuery;
-import blessed.nonconformity.service.query.SectorQuery;
+import blessed.sector.service.query.SectorQuery;
 import blessed.sector.entity.Sector;
 import blessed.user.entity.User;
 import blessed.user.service.query.UserQuery;
@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.UUID;
 
 
 @Service

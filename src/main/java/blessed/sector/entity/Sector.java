@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
         }
 )
 @Getter
+@Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id", callSuper = false)
 public class Sector extends AuditableEntity {
@@ -32,4 +34,14 @@ public class Sector extends AuditableEntity {
         this.description = data.description().toLowerCase();
         this.active = true;
     }
+
+    public void enable(){
+        this.active = true;
+    }
+
+    public void disable(){
+        this.active = false;
+    }
+
 }
+

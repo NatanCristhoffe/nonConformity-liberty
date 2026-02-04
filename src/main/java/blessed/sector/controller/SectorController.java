@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -33,5 +34,26 @@ public class SectorController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new SectorResponseDTO(sector));
+    }
+
+    @PutMapping("/{idSector}")
+    public ResponseEntity<SectorResponseDTO> update(
+            @PathVariable Long idSector,
+            @RequestBody @Valid SectorRequestDTO dataUpdate){
+
+        return ResponseEntity.ok(service.update(idSector, dataUpdate));
+
+    }
+
+    @DeleteMapping("/admin/delete/{idSector}")
+    public ResponseEntity<Map<String, String>> deleteSectors(@PathVariable Long idSector){
+        service.disable(idSector);
+        return ResponseEntity.ok(Map.of("success","setor deletado com sucesso."));
+    }
+
+    @PutMapping("/admin/enable/{idSector}")
+    public ResponseEntity<Map<String, String>> enableSectors(@PathVariable Long idSector){
+        service.enable(idSector);
+        return ResponseEntity.ok(Map.of("success","setor ativo com sucesso."));
     }
 }
