@@ -68,4 +68,8 @@ public class NonConformityQuery {
         return nonconformityRepository
                 .findMyNonconformitiesByStatus(status, userId, pageable);
     }
+
+    public boolean existsByIdAndDispositionOwnerId(Long id, UUID idUSer){
+        return nonconformityRepository.existsByIdAndDispositionOwnerId(id, idUSer);
+    }
 }

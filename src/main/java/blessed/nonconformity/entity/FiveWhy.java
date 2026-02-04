@@ -45,6 +45,7 @@ public class FiveWhy {
     }
 
     public void addAnswer(FiveWhyAnswerRequestDTO data, NonConformity nc){
+
         if (!this.fiveWhyTool.getNonconformity().getId().equals(nc.getId())) {
             throw new BusinessException("A pergunta Cinco Porquês não pertence a esta categoria de não conformidade.");
         }

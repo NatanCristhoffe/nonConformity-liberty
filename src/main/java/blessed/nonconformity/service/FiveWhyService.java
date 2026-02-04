@@ -11,8 +11,11 @@ import blessed.nonconformity.repository.FiveWhyRepository;
 import blessed.nonconformity.repository.FiveWhyToolRepository;
 import blessed.nonconformity.repository.NonconformityRepository;
 import blessed.nonconformity.tools.FiveWhyTool;
+import blessed.user.entity.User;
+import blessed.user.service.query.UserQuery;
 import blessed.utils.DataTimeUtils;
 import jakarta.transaction.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +23,7 @@ import java.util.List;
 
 @Service
 public class FiveWhyService {
+    private final UserQuery userQuery;
     private final NonconformityRepository ncRepository;
     private final FiveWhyRepository fiveWhyRepository;
     private final FiveWhyToolRepository fiveWhyToolRepository;
@@ -27,30 +31,38 @@ public class FiveWhyService {
     public FiveWhyService(
             NonconformityRepository ncRepository,
             FiveWhyToolRepository fiveWhyToolRepository,
-            FiveWhyRepository fiveWhyRepository
+            FiveWhyRepository fiveWhyRepository,
+            UserQuery userQuery
             ){
         this.fiveWhyToolRepository = fiveWhyToolRepository;
         this.fiveWhyRepository = fiveWhyRepository;
         this.ncRepository = ncRepository;
+        this.userQuery = userQuery;
     }
 
-
+    @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
     @Transactional
-    public void addAnswer(Long nonconformityId, Long fiveWhyId, FiveWhyAnswerRequestDTO answer){
+    public void addAnswer(
+            Long nonconformityId,
+            Long fiveWhyId,
+            FiveWhyAnswerRequestDTO answer
+    ) {
         NonConformity nc = ncRepository.findById(nonconformityId)
-                .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Não conformidade não encontrada.")
+                );
 
         FiveWhy fiveWhy = fiveWhyRepository.findById(fiveWhyId)
-                .orElseThrow(()-> new ResourceNotFoundException("Porquês não encontrado."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Porquês não encontrado.")
+                );
 
         fiveWhy.addAnswer(answer, nc);
         fiveWhyRepository.save(fiveWhy);
 
-        boolean allAnswered = fiveWhy.areAllWhysAnswered();
-        if (allAnswered) {
+        if (fiveWhy.areAllWhysAnswered()) {
             nc.concludeFiveWhyTool();
         }
     }
-
 
 }

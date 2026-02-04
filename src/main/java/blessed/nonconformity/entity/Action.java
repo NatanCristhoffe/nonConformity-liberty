@@ -60,9 +60,11 @@ public class Action {
     private String evidenceUrl;
 
     @Column(columnDefinition = "TEXT")
+    @Size(min = 5, max = 500)
     private String observation;
 
     @Column(name = "non_execution_reason", columnDefinition = "TEXT")
+    @Size(min = 5, max = 500)
     private String nonExecutionReason;
 
     private LocalDateTime completedAt;

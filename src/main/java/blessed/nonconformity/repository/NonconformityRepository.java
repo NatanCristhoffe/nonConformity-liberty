@@ -29,6 +29,8 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
             Pageable pageable
     );
 
+    boolean existsByIdAndDispositionOwnerId(Long id, UUID dispositionOwnerId);
+
     @Query("""
     SELECT nc.status, COUNT(nc)
     FROM NonConformity nc
