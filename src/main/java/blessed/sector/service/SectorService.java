@@ -5,6 +5,8 @@ import blessed.sector.entity.Sector;
 import blessed.sector.dto.SectorRequestDTO;
 import blessed.sector.dto.SectorResponseDTO;
 import blessed.sector.service.query.SectorQuery;
+import blessed.user.entity.User;
+import blessed.user.service.query.UserQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +16,25 @@ import java.util.List;
 public class SectorService {
 
     private final SectorQuery sectorQuery;
-    public  SectorService(SectorQuery sectorQuery){
+    private final UserQuery userQuery;
+
+    public  SectorService(SectorQuery sectorQuery, UserQuery userQuery){
         this.sectorQuery = sectorQuery;
+        this.userQuery = userQuery;
     }
 
     public List<SectorResponseDTO> getAll(){
         return sectorQuery.getAll();
+    }
+
+    public List<SectorResponseDTO> getByName(String name, boolean getNotActive, User userRequest){
+        User user = userQuery.byId(userRequest.getId());
+        System.out.println(getNotActive);
+        boolean includeInactive = user.isAdmin() && getNotActive;
+
+
+        return sectorQuery.getByName(name, includeInactive);
+
     }
 
     @Transactional

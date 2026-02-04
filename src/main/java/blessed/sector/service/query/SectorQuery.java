@@ -40,4 +40,11 @@ public class SectorQuery {
     public Integer countByActive(boolean active){
         return  repository.countByActive(active);
     }
+
+    public List<SectorResponseDTO> getByName(String name, boolean includeInactive){
+        return repository.findByName(name, includeInactive)
+                .stream()
+                .map(SectorResponseDTO::new)
+                .toList();
+    }
 }
