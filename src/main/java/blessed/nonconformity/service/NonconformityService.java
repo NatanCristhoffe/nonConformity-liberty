@@ -46,11 +46,20 @@ public class NonconformityService {
         return new NonconformityResponseDTO(nonConformity, includeAll);
     }
 
-    public List<NonconformityResponseDTO> getAll(){
-        return nonConformityQuery.getAll()
-                .stream()
-                .map(NonconformityResponseDTO::new)
-                .toList();
+    public Page<NonconformityResponseDTO> getAllOrGetByUser(
+            User userRequest,
+            boolean getAll,
+            Pageable pageable
+    ){
+
+        User user = userQuery.byId(userRequest.getId());
+
+        if(getAll && user.isAdmin()){
+            return nonConformityQuery.getAll(pageable)
+                    .map(NonconformityResponseDTO::new);
+        }
+
+        return nonConformityQuery.getAllUser(user.getId(), pageable).map(NonconformityResponseDTO::new);
     }
 
     @Transactional

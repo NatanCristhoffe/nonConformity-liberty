@@ -37,8 +37,12 @@ public class NonConformityQuery {
                 );
     }
 
-    public List<NonConformity> getAll(){
-         return nonconformityRepository.findAll();
+    public Page<NonConformity> getAll(Pageable pageable){
+         return nonconformityRepository.findAllByOrderByCreatedAtDesc(pageable);
+    }
+
+    public Page<NonConformity> getAllUser(UUID user, Pageable pageable){
+        return nonconformityRepository.findByUser(user, pageable);
     }
 
     public List<NonConformity> findByTitle(String title){

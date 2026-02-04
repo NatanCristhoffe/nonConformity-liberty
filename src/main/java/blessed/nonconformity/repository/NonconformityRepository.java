@@ -1,9 +1,7 @@
 package blessed.nonconformity.repository;
 
-import blessed.nonconformity.dto.NonconformityResponseDTO;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityStatus;
-import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +13,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface NonconformityRepository extends JpaRepository<NonConformity, Long> {
+    @Query("""
+    SELECT n FROM NonConformity n
+    WHERE n.createdBy.id = :userId OR n.dispositionOwner.id = :userId OR n.effectivenessAnalyst.id = :userId
+    """)
+    Page<NonConformity> findByUser(@Param("userId") UUID userId, Pageable pageable);
+
+    Page<NonConformity> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+
     List<NonConformity> findTop5ByTitleStartingWithIgnoreCase(String title);
 
     Page<NonConformity> findByStatus(
@@ -86,4 +93,6 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
             @Param("userId") UUID userId,
             Pageable pageable
     );
+
+
 }

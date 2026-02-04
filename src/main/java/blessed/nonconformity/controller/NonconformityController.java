@@ -10,11 +10,13 @@ import blessed.nonconformity.service.NonconformityService;
 import blessed.user.entity.User;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,9 +47,14 @@ public class NonconformityController {
     }
 
     @GetMapping
-    public List<NonconformityResponseDTO> getAll(){
-        List<NonconformityResponseDTO> nonconformities = service.getAll();
-        return  nonconformities;
+    public ResponseEntity<Page<NonconformityResponseDTO>> getAllOrGetByUser(
+            @AuthenticationPrincipal User user,
+            @RequestParam(defaultValue = "false") boolean getAll,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+            ){
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(service.getAllOrGetByUser(user, getAll, pageable));
     }
 
     @GetMapping("/{id}")
@@ -108,7 +115,5 @@ public class NonconformityController {
 
         return ResponseEntity.noContent().build();
     }
-
-
 
 }
