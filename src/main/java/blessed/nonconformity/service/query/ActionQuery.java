@@ -13,8 +13,13 @@ import java.util.UUID;
 
 @Service
 public class ActionQuery {
-    @Autowired
-    ActionRepository actionRepository;
+
+    private final ActionRepository actionRepository;
+
+    public ActionQuery(ActionRepository actionRepository){
+        this.actionRepository = actionRepository;
+    }
+
 
     public void save(Action action){
         actionRepository.save(action);
