@@ -43,12 +43,12 @@ public class ActionService {
 
     @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
     @Transactional
-    public Action create(Long nonconformityId, ActionRequestDTO data){
+    public Action create(Long nonconformityId, ActionRequestDTO data, User userRequest){
         NonConformity nc = nonConformityQuery.byId(nonconformityId);
         User responsibleUser = userQuery.byId(data.responsibleUserId());
 
         Action action = new Action(data);
-        nc.addAction(action, responsibleUser);
+        nc.addAction(action, responsibleUser, userRequest);
         actionQuery.save(action);
         return action;
     }

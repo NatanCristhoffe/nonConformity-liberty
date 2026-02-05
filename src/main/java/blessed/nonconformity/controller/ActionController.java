@@ -28,8 +28,10 @@ public class ActionController {
     @PostMapping("/add/{nc}")
     public ResponseEntity<ActionResponseDTO> addAction(
             @PathVariable Long nc,
-            @RequestBody @Valid ActionRequestDTO actionUser){
-        Action action = service.create(nc, actionUser);
+            @RequestBody @Valid ActionRequestDTO actionUser,
+            @AuthenticationPrincipal User user
+            ){
+        Action action = service.create(nc, actionUser, user);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

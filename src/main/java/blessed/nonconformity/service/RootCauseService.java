@@ -41,7 +41,7 @@ public class RootCauseService {
         User userRequest = userQuery.byId(user.getId());
 
         RootCause rootCause = new RootCause(data, userRequest);
-        nc.addRootCause(rootCause);
+        nc.addRootCause(rootCause, user);
 
         rootCauseQuery.save(rootCause);
         return rootCause;

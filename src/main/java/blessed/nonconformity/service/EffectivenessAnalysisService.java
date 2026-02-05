@@ -41,7 +41,7 @@ public class EffectivenessAnalysisService {
         User user = userQuery.byId(userRequest.getId());
 
         EffectivenessAnalysis effectiveness = new EffectivenessAnalysis(data, nc, user);
-        nc.addEffectivenessAnalysis(effectiveness);
+        nc.addEffectivenessAnalysis(effectiveness, userRequest);
 
         effectivenessAnalysisQuery.save(effectiveness);
     }

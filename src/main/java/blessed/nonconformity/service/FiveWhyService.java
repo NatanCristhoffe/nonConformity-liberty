@@ -16,6 +16,8 @@ import blessed.user.service.query.UserQuery;
 import blessed.utils.DataTimeUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,17 +29,19 @@ public class FiveWhyService {
     private final NonconformityRepository ncRepository;
     private final FiveWhyRepository fiveWhyRepository;
     private final FiveWhyToolRepository fiveWhyToolRepository;
+    private final AuthenticationManager authenticationManager;
 
     public FiveWhyService(
             NonconformityRepository ncRepository,
             FiveWhyToolRepository fiveWhyToolRepository,
             FiveWhyRepository fiveWhyRepository,
-            UserQuery userQuery
-            ){
+            UserQuery userQuery,
+            AuthenticationManager authenticationManager){
         this.fiveWhyToolRepository = fiveWhyToolRepository;
         this.fiveWhyRepository = fiveWhyRepository;
         this.ncRepository = ncRepository;
         this.userQuery = userQuery;
+        this.authenticationManager = authenticationManager;
     }
 
     @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
@@ -45,7 +49,8 @@ public class FiveWhyService {
     public void addAnswer(
             Long nonconformityId,
             Long fiveWhyId,
-            FiveWhyAnswerRequestDTO answer
+            FiveWhyAnswerRequestDTO answer,
+            User user
     ) {
         NonConformity nc = ncRepository.findById(nonconformityId)
                 .orElseThrow(() ->
@@ -61,7 +66,7 @@ public class FiveWhyService {
         fiveWhyRepository.save(fiveWhy);
 
         if (fiveWhy.areAllWhysAnswered()) {
-            nc.concludeFiveWhyTool();
+            nc.concludeFiveWhyTool(user);
         }
     }
 

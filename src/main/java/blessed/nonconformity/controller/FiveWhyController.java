@@ -7,6 +7,7 @@ import blessed.user.entity.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +25,10 @@ public class FiveWhyController {
     public ResponseEntity<Void> addAnswer(
             @PathVariable Long nonconformityId,
             @PathVariable Long fiveWhyId,
-            @RequestBody @Valid FiveWhyAnswerRequestDTO data
+            @RequestBody @Valid FiveWhyAnswerRequestDTO data,
+            @AuthenticationPrincipal User user
             ){
-        service.addAnswer(nonconformityId, fiveWhyId, data);
+        service.addAnswer(nonconformityId, fiveWhyId, data, user);
         return ResponseEntity.noContent().build();
     }
 }

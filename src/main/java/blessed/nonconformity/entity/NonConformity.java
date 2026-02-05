@@ -138,8 +138,9 @@ public class NonConformity {
         this.createdBy = createBy;
         this.createdAt = LocalDateTime.now();
         addLog(
-                "Não conformidade criada | "
-                + DataTimeUtils.formatNow()
+                "[NC] Não conformidade criada" +
+                " | Usuário: " + createBy.getFirstName() + " " + createBy.getLastName() +
+                " | Data/Hora: " + DataTimeUtils.formatNow()
         );
     }
 
@@ -154,10 +155,11 @@ public class NonConformity {
             switch (this.selectedTool){
                 case FIVE_WHYS -> {
                     addLog(
-                            "Adicionando ferramenta de qualidade | " +
-                            "Data: " + DataTimeUtils.formatNow() +
-                            " | Responsável: " + user.getFirstName() + " " + user.getLastName()
+                            "[QUALIDADE] Ferramenta adicionada: 5 Porquês" +
+                            " | Usuário: " + user.getFirstName() + " " + user.getLastName() +
+                            " | Data/Hora: " + DataTimeUtils.formatNow()
                     );
+
                 }
                 case ISHIKAWA -> {
                     throw new BusinessException("Ferramenta não disponível");
@@ -169,15 +171,12 @@ public class NonConformity {
             this.status = NonConformityStatus.WAITING_ROOT_CAUSE;
         }
 
-//        if (this.requiresQualityTool){
-//
-//        }
-
         addLog(
-                "Não conformidade aprovada | " +
-                "Data: " + DataTimeUtils.formatNow() +
-                " | Responsável: " + user.getFirstName() + " " + user.getLastName()
+                "[NC] Não conformidade aprovada" +
+                " | Usuário: " + user.getFirstName() + " " + user.getLastName() +
+                " | Data/Hora: " + DataTimeUtils.formatNow()
         );
+
     }
 
     public void correction(User user){
@@ -187,10 +186,11 @@ public class NonConformity {
 
         this.status = NonConformityStatus.RETURNED_FOR_CORRECTION;
         addLog(
-                "Não conformidade enviada para correção | " +
-                        "Data: " + DataTimeUtils.formatNow() +
-                        " | Responsável: " + user.getFirstName() + " " + user.getLastName()
+                "[NC] Enviada para correção" +
+                " | Usuário: " + user.getFirstName() + " " + user.getLastName() +
+                " | Data/Hora: " + DataTimeUtils.formatNow()
         );
+
     }
 
 
@@ -198,7 +198,7 @@ public class NonConformity {
         logs.add(new NonconformityLog(this, message));
     }
 
-    public void concludeFiveWhyTool() {
+    public void concludeFiveWhyTool(User user) {
         if (this.status != NonConformityStatus.WAITING_QUALITY_TOOL) {
             throw new BusinessException(
                     "A ferramenta dos 5 Porquês só pode ser concluída quando a NC estiver aguardando ferramenta de qualidade."
@@ -207,13 +207,14 @@ public class NonConformity {
         this.fiveWhyTool.setCompleted(true);
         this.status = NonConformityStatus.WAITING_ROOT_CAUSE;
         addLog(
-                "Ferramenta dos 5 Porquês concluída | " +
-                        DataTimeUtils.formatNow() +
-                        " | Status: Aguardando causa raiz"
+                "[QUALIDADE] Ferramenta 5 Porquês concluída" +
+                " | Usuário: " + user.getFirstName() + " " + user.getLastName() +
+                " | Data/Hora: " + DataTimeUtils.formatNow()
         );
+
     }
 
-    public void addRootCause(RootCause rootCause){
+    public void addRootCause(RootCause rootCause, User user){
         if(this.status != NonConformityStatus.WAITING_ROOT_CAUSE){
             throw new BusinessException(
                     "A causa raiz só pode ser adicionada quando a NC estiver aguardando causa raiz"
@@ -224,13 +225,14 @@ public class NonConformity {
         rootCause.setNonconformity(this);
         this.status = NonConformityStatus.WAITING_ACTIONS;
         addLog(
-                "Causa raiz definida | " +
-                DataTimeUtils.formatNow() +
-                " | Status: Aguardando ações"
+                "[CAUSA RAIZ] Definida" +
+                " | Usuário: " + user.getFirstName() + " " + user.getLastName() +
+                " | Data/Hora: " + DataTimeUtils.formatNow()
         );
+
     }
 
-    public void addAction(Action action, User responsibleUser){
+    public void addAction(Action action, User responsibleUser, User userRequest){
         if (this.status != NonConformityStatus.WAITING_ACTIONS) {
             throw new BusinessException(
                     "Ação só pode ser adicionada quando a NC estiver aguardando ações."
@@ -242,8 +244,10 @@ public class NonConformity {
 
         this.actions.add(action);
         addLog(
-                "Ação adicionada: " + action.getTitle() + " | " +
-                        DataTimeUtils.formatNow()
+                "[AÇÃO] Adicionada: " + action.getTitle() +
+                " | Usuário: " + userRequest.getFirstName() + " " + userRequest.getLastName() +
+                " | Responsável: " + responsibleUser.getFirstName() + " " + responsibleUser.getLastName() +
+                " | Data/Hora: " + DataTimeUtils.formatNow()
         );
     }
 
@@ -256,10 +260,12 @@ public class NonConformity {
         action.complete(data, user);
 
         addLog(
-                "Ação concluída: " + action.getTitle() +
-                " | " +
-                DataTimeUtils.formatNow()
+                "[AÇÃO] Concluída: " + action.getTitle() +
+                " | Usuário: " + user.getFirstName() + " " + user.getLastName() +
+                " | Ação: " + action.getTitle() +
+                " | Data/Hora: " + DataTimeUtils.formatNow()
         );
+
     }
 
     public void notExecutedAction(Action action, ActionNotExecutedRequestDTO data, User user) {
@@ -271,10 +277,12 @@ public class NonConformity {
         action.markAsNotExecuted(data, user);
 
         addLog(
-                "Ação não concluída: " + action.getTitle() +
-                        " | " +
-                        DataTimeUtils.formatNow()
+                "[AÇÃO] Não executada: " + action.getTitle() +
+                " | Usuário: " + user.getFirstName() + " " + user.getLastName() +
+                " | Ação: " + action.getTitle() +
+                " | Data/Hora: " + DataTimeUtils.formatNow()
         );
+
     }
 
     public void closedAction(User user){
@@ -292,15 +300,23 @@ public class NonConformity {
 
         this.status = NonConformityStatus.WAITING_EFFECTIVENESS_CHECK;
         addLog(
-                "Ações concluídas" +
+                "[AÇÃO] Todas as ações finalizadas" +
+                " | Usuário: " + user.getFirstName() + " " + user.getLastName() +
+                " | Data/Hora: " + DataTimeUtils.formatNow()
+        );
+
+    }
+
+    public void closedDisposition(User user){
+        addLog(
+                "[DISPOSIÇÃO] concluida." +
                 " | Usuário : " + user.getFirstName() + " " + user.getLastName() +
-                DataTimeUtils.formatNow()
+                " | Data : " + DataTimeUtils.formatNow()
         );
     }
 
 
-
-    public void addEffectivenessAnalysis(EffectivenessAnalysis analysis) {
+    public void addEffectivenessAnalysis(EffectivenessAnalysis analysis, User user) {
         if (this.status != NonConformityStatus.WAITING_EFFECTIVENESS_CHECK) {
             throw new BusinessException(
                     "A análise de eficácia só pode ser realizada quando a NC estiver aguardando verificação de eficácia."
@@ -312,11 +328,11 @@ public class NonConformity {
         this.closedAt = LocalDateTime.now();
 
         addLog(
-                "Análise de eficácia registrada | " +
-                        DataTimeUtils.formatNow() +
-                        " | Status: Aprovada"
+                "[EFICÁCIA] Análise registrada" +
+                " | Usuário: " + user.getFirstName() + " " + user.getLastName() +
+                " | Data/Hora: " + DataTimeUtils.formatNow()
         );
-    }
 
+    }
 
 }
