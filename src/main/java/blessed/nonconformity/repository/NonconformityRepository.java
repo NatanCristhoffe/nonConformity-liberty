@@ -30,6 +30,8 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     );
 
     boolean existsByIdAndDispositionOwnerId(Long id, UUID dispositionOwnerId);
+    boolean existsByIdAndEffectivenessAnalystId(Long id, UUID effectivenessAnalystId);
+
 
     @Query("""
     SELECT nc.status, COUNT(nc)

@@ -14,6 +14,7 @@ import blessed.user.entity.User;
 import blessed.user.repository.UserRepository;
 import blessed.user.service.query.UserQuery;
 import jakarta.transaction.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,10 +34,10 @@ public class EffectivenessAnalysisService {
         this.userQuery = userQuery;
     }
 
+    @PreAuthorize("@ncAuth.isEffectivenessAnalystOrAdmin(#nonconformityId, authentication)")
     @Transactional
-    public void addEffectivenessAnalysis(Long ncId,EffectivenessAnalysisRequestDTO data, User userRequest) {
-
-        NonConformity nc = nonConformityQuery.byId(ncId);
+    public void addEffectivenessAnalysis(Long nonconformityId,EffectivenessAnalysisRequestDTO data, User userRequest) {
+        NonConformity nc = nonConformityQuery.byId(nonconformityId);
         User user = userQuery.byId(userRequest.getId());
 
         EffectivenessAnalysis effectiveness = new EffectivenessAnalysis(data, nc, user);

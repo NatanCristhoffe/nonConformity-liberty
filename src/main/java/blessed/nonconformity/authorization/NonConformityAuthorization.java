@@ -30,6 +30,16 @@ public class NonConformityAuthorization {
                 .existsByIdAndDispositionOwnerId(nonconformityId, user.getId());
     }
 
+    public boolean isEffectivenessAnalystOrAdmin(Long nonconformityId, Authentication authentication){
+        User user = (User) authentication.getPrincipal();
+
+        if (user.isAdmin()) {
+            return true;
+        }
+
+        return nonConformityQuery.existsByIdAndEffectivenessAnalystId(nonconformityId, user.getId());
+    }
+
     public boolean canAccessNc(Long ncId, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
 

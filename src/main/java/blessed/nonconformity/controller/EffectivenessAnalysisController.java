@@ -22,7 +22,7 @@ public class EffectivenessAnalysisController {
     }
 
     @PostMapping("/add/{ncId}")
-    public ResponseEntity addEffectivenessAnalysis(
+    public ResponseEntity<Map<String, String>> addEffectivenessAnalysis(
             @RequestBody @Valid EffectivenessAnalysisRequestDTO data,
             @PathVariable Long ncId,
             Authentication authentication
