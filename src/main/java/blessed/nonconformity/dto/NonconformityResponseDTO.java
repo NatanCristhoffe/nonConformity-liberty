@@ -23,9 +23,10 @@ public record NonconformityResponseDTO(
 
         NonConformityPriorityLevel priorityLevel,
         NonConformityStatus status,
+        LocalDateTime createdAt,
 
         LocalDateTime dispositionDate,
-        LocalDateTime createdAt,
+        LocalDateTime dispositionClosedAt,
 
         LinkedRncDTO linkedRnc,
 
@@ -66,6 +67,7 @@ public record NonconformityResponseDTO(
                 entity.getStatus(),
 
                 entity.getDispositionDate(),
+                entity.getDispositionClosedAt(),
                 entity.getCreatedAt(),
 
                 entity.getLinkedRnc() != null
