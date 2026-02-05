@@ -324,7 +324,7 @@ public class NonConformity {
         }
 
         this.effectivenessAnalysis = analysis;
-        this.status = NonConformityStatus.APPROVED;
+        this.status = NonConformityStatus.CLOSED;
         this.closedAt = LocalDateTime.now();
 
         addLog(

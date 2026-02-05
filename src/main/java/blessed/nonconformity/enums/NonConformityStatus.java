@@ -9,7 +9,7 @@ public enum NonConformityStatus {
     WAITING_ACTIONS,
     WAITING_EFFECTIVENESS_CHECK,
 
-    APPROVED,
+    CLOSED,
     CANCELED
 
 }
