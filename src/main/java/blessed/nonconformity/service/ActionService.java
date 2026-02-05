@@ -82,6 +82,7 @@ public class ActionService {
     public NonConformity closeActionStage(Long nonconformityId, User userRequest){
         NonConformity nc = nonConformityQuery.byId(nonconformityId);
         nc.closedAction(userRequest);
+        nc.closedDisposition(userRequest);
         return nc;
     }
 }

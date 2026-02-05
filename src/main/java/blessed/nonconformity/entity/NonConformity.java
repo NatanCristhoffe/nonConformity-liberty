@@ -48,6 +48,7 @@ public class NonConformity {
     @Enumerated(EnumType.STRING)
     private NonConformityPriorityLevel priorityLevel;
     private LocalDateTime dispositionDate;
+    private LocalDateTime dispositionClosedAt;
     @ManyToOne
     @JoinColumn(name = "linked_rnc_id")
     private NonConformity linkedRnc;
@@ -262,7 +263,6 @@ public class NonConformity {
         addLog(
                 "[AÇÃO] Concluída: " + action.getTitle() +
                 " | Usuário: " + user.getFirstName() + " " + user.getLastName() +
-                " | Ação: " + action.getTitle() +
                 " | Data/Hora: " + DataTimeUtils.formatNow()
         );
 
@@ -279,7 +279,6 @@ public class NonConformity {
         addLog(
                 "[AÇÃO] Não executada: " + action.getTitle() +
                 " | Usuário: " + user.getFirstName() + " " + user.getLastName() +
-                " | Ação: " + action.getTitle() +
                 " | Data/Hora: " + DataTimeUtils.formatNow()
         );
 
@@ -308,6 +307,7 @@ public class NonConformity {
     }
 
     public void closedDisposition(User user){
+        this.dispositionClosedAt = LocalDateTime.now();
         addLog(
                 "[DISPOSIÇÃO] concluida." +
                 " | Usuário : " + user.getFirstName() + " " + user.getLastName() +
