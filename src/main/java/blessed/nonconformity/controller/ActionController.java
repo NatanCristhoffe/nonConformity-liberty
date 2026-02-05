@@ -9,7 +9,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -38,11 +40,9 @@ public class ActionController {
     public ResponseEntity<ActionResponseDTO> completedAction(
             @PathVariable Long actionId,
             @RequestBody @Valid ActionCompletedRequestDTO data,
-            Authentication authentication
+            @AuthenticationPrincipal User user
             ){
-
-        User userRequest = (User) authentication.getPrincipal();
-        ActionResponseDTO actionCompleted = service.completedAction(actionId, data, userRequest);
+        ActionResponseDTO actionCompleted = service.completedAction(actionId, data, user);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

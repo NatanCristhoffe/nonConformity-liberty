@@ -101,5 +101,21 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
             Pageable pageable
     );
 
-
+    @Query("""
+        select
+            case when count(nc) > 0 then true else false end
+        from NonConformity nc
+            left join nc.actions a
+        where nc.id = :idRnc
+          and (
+               nc.createdBy.id = :idUser
+            or nc.dispositionOwner.id = :idUser
+            or nc.effectivenessAnalyst.id = :idUser
+            or a.responsibleUser.id = :idUser
+          )
+    """)
+    boolean hasLink(
+            @Param("idRnc") Long idRnc,
+            @Param("idUser") UUID idUser
+    );
 }

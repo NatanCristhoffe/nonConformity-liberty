@@ -20,6 +20,7 @@ import blessed.user.entity.User;
 import blessed.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -40,9 +41,10 @@ public class ActionService {
     }
 
 
+    @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
     @Transactional
-    public Action create(Long ncId, ActionRequestDTO data){
-        NonConformity nc = nonConformityQuery.byId(ncId);
+    public Action create(Long nonconformityId, ActionRequestDTO data){
+        NonConformity nc = nonConformityQuery.byId(nonconformityId);
         User responsibleUser = userQuery.byId(data.responsibleUserId());
 
         Action action = new Action(data);
@@ -51,6 +53,7 @@ public class ActionService {
         return action;
     }
 
+    @PreAuthorize("@actionAuth.isResponsibleOrAdmin(#actionId, authentication)")
     @Transactional
     public ActionResponseDTO completedAction(Long actionId, ActionCompletedRequestDTO data, User completedBy){
         User managedUser = userQuery.byId(completedBy.getId());
@@ -61,6 +64,7 @@ public class ActionService {
         return new ActionResponseDTO(action);
     }
 
+    @PreAuthorize("@actionAuth.isResponsibleOrAdmin(#actionId, authentication)")
     @Transactional
     public Action notExecutedAction(Long actionId, User userRequest, ActionNotExecutedRequestDTO data){
 
@@ -73,9 +77,10 @@ public class ActionService {
         return action;
     }
 
+    @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
     @Transactional
-    public NonConformity closeActionStage(Long ncId, User userRequest){
-        NonConformity nc = nonConformityQuery.byId(ncId);
+    public NonConformity closeActionStage(Long nonconformityId, User userRequest){
+        NonConformity nc = nonConformityQuery.byId(nonconformityId);
         nc.closedAction(userRequest);
         return nc;
     }

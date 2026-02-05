@@ -95,13 +95,6 @@ public class Action {
             throw new BusinessException("A ação só pode ser concluída quando o status estiver PENDING.");
         }
 
-        boolean isResponsible = this.responsibleUser.getId().equals(user.getId());
-        boolean isAdmin = user.getRole() == UserRole.ADMIN;
-
-        if (!isResponsible && !isAdmin) {
-            throw new BusinessException("Você não tem permissão para concluir esta ação.");
-        }
-
         this.status = ActionStatus.COMPLETED;
         this.evidenceUrl = data.evidenceUrl();
         this.observation = data.observation();
@@ -115,13 +108,6 @@ public class Action {
     public void markAsNotExecuted(ActionNotExecutedRequestDTO data, User user) {
         if (this.status != ActionStatus.PENDING) {
             throw new BusinessException("A ação não pode ser marcada como não executada.");
-        }
-
-        boolean isResponsible = this.responsibleUser.getId().equals(user.getId());
-        boolean isAdmin = user.getRole() == UserRole.ADMIN;
-
-        if (!isResponsible && !isAdmin) {
-            throw new BusinessException("Você não tem permissão para marcar esta ação como não executada.");
         }
 
         this.status = ActionStatus.NOT_EXECUTED;

@@ -9,6 +9,8 @@ import blessed.nonconformity.repository.ActionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class ActionQuery {
     @Autowired
@@ -32,5 +34,9 @@ public class ActionQuery {
         }
 
         return action;
+    }
+
+    public boolean existsByIdAndResponsibleUserId(Long actionId, UUID responsibleUserId){
+        return actionRepository.existsByIdAndResponsibleUserId(actionId, responsibleUserId);
     }
 }

@@ -12,6 +12,7 @@ import blessed.user.service.query.UserQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -36,15 +37,15 @@ public class NonconformityService {
         this.sectorQuery = sectorQuery;
     }
 
-
-    public NonconformityResponseDTO getNcById(Long ncId, boolean includeAll){
-
+    @PreAuthorize("@ncAuth.canAccessNc(#nonconformityId, authentication)")
+    public NonconformityResponseDTO getNcById(Long nonconformityId, boolean includeAll){
         NonConformity nonConformity = includeAll
-                ? nonConformityQuery.byIdWithAll(ncId)
-                : nonConformityQuery.byId(ncId);
+                ? nonConformityQuery.byIdWithAll(nonconformityId)
+                : nonConformityQuery.byId(nonconformityId);
 
         return new NonconformityResponseDTO(nonConformity, includeAll);
     }
+
 
     public Page<NonconformityResponseDTO> getAllOrGetByUser(
             User userRequest,
