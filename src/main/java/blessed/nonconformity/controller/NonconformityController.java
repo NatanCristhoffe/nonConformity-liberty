@@ -2,6 +2,7 @@ package blessed.nonconformity.controller;
 
 
 import blessed.exception.BusinessException;
+import blessed.nonconformity.dto.PageResponseDTO;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
 import blessed.nonconformity.dto.NonconformityResponseDTO;
@@ -73,7 +74,7 @@ public class NonconformityController {
     }
 
     @GetMapping("/by-status")
-    public ResponseEntity<Page<NonconformityResponseDTO>> getByStatus(
+    public ResponseEntity<PageResponseDTO<NonconformityResponseDTO>> getByStatus(
             @RequestParam NonConformityStatus status,
             @RequestParam(defaultValue = "false") boolean includeAll,
             @PageableDefault(size = 20) Pageable pageable,
@@ -81,14 +82,15 @@ public class NonconformityController {
     ) {
         User userRequest = (User) authentication.getPrincipal();
 
-        return ResponseEntity.ok(
+        Page<NonconformityResponseDTO> page =
                 service.getMyNonconformitiesByStatus(
                         status,
                         userRequest,
                         includeAll,
                         pageable
-                )
-        );
+                );
+
+        return ResponseEntity.ok(PageResponseDTO.from(page));
     }
 
 
