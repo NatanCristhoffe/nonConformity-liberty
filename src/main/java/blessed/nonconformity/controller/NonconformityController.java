@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,13 +36,14 @@ public class NonconformityController {
         this.service = service;
     }
 
-    @PostMapping()
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<NonconformityResponseDTO> create(
-            @RequestBody @Valid NonconformityRequestDTO data,
+            @RequestPart("data") @Valid NonconformityRequestDTO data,
+            @RequestPart(value = "file", required = false) MultipartFile file,
             Authentication authentication
     ) {
         User user = (User) authentication.getPrincipal();
-        NonConformity nonconformity = service.create(data, user);
+        NonConformity nonconformity = service.create(data, user, file);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new NonconformityResponseDTO(nonconformity));

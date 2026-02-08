@@ -121,14 +121,14 @@ public class NonConformity {
 
     public NonConformity(
             NonconformityRequestDTO data, Sector source, Sector responsibleDepartment,
-            User createBy, User dispositionOwner, User effectivenessAnalyst
+            User createBy, User dispositionOwner, User effectivenessAnalyst, String urlEvidence
             ){
         this.title = data.title().toLowerCase();
         this.description = data.description();
         this.hasAccidentRisk = data.hasAccidentRisk();
+        this.urlEvidence = urlEvidence;
         this.priorityLevel = data.priorityLevel();
         this.dispositionDate = data.dispositionDate();
-        this.urlEvidence = data.urlEvidence();
         this.sourceDepartment = source;
         this.responsibleDepartment = responsibleDepartment;
         this.dispositionOwner = dispositionOwner;
