@@ -1,5 +1,6 @@
 package blessed.nonconformity.service;
 
+import blessed.infra.enums.FileType;
 import blessed.infra.storage.S3FileStorageService;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityStatus;
@@ -81,7 +82,7 @@ public class NonconformityService {
         String urlEvidence = null; // Começa nulo
 
         if (file != null && !file.isEmpty()) {
-            urlEvidence = s3Service.uploadFile(file, "evidencias");
+            urlEvidence = s3Service.uploadFile(file, "evidencias", FileType.EVIDENCE);
         }
 
         NonConformity nc = new NonConformity(
