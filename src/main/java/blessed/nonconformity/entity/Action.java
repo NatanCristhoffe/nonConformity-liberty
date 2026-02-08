@@ -90,16 +90,16 @@ public class Action {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void complete(ActionCompletedRequestDTO data, User user) {
+    public void complete(ActionCompletedRequestDTO data, User user, String urlEvidence) {
         if (this.status != ActionStatus.PENDING) {
             throw new BusinessException("A ação só pode ser concluída quando o status estiver PENDING.");
         }
 
         this.status = ActionStatus.COMPLETED;
-        this.evidenceUrl = data.evidenceUrl();
         this.observation = data.observation();
         this.completedAt = LocalDateTime.now();
         this.finalizedBy = user;
+        this.evidenceUrl = urlEvidence;
         this.updatedAt = LocalDateTime.now();
     }
 

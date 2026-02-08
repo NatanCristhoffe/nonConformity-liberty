@@ -3,6 +3,8 @@ package blessed.nonconformity.service;
 
 import blessed.exception.BusinessException;
 import blessed.exception.ResourceNotFoundException;
+import blessed.infra.enums.FileType;
+import blessed.infra.storage.S3FileStorageService;
 import blessed.nonconformity.dto.ActionCompletedRequestDTO;
 import blessed.nonconformity.dto.ActionNotExecutedRequestDTO;
 import blessed.nonconformity.dto.ActionRequestDTO;
@@ -22,6 +24,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ActionService {
@@ -29,15 +32,18 @@ public class ActionService {
     private final UserQuery userQuery;
     private final ActionQuery actionQuery;
     private final NonConformityQuery nonConformityQuery;
+    private final S3FileStorageService s3Service;
 
     public ActionService(
             UserQuery userQuery,
             ActionQuery actionQuery,
-            NonConformityQuery nonConformityQuery
+            NonConformityQuery nonConformityQuery,
+            S3FileStorageService s3Service
     ) {
         this.userQuery = userQuery;
         this.actionQuery = actionQuery;
         this.nonConformityQuery = nonConformityQuery;
+        this.s3Service = s3Service;
     }
 
 
@@ -55,12 +61,18 @@ public class ActionService {
 
     @PreAuthorize("@actionAuth.isResponsibleOrAdmin(#actionId, authentication)")
     @Transactional
-    public ActionResponseDTO completedAction(Long actionId, ActionCompletedRequestDTO data, User completedBy){
+    public ActionResponseDTO completedAction(Long actionId, ActionCompletedRequestDTO data, User completedBy, MultipartFile file){
+
+        String urlEvidence = null;
+        if (file != null && !file.isEmpty()){
+            urlEvidence = s3Service.uploadFile(file, "actions-evidence", FileType.EVIDENCE);
+        }
+
         User managedUser = userQuery.byId(completedBy.getId());
         Action action = actionQuery.getActionPendingById(actionId);
 
         NonConformity nonConformity = action.getNonconformity();
-        nonConformity.completeAction(action, data, managedUser);
+        nonConformity.completeAction(action, data, managedUser, urlEvidence);
         return new ActionResponseDTO(action);
     }
 

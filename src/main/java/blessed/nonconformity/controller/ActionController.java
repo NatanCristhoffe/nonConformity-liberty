@@ -8,11 +8,13 @@ import blessed.user.entity.User;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -38,13 +40,14 @@ public class ActionController {
                 .body(new ActionResponseDTO(action));
     }
 
-    @PutMapping("/{actionId}/completed")
+    @PutMapping(value = "/{actionId}/completed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ActionResponseDTO> completedAction(
             @PathVariable Long actionId,
-            @RequestBody @Valid ActionCompletedRequestDTO data,
+            @RequestPart("data") @Valid ActionCompletedRequestDTO data,
+            @RequestPart(value = "file", required = false) MultipartFile file,
             @AuthenticationPrincipal User user
             ){
-        ActionResponseDTO actionCompleted = service.completedAction(actionId, data, user);
+        ActionResponseDTO actionCompleted = service.completedAction(actionId, data, user, file);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

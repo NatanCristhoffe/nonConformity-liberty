@@ -252,13 +252,13 @@ public class NonConformity {
         );
     }
 
-    public void completeAction(Action action, ActionCompletedRequestDTO data, User user) {
+    public void completeAction(Action action, ActionCompletedRequestDTO data, User user, String urlEvidence) {
 
         if (!this.actions.contains(action)) {
             throw new BusinessException("A ação não pertence a esta não conformidade.");
         }
 
-        action.complete(data, user);
+        action.complete(data, user, urlEvidence);
 
         addLog(
                 "[AÇÃO] Concluída: " + action.getTitle() +
