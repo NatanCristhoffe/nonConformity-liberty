@@ -9,7 +9,6 @@ import blessed.nonconformity.enums.NonConformityPriorityLevel;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
 import blessed.nonconformity.enums.QualityToolType;
-import blessed.nonconformity.interfaces.QualityToolService;
 import blessed.nonconformity.tools.FiveWhyTool;
 import blessed.sector.entity.Sector;
 import blessed.user.entity.User;
@@ -17,9 +16,7 @@ import blessed.utils.DataTimeUtils;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -268,13 +265,13 @@ public class NonConformity {
 
     }
 
-    public void notExecutedAction(Action action, ActionNotExecutedRequestDTO data, User user) {
+    public void notExecutedAction(Action action, ActionNotExecutedRequestDTO data, User user, String urlEvidence) {
 
         if (!this.actions.contains(action)) {
             throw new BusinessException("A ação não pertence a esta não conformidade.");
         }
 
-        action.markAsNotExecuted(data, user);
+        action.markAsNotExecuted(data, user, urlEvidence);
 
         addLog(
                 "[AÇÃO] Não executada: " + action.getTitle() +

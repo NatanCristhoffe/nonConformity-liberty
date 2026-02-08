@@ -7,7 +7,6 @@ import blessed.nonconformity.dto.ActionRequestDTO;
 import blessed.nonconformity.enums.ActionStatus;
 import blessed.nonconformity.enums.ActionType;
 import blessed.user.entity.User;
-import blessed.user.enums.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -105,13 +104,14 @@ public class Action {
 
 
 
-    public void markAsNotExecuted(ActionNotExecutedRequestDTO data, User user) {
+    public void markAsNotExecuted(ActionNotExecutedRequestDTO data, User user, String urlEvidence) {
         if (this.status != ActionStatus.PENDING) {
             throw new BusinessException("A ação não pode ser marcada como não executada.");
         }
 
         this.status = ActionStatus.NOT_EXECUTED;
         this.nonExecutionReason = data.nonExecutionReason();
+        this.evidenceUrl = urlEvidence;
         this.completedAt = LocalDateTime.now();
         this.finalizedBy = user;
         this.updatedAt = LocalDateTime.now();

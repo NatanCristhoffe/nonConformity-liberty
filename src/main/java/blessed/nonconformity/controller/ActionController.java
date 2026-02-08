@@ -6,17 +6,13 @@ import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.service.ActionService;
 import blessed.user.entity.User;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/action")
@@ -40,34 +36,25 @@ public class ActionController {
                 .body(new ActionResponseDTO(action));
     }
 
-    @PutMapping(value = "/{actionId}/completed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ActionResponseDTO> completedAction(
+
+    @PutMapping(value = "/{actionId}/complete", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ActionResponseDTO> completeAction(
             @PathVariable Long actionId,
             @RequestPart("data") @Valid ActionCompletedRequestDTO data,
             @RequestPart(value = "file", required = false) MultipartFile file,
             @AuthenticationPrincipal User user
-            ){
-        ActionResponseDTO actionCompleted = service.completedAction(actionId, data, user, file);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(actionCompleted);
-
+    ) {
+        return ResponseEntity.ok(service.completeAction(actionId, data, user, file));
     }
 
-    @PutMapping("/{actionId}/not-executed")
+    @PutMapping(value = "/{actionId}/not-executed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ActionResponseDTO> notExecutedAction(
             @PathVariable Long actionId,
-            @RequestBody @Valid ActionNotExecutedRequestDTO data,
-            Authentication authentication
-    ){
-        User userRequest = (User) authentication.getPrincipal();
-        Action actionCompleted = service.notExecutedAction(actionId, userRequest, data);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ActionResponseDTO(actionCompleted));
-
+            @RequestPart("data") @Valid ActionNotExecutedRequestDTO data,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(service.markAsNotExecuted(actionId, data, user, file));
     }
 
     @PutMapping("/closed/{ncId}")
