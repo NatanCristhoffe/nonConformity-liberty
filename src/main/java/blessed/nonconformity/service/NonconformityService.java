@@ -50,7 +50,9 @@ public class NonconformityService {
                 ? nonConformityQuery.byIdWithAll(nonconformityId)
                 : nonConformityQuery.byId(nonconformityId);
 
-        return new NonconformityResponseDTO(nonConformity, includeAll);
+        String presignedUrl = s3Service.generatePresignedUrl(nonConformity.getUrlEvidence());
+
+        return new NonconformityResponseDTO(nonConformity, includeAll, presignedUrl);
     }
 
 

@@ -50,18 +50,18 @@ public record NonconformityResponseDTO(
 
     /** 🔹 Construtor LEVE (default) */
     public NonconformityResponseDTO(NonConformity entity) {
-        this(entity, false);
+        this(entity, false, null);
     }
 
     /** 🔹 Construtor COMPLETO (includeAll = true) */
-    public NonconformityResponseDTO(NonConformity entity, boolean includeAll) {
+    public NonconformityResponseDTO(NonConformity entity, boolean includeAll,String presignedUrlEvidence) {
         this(
                 entity.getId(),
                 entity.getTitle(),
                 entity.getDescription(),
 
                 entity.getHasAccidentRisk(),
-                entity.getUrlEvidence(),
+                presignedUrlEvidence != null ? presignedUrlEvidence : entity.getUrlEvidence(),
 
                 entity.getPriorityLevel(),
                 entity.getStatus(),
