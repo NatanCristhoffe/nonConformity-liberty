@@ -48,13 +48,14 @@ public record NonconformityResponseDTO(
         Set<NonconformityLogResponseDTO> logs
 ) {
 
-    /** 🔹 Construtor LEVE (default) */
     public NonconformityResponseDTO(NonConformity entity) {
-        this(entity, false, null);
+        this(entity, false, null, null);
     }
 
-    /** 🔹 Construtor COMPLETO (includeAll = true) */
-    public NonconformityResponseDTO(NonConformity entity, boolean includeAll,String presignedUrlEvidence) {
+    public NonconformityResponseDTO(
+            NonConformity entity, boolean includeAll,String presignedUrlEvidence,
+            Set<ActionResponseDTO> signedActions
+    ) {
         this(
                 entity.getId(),
                 entity.getTitle(),
@@ -88,12 +89,11 @@ public record NonconformityResponseDTO(
                         ? new RootCauseResponseDTO(entity.getRootCause())
                         : null,
 
-                includeAll && entity.getActions() != null
-                        ? entity.getActions()
-                        .stream()
-                        .map(ActionResponseDTO::new)
-                        .collect(Collectors.toSet())
-                        : Set.of(),
+                signedActions != null ? signedActions : (
+                        includeAll && entity.getActions() != null
+                                ? entity.getActions().stream().map(ActionResponseDTO::new).collect(Collectors.toSet())
+                                : Set.of()
+                ),
 
                 includeAll && entity.getEffectivenessAnalysis() != null
                         ? new EffectivenessAnalysisResponseDTO(entity.getEffectivenessAnalysis())

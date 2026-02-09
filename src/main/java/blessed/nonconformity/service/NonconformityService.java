@@ -2,6 +2,8 @@ package blessed.nonconformity.service;
 
 import blessed.infra.enums.FileType;
 import blessed.infra.storage.S3FileStorageService;
+import blessed.nonconformity.dto.ActionResponseDTO;
+import blessed.nonconformity.entity.Action;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
@@ -19,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -52,7 +56,18 @@ public class NonconformityService {
 
         String presignedUrl = s3Service.generatePresignedUrl(nonConformity.getUrlEvidence());
 
-        return new NonconformityResponseDTO(nonConformity, includeAll, presignedUrl);
+        Set<ActionResponseDTO> actionsDto = null;
+
+        if (includeAll && nonConformity.getActions() != null) {
+            actionsDto = nonConformity.getActions().stream()
+                    .map(action -> new ActionResponseDTO(
+                            action,
+                            s3Service.generatePresignedUrl(action.getEvidenceUrl())
+                    ))
+                    .collect(Collectors.toSet());
+        }
+
+        return new NonconformityResponseDTO(nonConformity, includeAll, presignedUrl, actionsDto);
     }
 
 
