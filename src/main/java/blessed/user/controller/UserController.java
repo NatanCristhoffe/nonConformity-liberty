@@ -1,15 +1,18 @@
 package blessed.user.controller;
 
+import blessed.auth.dto.RegisterDTO;
 import blessed.user.dto.UserRequestDTO;
 import blessed.user.dto.UserResponseDTO;
 import blessed.user.entity.User;
 import blessed.user.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +24,18 @@ public class UserController {
     private final UserService service;
     public UserController(UserService service){
         this.service = service;
+    }
+
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, String>> register(
+            @RequestPart("data")RegisterDTO data,
+            @RequestPart(value = "file", required = false)MultipartFile file
+            ){
+        service.register(data, file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                Map.of("success", "usuário criado com sucesso.")
+        );
+
     }
 
     @GetMapping

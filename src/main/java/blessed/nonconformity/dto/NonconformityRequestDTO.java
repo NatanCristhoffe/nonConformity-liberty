@@ -29,8 +29,6 @@ public record NonconformityRequestDTO(
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
         LocalDateTime dispositionDate,
 
-        String urlEvidence,
-
         Long linkedRncId,
 
         @NotNull(message = "O setor onde ocorreu a não conformidade deve ser informado.")

@@ -39,8 +39,8 @@ public class SecurityConfigurations {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/sectors/create").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/users/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/sectors/create").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/sectors/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/sectors/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/users/admin/**").hasRole("ADMIN")
