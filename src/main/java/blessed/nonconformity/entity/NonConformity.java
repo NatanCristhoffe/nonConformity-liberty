@@ -4,6 +4,7 @@ package blessed.nonconformity.entity;
 import blessed.exception.BusinessException;
 import blessed.nonconformity.dto.ActionCompletedRequestDTO;
 import blessed.nonconformity.dto.ActionNotExecutedRequestDTO;
+import blessed.nonconformity.dto.NonconformityUpdateDTO;
 import blessed.nonconformity.enums.ActionStatus;
 import blessed.nonconformity.enums.NonConformityPriorityLevel;
 import blessed.nonconformity.enums.NonConformityStatus;
@@ -175,6 +176,39 @@ public class NonConformity {
                 " | Data/Hora: " + DataTimeUtils.formatNow()
         );
 
+    }
+
+    public void update(
+            NonconformityUpdateDTO data, Sector sourceDepartment, Sector responsibleDepartment,
+            User dispositionUser, User effectivenessUser, User userRequest, String newUrlEvidence
+    ){
+
+        if (!this.status.equals(NonConformityStatus.RETURNED_FOR_CORRECTION)){
+            throw new BusinessException("Apenas RNCs em revisão podem ser editadas.");
+        }
+
+        this.title = data.title();
+        this.description = data.description();
+        this.hasAccidentRisk = data.hasAccidentRisk();
+        this.priorityLevel = data.priorityLevel();
+        if (newUrlEvidence != null) {
+            this.urlEvidence = newUrlEvidence;
+        }
+        this.dispositionDate = data.dispositionDate();
+        this.sourceDepartment = sourceDepartment;
+        this.responsibleDepartment = responsibleDepartment;
+        this.dispositionOwner = dispositionUser;
+        this.effectivenessAnalyst = effectivenessUser;
+        this.requiresQualityTool = data.requiresQualityTool();
+        this.selectedTool = data.selectedTool();
+        this.status = NonConformityStatus.PENDING;
+
+
+        addLog(
+                "[NC] Atualizada e enviada para aprovação" +
+                " | Usuário: " + userRequest.getFirstName() + " " + userRequest.getLastName() +
+                " | Data/Hora: " + DataTimeUtils.formatNow()
+        );
     }
 
     public void correction(User user){

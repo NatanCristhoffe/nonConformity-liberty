@@ -2,6 +2,7 @@ package blessed.nonconformity.controller;
 
 
 import blessed.exception.BusinessException;
+import blessed.nonconformity.dto.NonconformityUpdateDTO;
 import blessed.nonconformity.dto.PageResponseDTO;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @CrossOrigin()
@@ -95,9 +97,18 @@ public class NonconformityController {
         return ResponseEntity.ok(PageResponseDTO.from(page));
     }
 
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, String>> updateNonconformity(
+            @PathVariable Long id,
+            @Valid @RequestPart("data") NonconformityUpdateDTO data,
+            @RequestPart(value = "file", required = false)  MultipartFile file,
+            @AuthenticationPrincipal User userRequest
+            ){
+        service.update(id, data, userRequest, file);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("Success", "Nc atualizada com sucesso."));
+    }
 
     //Routes Admin
-
     @PutMapping("/admin/{id}/approve")
     public ResponseEntity<Void> approve(
             @PathVariable Long id,

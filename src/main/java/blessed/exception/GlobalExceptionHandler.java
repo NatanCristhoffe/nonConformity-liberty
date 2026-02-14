@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -174,6 +175,20 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+    /* =========================
+       User not auth
+    ========================= */
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponse> accessDenaied(HttpServletRequest request){
+        ErrorResponse error = new ErrorResponse(
+                "Usuário não autorizado.",
+                HttpStatus.FORBIDDEN.value(),
+                request.getRequestURI()
+        );
+
+        return  ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
 
     /* =========================
        Fallback (500)
@@ -191,6 +206,5 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
-
 
 }

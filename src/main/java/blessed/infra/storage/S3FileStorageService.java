@@ -108,11 +108,4 @@ public class S3FileStorageService implements FileStorageService {
         }
     }
 
-
-    private boolean isAllowedType(String contentType){
-        return contentType.equals("image/jpeg") ||
-                contentType.equals("image/png") ||
-                contentType.equals("image/webp") ||
-                contentType.equals("application/pdf");
-    }
 }

@@ -3,7 +3,7 @@ package blessed.nonconformity.service;
 import blessed.infra.enums.FileType;
 import blessed.infra.storage.S3FileStorageService;
 import blessed.nonconformity.dto.ActionResponseDTO;
-import blessed.nonconformity.entity.Action;
+import blessed.nonconformity.dto.NonconformityUpdateDTO;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.dto.NonconformityRequestDTO;
@@ -18,6 +18,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -155,4 +157,42 @@ public class NonconformityService {
                 .map(NonconformityResponseDTO::new);
     }
 
+    @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
+    @Transactional
+    public void update(Long id, NonconformityUpdateDTO data, User userRequest, MultipartFile file){
+        NonConformity nonConformity = nonConformityQuery.byId(id);
+
+        String oldEvidence = nonConformity.getUrlEvidence();
+
+        String newUrlEvidence;
+
+        if (file != null && !file.isEmpty()) {
+            newUrlEvidence = s3Service.uploadFile(file, "evidencias", FileType.EVIDENCE);
+        } else {
+            newUrlEvidence = null;
+        }
+
+        Sector sourceDepartment = sectorQuery.byId(data.sourceDepartmentId());
+        Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId());
+
+        User dispositionUser = userQuery.byId(data.dispositionOwnerId());
+        User effectivenessUser = userQuery.byId(data.effectivenessAnalystId());
+
+        nonConformity.update(
+                data,sourceDepartment, responsibleDepartment,
+                dispositionUser, effectivenessUser, userRequest, newUrlEvidence
+        );
+
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit(){
+                        if (oldEvidence != null && newUrlEvidence != null){
+                            s3Service.deleteFile(oldEvidence);
+                        }
+                    }
+                }
+        );
+
+    }
 }
