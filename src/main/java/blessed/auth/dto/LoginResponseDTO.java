@@ -4,11 +4,19 @@ import blessed.sector.dto.SectorResponseDTO;
 import blessed.sector.entity.Sector;
 import blessed.user.entity.User;
 import blessed.user.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.util.UUID;
+
+@JsonFormat(
+
+)
 public record LoginResponseDTO(
         String token,
-        String email,
+        UUID id,
         String name,
+        String email,
+        String phone,
         UserRole role,
         SectorResponseDTO sector,
         Boolean enable
@@ -16,8 +24,10 @@ public record LoginResponseDTO(
     public LoginResponseDTO(String token, User user){
         this(
                 token,
-                user.getEmail(),
+                user.getId(),
                 user.getFirstName() + " " + user.getLastName(),
+                user.getEmail(),
+                user.getPhone(),
                 user.getRole(),
                 user.getSector() != null
                     ? new SectorResponseDTO(user.getSector())

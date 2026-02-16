@@ -8,6 +8,7 @@ import blessed.infra.storage.S3FileStorageService;
 import blessed.sector.entity.Sector;
 import blessed.sector.repository.SectorRepository;
 import blessed.sector.service.query.SectorQuery;
+import blessed.user.dto.UpdateUserDTO;
 import blessed.user.dto.UserRequestDTO;
 import blessed.user.dto.UserResponseDTO;
 import blessed.user.entity.User;
@@ -16,6 +17,7 @@ import blessed.user.service.query.UserQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Limit;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -62,7 +64,7 @@ public class UserService{
     }
 
     @Transactional
-    public void register(RegisterDTO data, MultipartFile file){
+    public void register(RegisterDTO data){
         if (this.userQuery.existsByEmail(data.email())){
             throw new BusinessException("E-mail informado já está em uso.");
         }
@@ -70,17 +72,53 @@ public class UserService{
             throw new BusinessException("Telefone informado já está em uso.");
         }
 
-        String photoProfileUrl = null;
-        if (file != null && !file.isEmpty()){
-            photoProfileUrl = s3Service.uploadFile(file, "users", FileType.IMAGE);
+        Sector sector = sectorQuery.byId(data.sectorId());
+        String encryptedPassword = encryptedPassword(data.password());
+
+        User newUser = new User(data, encryptedPassword, sector);
+        userQuery.save(newUser);
+    }
+
+
+
+    @Transactional
+    public UserResponseDTO updateDataUser(UUID userUpdateId, UpdateUserDTO newData, User userRequest){
+        User user = userQuery.byId(userUpdateId);
+
+        if (!user.getId().equals(userRequest.getId())){
+            throw new BusinessException("Usuário não autorizado.");
         }
 
+        Sector sector =  sectorQuery.byId(newData.sectorId());
 
-        Sector sector = sectorQuery.byId(data.sectorId());
-        String encryptedPassword = passwordEncoder.encode(data.password());
+        String newPassword =  null;
+        boolean isTryingToChangePassword =
+                newData.newPassword() != null || newData.oldPassword() != null;
 
-        User newUser = new User(data, encryptedPassword, sector, photoProfileUrl);
-        userQuery.save(newUser);
+        if (isTryingToChangePassword){
+            if (newData.newPassword() == null || newData.oldPassword() == null) {
+                throw new BusinessException("Para alterar a senha, informe senha atual e nova senha.");
+            }
+
+            if (passwordEncoder.matches(newData.newPassword(), user.getPassword())) {
+                throw new BusinessException("A nova senha não pode ser igual à senha atual.");
+            }
+
+            boolean passwordMatches = passwordEncoder.matches(newData.oldPassword(), user.getPassword());
+
+            if (!passwordMatches){
+                throw new BusinessException("Senha antiga está incorreta.");
+            }
+
+            newPassword = encryptedPassword(newData.newPassword());
+        }
+        user.update(newData, sector, newPassword);
+
+        return new UserResponseDTO(user);
+    }
+
+    private String encryptedPassword(String password){
+        return passwordEncoder.encode(password);
     }
 
 }

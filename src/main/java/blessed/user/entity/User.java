@@ -3,6 +3,7 @@ package blessed.user.entity;
 import blessed.auth.dto.AuthenticationDTO;
 import blessed.auth.dto.RegisterDTO;
 import blessed.exception.BusinessException;
+import blessed.user.dto.UpdateUserDTO;
 import blessed.user.enums.UserRole;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -49,8 +50,6 @@ public class User implements UserDetails{
     @Column(nullable = false)
     private String email;
 
-    private String photoProfileUserUrl;
-
     @Column(nullable = false)
     private String password;
 
@@ -74,7 +73,7 @@ public class User implements UserDetails{
     @JoinColumn(name = "sector_id", nullable = true)
     private Sector sector;
 
-    public User(RegisterDTO data, String encryptedPassword, Sector sector, String photoProfileUrl){
+    public User(RegisterDTO data, String encryptedPassword, Sector sector){
         if (encryptedPassword == null || encryptedPassword.isBlank()) {
             throw new BusinessException("Senha inválida.");
         }
@@ -87,13 +86,25 @@ public class User implements UserDetails{
         this.password = encryptedPassword;
         this.firstName = data.firstName().toLowerCase();
         this.lastName = data.lastName().toLowerCase();
-        this.photoProfileUserUrl = photoProfileUrl;
         this.phone = data.phone();
         this.sector = sector;
         this.role=data.role();
         this.enabled = true;
         this.createdAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
+    }
+
+    public void update(UpdateUserDTO newData, Sector newSector, String newPassword){
+        this.firstName = newData.firstName();
+        this.lastName = newData.lastName();
+        this.phone = newData.phone();
+        this.sector =  newSector;
+
+        if (newPassword != null){
+            this.password = newPassword;
+        }
+
+
     }
 
     public void enable(){

@@ -1,6 +1,7 @@
 package blessed.user.controller;
 
 import blessed.auth.dto.RegisterDTO;
+import blessed.user.dto.UpdateUserDTO;
 import blessed.user.dto.UserRequestDTO;
 import blessed.user.dto.UserResponseDTO;
 import blessed.user.entity.User;
@@ -9,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
@@ -28,14 +30,22 @@ public class UserController {
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> register(
-            @RequestPart("data")RegisterDTO data,
-            @RequestPart(value = "file", required = false)MultipartFile file
+            @RequestPart("data")RegisterDTO data
             ){
-        service.register(data, file);
+        service.register(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 Map.of("success", "usuário criado com sucesso.")
         );
+    }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> update(
+            @PathVariable UUID id, @RequestBody @Valid UpdateUserDTO newData,
+            @AuthenticationPrincipal User userRequest
+    ){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(service.updateDataUser(id, newData, userRequest));
     }
 
     @GetMapping
