@@ -5,11 +5,14 @@ import blessed.user.dto.UpdateUserDTO;
 import blessed.user.dto.UserRequestDTO;
 import blessed.user.dto.UserResponseDTO;
 import blessed.user.entity.User;
+import blessed.user.enums.UserRole;
 import blessed.user.service.UserService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,7 @@ public class UserController {
         this.service = service;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> register(
             @RequestPart("data")RegisterDTO data
@@ -61,15 +65,38 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @PutMapping("/admin/{id}/enable")
-    public ResponseEntity<Map<String, String>> enable(@PathVariable UUID id) {
-        service.enable(id);
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/enable")
+    public ResponseEntity<Map<String, String>> enable(
+            @PathVariable UUID id, @AuthenticationPrincipal User currentUser) {
+        service.enable(id, currentUser);
         return ResponseEntity.ok(Map.of("success", "Usuário habilitado."));
     }
 
-    @PutMapping("/admin/{id}/disable")
-    public ResponseEntity<Map<String, String>> disable(@PathVariable UUID id) {
-        service.disable(id);
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/disable")
+    public ResponseEntity<Map<String, String>> disable(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        service.disable(id, currentUser);
         return ResponseEntity.ok(Map.of("success", "Usuário desabilitado."));
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{id}/promote")
+    public ResponseEntity<Map<String, String>> promote(@PathVariable UUID id, @AuthenticationPrincipal User userRequest){
+        service.changeRole(id, UserRole.ADMIN, userRequest);
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "Usuário promovido com sucesso"));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{id}/demote")
+    public ResponseEntity<Map<String, String>> demote(@PathVariable UUID id, @AuthenticationPrincipal User userRequest){
+        service.changeRole(id, UserRole.USER, userRequest);
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "Usuário definido como user com sucesso"));
+    }
+
 }

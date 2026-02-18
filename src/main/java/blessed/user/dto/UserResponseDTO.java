@@ -2,6 +2,7 @@ package blessed.user.dto;
 
 import blessed.sector.entity.Sector;
 import blessed.user.entity.User;
+import blessed.user.enums.UserRole;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +18,7 @@ public class UserResponseDTO {
     private String email;
     private String phone;
     private Sector sector;
+    private UserRole role;
     private boolean enable;
     private LocalDateTime createdAt;
 
@@ -26,6 +28,7 @@ public class UserResponseDTO {
         this.email = user.getEmail();
         this.phone = user.getPhone();
         this.sector = user.getSector();
+        this.role = user.getRole();
         this.enable = user.isEnabled();
         this.createdAt = user.getCreatedAt();
     }

@@ -7,6 +7,7 @@ import blessed.user.entity.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,6 +33,7 @@ public class SectorController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<SectorResponseDTO> createSector(@Valid @RequestBody SectorRequestDTO data){
         Sector sector = service.create(data);
@@ -49,13 +51,15 @@ public class SectorController {
 
     }
 
-    @DeleteMapping("/admin/delete/{idSector}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/delete/{idSector}")
     public ResponseEntity<Map<String, String>> deleteSectors(@PathVariable Long idSector){
         service.disable(idSector);
         return ResponseEntity.ok(Map.of("success","setor deletado com sucesso."));
     }
 
-    @PutMapping("/admin/enable/{idSector}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/enable/{idSector}")
     public ResponseEntity<Map<String, String>> enableSectors(@PathVariable Long idSector){
         service.enable(idSector);
         return ResponseEntity.ok(Map.of("success","setor ativo com sucesso."));

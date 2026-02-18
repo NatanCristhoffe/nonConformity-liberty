@@ -12,6 +12,7 @@ import blessed.user.dto.UpdateUserDTO;
 import blessed.user.dto.UserRequestDTO;
 import blessed.user.dto.UserResponseDTO;
 import blessed.user.entity.User;
+import blessed.user.enums.UserRole;
 import blessed.user.repository.UserRepository;
 import blessed.user.service.query.UserQuery;
 import jakarta.transaction.Transactional;
@@ -52,14 +53,21 @@ public class UserService{
 
 
     @Transactional
-    public void enable(UUID userId) {
+    public void enable(UUID userId, User currentUser) {
         User user = userQuery.byId(userId);
+        if (user.getId().equals(currentUser.getId())){
+            throw new BusinessException("Operação não permitida: não é possível habilitar o próprio usuário.");
+        }
+
         user.enable();
     }
 
     @Transactional
-    public void disable(UUID userId) {
+    public void disable(UUID userId, User currentUser){
         User user = userQuery.byId(userId);
+        if (user.getId().equals(currentUser.getId())){
+            throw new BusinessException("Operação não permitida: não é possível desabilitar o próprio usuário.");
+        }
         user.disable();
     }
 
@@ -116,6 +124,21 @@ public class UserService{
 
         return new UserResponseDTO(user);
     }
+
+    @Transactional
+    public void changeRole(UUID userId, UserRole newRole, User userRequest){
+        User user = userQuery.byId(userId);
+
+        if (user.getId().equals(userRequest.getId())){
+            throw  new BusinessException("Você não pode alterar sua própria role");
+        }
+
+        if (user.getRole() == newRole){
+            throw  new BusinessException("Usuário já possui essa role");
+        }
+        user.setRole(newRole);
+    }
+
 
     private String encryptedPassword(String password){
         return passwordEncoder.encode(password);

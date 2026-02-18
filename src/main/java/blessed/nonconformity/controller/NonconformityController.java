@@ -18,6 +18,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -82,14 +83,12 @@ public class NonconformityController {
             @RequestParam NonConformityStatus status,
             @RequestParam(defaultValue = "false") boolean includeAll,
             @PageableDefault(size = 20) Pageable pageable,
-            Authentication authentication
+            @AuthenticationPrincipal User user
     ) {
-        User userRequest = (User) authentication.getPrincipal();
-
         Page<NonconformityResponseDTO> page =
                 service.getMyNonconformitiesByStatus(
                         status,
-                        userRequest,
+                        user,
                         includeAll,
                         pageable
                 );
@@ -108,8 +107,8 @@ public class NonconformityController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("Success", "Nc atualizada com sucesso."));
     }
 
-    //Routes Admin
-    @PutMapping("/admin/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/approve")
     public ResponseEntity<Void> approve(
             @PathVariable Long id,
             Authentication authentication)
@@ -119,8 +118,8 @@ public class NonconformityController {
 
         return ResponseEntity.noContent().build();
     }
-
-    @PutMapping("/admin/{id}/correction")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/correction")
     public ResponseEntity<Void> correction(
             @PathVariable Long id,
             Authentication authentication)
