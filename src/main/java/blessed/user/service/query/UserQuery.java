@@ -3,6 +3,7 @@ package blessed.user.service.query;
 import blessed.exception.ResourceNotFoundException;
 import blessed.user.dto.UserResponseDTO;
 import blessed.user.entity.User;
+import blessed.user.enums.UserRole;
 import blessed.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Limit;
@@ -38,8 +39,8 @@ public class UserQuery {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
     }
 
-    public List<UserResponseDTO> byName(String firstName){
-        return repository.findByFirstNameStartingWithIgnoreCase(firstName, Limit.of(5))
+    public List<UserResponseDTO> byName(String firstName, UserRole roleFilter){
+        return repository.findByFirstNameAndRole(firstName, roleFilter,Limit.of(5))
                 .stream()
                 .map(UserResponseDTO::new)
                 .toList();

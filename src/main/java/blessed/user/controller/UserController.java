@@ -52,17 +52,18 @@ public class UserController {
                 .body(service.updateDataUser(id, newData, userRequest));
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAll(){
-        List<UserResponseDTO> users = service.getAll();
-        return ResponseEntity.ok(users);
-    }
+    @GetMapping()
+    public ResponseEntity<List<UserResponseDTO>> getByFirstName(
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) UserRole role
+    ){
+        if (firstName != null){
+            List<UserResponseDTO> users = service.findByFirstName(firstName, role);
+            return ResponseEntity.ok(users);
+        }
 
-    @GetMapping(params = "firstName")
-    public ResponseEntity<List<UserResponseDTO>> getByFirstName(@RequestParam String firstName){
-        List<UserResponseDTO> users = service.findByFirstName(firstName);
+        return  ResponseEntity.ok(service.getAll());
 
-        return ResponseEntity.ok(users);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

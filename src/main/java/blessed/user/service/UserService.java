@@ -33,22 +33,20 @@ public class UserService{
     private final UserQuery userQuery;
     private final PasswordEncoder passwordEncoder;
     private final SectorQuery sectorQuery;
-    private final S3FileStorageService s3Service;
 
     public UserService(
-            UserQuery userQuery, PasswordEncoder passwordEncoder, SectorQuery sectorQuery,
-            S3FileStorageService s3Service
+            UserQuery userQuery, PasswordEncoder passwordEncoder, SectorQuery sectorQuery
     ){
         this.passwordEncoder = passwordEncoder;
         this.userQuery = userQuery;
         this.sectorQuery = sectorQuery;
-        this.s3Service = s3Service;
     }
     public List<UserResponseDTO> getAll(){
          return userQuery.getAll();
     }
-    public List<UserResponseDTO> findByFirstName(String firstName) {
-        return userQuery.byName(firstName);
+
+    public List<UserResponseDTO> findByFirstName(String firstName, UserRole role) {
+        return userQuery.byName(firstName, role);
     }
 
 
