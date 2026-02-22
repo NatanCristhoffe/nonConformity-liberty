@@ -1,5 +1,6 @@
 package blessed.sector.service;
 
+import blessed.company.entity.Company;
 import blessed.exception.BusinessException;
 import blessed.sector.entity.Sector;
 import blessed.sector.dto.SectorRequestDTO;
@@ -38,11 +39,12 @@ public class SectorService {
     }
 
     @Transactional
-    public Sector create(SectorRequestDTO data){
+    public Sector create(SectorRequestDTO data, Company company){
         if (sectorQuery.countByActive(true) >= 15){
             throw new BusinessException("Número máximo de setores ativos atingido.");
         }
-        return sectorQuery.save(data);
+        Sector sector = new Sector(data, company);
+        return sectorQuery.save(sector);
     }
 
     @Transactional

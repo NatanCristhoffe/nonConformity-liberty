@@ -1,6 +1,8 @@
 package blessed.user.service;
 
+import blessed.application.dto.AdminOnboardingRequestDTO;
 import blessed.auth.dto.RegisterDTO;
+import blessed.company.entity.Company;
 import blessed.exception.BusinessException;
 import blessed.exception.ResourceNotFoundException;
 import blessed.infra.enums.FileType;
@@ -70,7 +72,7 @@ public class UserService{
     }
 
     @Transactional
-    public void register(RegisterDTO data){
+    public void register(AdminOnboardingRequestDTO data, Company company, Sector sector){
         if (this.userQuery.existsByEmail(data.email())){
             throw new BusinessException("E-mail informado já está em uso.");
         }
@@ -78,13 +80,11 @@ public class UserService{
             throw new BusinessException("Telefone informado já está em uso.");
         }
 
-        Sector sector = sectorQuery.byId(data.sectorId());
         String encryptedPassword = encryptedPassword(data.password());
 
-        User newUser = new User(data, encryptedPassword, sector);
-        userQuery.save(newUser);
+        User newUser = new User(data, encryptedPassword, sector, company);
+        userQuery.save(newUser, company);
     }
-
 
 
     @Transactional

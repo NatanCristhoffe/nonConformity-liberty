@@ -1,7 +1,9 @@
 package blessed.user.entity;
 
+import blessed.application.dto.AdminOnboardingRequestDTO;
 import blessed.auth.dto.AuthenticationDTO;
 import blessed.auth.dto.RegisterDTO;
+import blessed.company.entity.Company;
 import blessed.exception.BusinessException;
 import blessed.user.dto.UpdateUserDTO;
 import blessed.user.enums.UserRole;
@@ -73,7 +75,15 @@ public class User implements UserDetails{
     @JoinColumn(name = "sector_id", nullable = true)
     private Sector sector;
 
-    public User(RegisterDTO data, String encryptedPassword, Sector sector){
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
+
+
+    public User(
+            AdminOnboardingRequestDTO data, String encryptedPassword,
+            Sector sector, Company company
+    ){
         if (encryptedPassword == null || encryptedPassword.isBlank()) {
             throw new BusinessException("Senha inválida.");
         }
@@ -88,10 +98,11 @@ public class User implements UserDetails{
         this.lastName = data.lastName().toLowerCase();
         this.phone = data.phone();
         this.sector = sector;
-        this.role=data.role();
+        this.role=UserRole.ADMIN;
         this.enabled = true;
         this.createdAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
+        this.company = company;
     }
 
     public void update(UpdateUserDTO newData, Sector newSector, String newPassword){

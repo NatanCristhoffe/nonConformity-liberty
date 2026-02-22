@@ -1,6 +1,7 @@
 package blessed.sector.entity;
 
 import blessed.common.entity.AuditableEntity;
+import blessed.company.entity.Company;
 import blessed.sector.dto.SectorRequestDTO;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
@@ -12,7 +13,7 @@ import lombok.Setter;
 @Table(
         name = "sectors",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = "name")
+                @UniqueConstraint(columnNames = {"name", "company_id"})
         }
 )
 @Getter
@@ -24,15 +25,20 @@ public class Sector extends AuditableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
     private String description;
     private boolean active;
 
-    public Sector(SectorRequestDTO data){
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
+
+    public Sector(SectorRequestDTO data, Company company){
         this.name = data.name().toLowerCase();
         this.description = data.description().toLowerCase();
         this.active = true;
+        this.company = company;
     }
 
     public void enable(){

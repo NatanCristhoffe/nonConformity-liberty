@@ -36,7 +36,7 @@ public class UserController {
     public ResponseEntity<Map<String, String>> register(
             @RequestPart("data")RegisterDTO data
             ){
-        service.register(data);
+//        service.register(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 Map.of("success", "usuário criado com sucesso.")
         );

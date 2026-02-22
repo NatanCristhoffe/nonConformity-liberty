@@ -4,16 +4,20 @@ package blessed.company.entity;
 import blessed.company.dto.CompanyRequestDTO;
 import blessed.company.enums.PlanType;
 import blessed.company.enums.TypeDocument;
+import blessed.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(
-        name = "campanies",
+        name = "companies",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "email"),
                 @UniqueConstraint(columnNames = "document"),
@@ -29,12 +33,14 @@ public class Company {
 
         @Id
         @GeneratedValue(strategy = GenerationType.UUID)
+        @JdbcTypeCode(SqlTypes.CHAR)
         private UUID id;
 
         @Column(nullable = false)
         private String companyName;
 
         @Column(nullable = false)
+        @Enumerated(EnumType.STRING)
         private PlanType planType;
 
         @Column(nullable = false)
@@ -73,7 +79,7 @@ public class Company {
         private LocalDateTime updateAt;
 
 
-        Company(CompanyRequestDTO data, TypeDocument typeDocument){
+        public Company(CompanyRequestDTO data, TypeDocument typeDocument){
                 this.companyName = data.companyName();
                 this.planType = data.planType();
                 this.document = data.document();
@@ -88,4 +94,10 @@ public class Company {
                 this.createAt = LocalDateTime.now();
                 this.updateAt = LocalDateTime.now();
         }
+
+        public void changePlan(PlanType newPlan){
+                this.planType = newPlan;
+                this.updateAt = LocalDateTime.now();
+        }
+
 }

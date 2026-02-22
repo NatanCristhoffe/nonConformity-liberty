@@ -29,4 +29,12 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             @Param("role") UserRole role,
             Limit limit
     );
+
+    @Query("""
+    SELECT COUNT(u)
+    FROM users u
+    WHERE u.company.id = :companyId
+    AND u.enabled = true
+    """)
+    Long countActiveUsersByCompany(@Param("companyId") UUID companyId);
 }

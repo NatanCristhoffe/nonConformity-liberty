@@ -1,5 +1,7 @@
 package blessed.user.service.query;
 
+import blessed.company.entity.Company;
+import blessed.exception.BusinessException;
 import blessed.exception.ResourceNotFoundException;
 import blessed.user.dto.UserResponseDTO;
 import blessed.user.entity.User;
@@ -30,7 +32,12 @@ public class UserQuery {
         this.repository = repository;
     }
 
-    public void save(User newUser){
+    public void save(User newUser, Company company){
+        Long totalUser = countByCompany(company.getId());
+
+        if (!company.getPlanType().canAddUser(totalUser)){
+            throw  new BusinessException("Limite de usuários do plano atingido.");
+        }
         repository.save(newUser);
     }
 
@@ -58,4 +65,7 @@ public class UserQuery {
         return repository.findByEmail(email);
     }
 
+    private Long countByCompany(UUID companyId){
+        return repository.countActiveUsersByCompany(companyId);
+    }
 }

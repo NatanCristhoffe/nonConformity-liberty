@@ -30,11 +30,11 @@ public class SectorQuery {
                 .orElseThrow(() -> new ResourceNotFoundException("Setor não encontrado!"));
     }
 
-    public Sector save(SectorRequestDTO data){
-        if (repository.existsByName(data.name().toLowerCase())){
+    public Sector save(Sector sector){
+        if (repository.existsByName(sector.getName().toLowerCase())){
             throw new BusinessException("Você já tem esse setor salvo.");
         }
-        return repository.save(new Sector(data));
+        return repository.save(sector);
     }
 
     public Integer countByActive(boolean active){
