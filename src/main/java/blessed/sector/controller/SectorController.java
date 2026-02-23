@@ -60,15 +60,21 @@ public class SectorController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{idSector}")
-    public ResponseEntity<Map<String, String>> deleteSectors(@PathVariable Long idSector){
-        service.disable(idSector);
+    public ResponseEntity<Map<String, String>> deleteSectors(
+            @PathVariable Long idSector,
+            @AuthenticationPrincipal User user
+            ){
+        service.disable(idSector, user.getCompany().getId());
         return ResponseEntity.ok(Map.of("success","setor deletado com sucesso."));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/enable/{idSector}")
-    public ResponseEntity<Map<String, String>> enableSectors(@PathVariable Long idSector){
-        service.enable(idSector);
+    public ResponseEntity<Map<String, String>> enableSectors(
+            @PathVariable Long idSector,
+            @AuthenticationPrincipal User user
+    ){
+        service.enable(idSector, user.getCompany().getId());
         return ResponseEntity.ok(Map.of("success","setor ativo com sucesso."));
     }
 
@@ -76,7 +82,7 @@ public class SectorController {
     public ResponseEntity<List<SectorResponseDTO>> getByName(
             @RequestParam String name,
             @RequestParam(defaultValue = "false") boolean getNotActive,
-            @AuthenticationPrincipal User userRequest){
-        return ResponseEntity.ok(service.getByName(name, getNotActive, userRequest));
+            @AuthenticationPrincipal User user){
+        return ResponseEntity.ok(service.getByName(name, getNotActive, user, user.getCompany().getId()));
     }
 }

@@ -19,12 +19,14 @@ public interface SectorRepository extends JpaRepository<Sector, Long> {
 
     @Query("""
     SELECT s FROM Sector s
-    WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :name, '%'))
+    WHERE s.company.id = :companyId
+    AND LOWER(s.name) LIKE LOWER(CONCAT('%', :name, '%'))
     AND (:includeInactive = true OR s.active = true)
 """)
     List<Sector> findByName(
             @Param("name") String name,
-            @Param("includeInactive") boolean includeInactive
+            @Param("includeInactive") boolean includeInactive,
+            @Param("companyId") UUID companyId
     );
 
 }

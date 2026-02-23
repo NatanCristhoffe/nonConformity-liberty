@@ -42,8 +42,11 @@ public class SectorQuery {
         return  repository.countByActive(active);
     }
 
-    public List<SectorResponseDTO> getByName(String name, boolean includeInactive){
-        return repository.findByName(name, includeInactive)
+    public List<SectorResponseDTO> getByName(
+            String name, boolean includeInactive,
+            UUID companyId
+    ){
+        return repository.findByName(name, includeInactive, companyId)
                 .stream()
                 .map(SectorResponseDTO::new)
                 .toList();

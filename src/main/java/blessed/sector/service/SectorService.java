@@ -31,21 +31,17 @@ public class SectorService {
         this.companyQuery = companyQuery;
     }
 
-
     @Transactional
     public List<SectorResponseDTO> getAll(UUID companyId){
         Company company = companyQuery.byId(companyId);
         return sectorQuery.getAll(company.getId());
     }
 
-    public List<SectorResponseDTO> getByName(String name, boolean getNotActive, User userRequest){
+    public List<SectorResponseDTO> getByName(String name, boolean getNotActive, User userRequest, UUID companyId){
         User user = userQuery.byId(userRequest.getId());
-        System.out.println(getNotActive);
+
         boolean includeInactive = user.isAdmin() && getNotActive;
-
-
-        return sectorQuery.getByName(name, includeInactive);
-
+        return sectorQuery.getByName(name, includeInactive, companyId);
     }
 
     @Transactional
@@ -62,11 +58,7 @@ public class SectorService {
     @Transactional
     public SectorResponseDTO update(Long id, SectorRequestDTO dataUpdate, UUID companyId){
         Sector sector = sectorQuery.byId(id);
-        Company company = companyQuery.byId(companyId);
-
-        if (!sector.getCompany().getId().equals(company.getId())){
-            throw new BusinessException("Você não pode atualizar os dados desse setor.");
-        }
+        verifyIfSectorPercentTheCompany(companyId, sector);
 
         sector.setName(dataUpdate.name());
         sector.setDescription(dataUpdate.description());
@@ -75,15 +67,26 @@ public class SectorService {
     }
 
     @Transactional
-    public void enable(Long id){
+    public void enable(Long id, UUID companyId){
         Sector sector = sectorQuery.byId(id);
+        verifyIfSectorPercentTheCompany(companyId, sector);
         sector.enable();
     }
 
     @Transactional
-    public void disable(Long id){
+    public void disable(Long id, UUID companyId){
         Sector sector = sectorQuery.byId(id);
+        verifyIfSectorPercentTheCompany(companyId, sector);
+
         sector.disable();
+    }
+
+    private void verifyIfSectorPercentTheCompany(UUID companyId, Sector sector){
+        Company company = companyQuery.byId(companyId);
+
+        if (!sector.getCompany().getId().equals(company.getId())){
+            throw new BusinessException("Você não pode atualizar os dados desse setor.");
+        }
     }
 
 
