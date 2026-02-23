@@ -34,9 +34,10 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> register(
-            @RequestPart("data")RegisterDTO data
+            @RequestPart("data")RegisterDTO data,
+            @AuthenticationPrincipal User user
             ){
-//        service.register(data);
+        service.create(data, user.getCompany().getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 Map.of("success", "usuário criado com sucesso.")
         );
@@ -55,10 +56,11 @@ public class UserController {
     @GetMapping()
     public ResponseEntity<List<UserResponseDTO>> getByFirstName(
             @RequestParam(required = false) String firstName,
-            @RequestParam(required = false) UserRole role
+            @RequestParam(required = false) UserRole role,
+            @AuthenticationPrincipal User user
     ){
         if (firstName != null){
-            List<UserResponseDTO> users = service.findByFirstName(firstName, role);
+            List<UserResponseDTO> users = service.findByFirstName(firstName, role, user.getCompany().getId());
             return ResponseEntity.ok(users);
         }
 

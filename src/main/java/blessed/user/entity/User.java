@@ -105,6 +105,31 @@ public class User implements UserDetails{
         this.company = company;
     }
 
+    public User(
+            RegisterDTO data, String encryptedPassword,
+            Sector sector, Company company
+    ){
+        if (encryptedPassword == null || encryptedPassword.isBlank()) {
+            throw new BusinessException("Senha inválida.");
+        }
+
+        if (data.email() == null || !data.email().contains("@")) {
+            throw new BusinessException("E-mail inválido.");
+        }
+
+        this.email = data.email().toLowerCase();
+        this.password = encryptedPassword;
+        this.firstName = data.firstName().toLowerCase();
+        this.lastName = data.lastName().toLowerCase();
+        this.phone = data.phone();
+        this.sector = sector;
+        this.role=data.role();
+        this.enabled = true;
+        this.createdAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+        this.company = company;
+    }
+
     public void update(UpdateUserDTO newData, Sector newSector, String newPassword){
         this.firstName = newData.firstName();
         this.lastName = newData.lastName();

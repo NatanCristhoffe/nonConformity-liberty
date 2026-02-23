@@ -6,12 +6,19 @@ import blessed.company.repository.CompanyRepository;
 import blessed.exception.BusinessException;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class CompanyQuery {
     private final CompanyRepository repository;
 
     CompanyQuery(CompanyRepository repository){
         this.repository = repository;
+    }
+
+    public Company byId(UUID id){
+        return repository.findById(id)
+                .orElseThrow(() -> new BusinessException("Empresa não encontrada"));
     }
 
     public void save(Company company){

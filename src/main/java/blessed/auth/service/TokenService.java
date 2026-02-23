@@ -21,14 +21,14 @@ public class TokenService {
     public String generateToken(User user){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            String token = JWT.create()
+             return JWT.create()
                     .withIssuer("auth-api")
-                    .withSubject(user.getId().toString())
+                    .withSubject(user.getEmail())
                     .withClaim("companyId", user.getCompany().getId().toString())
                     .withClaim("role", user.getRole().name())
                     .withExpiresAt(genExpirationDate())
                     .sign(algorithm);
-            return token;
+
 
         }catch (JWTCreationException exception){
             throw new BusinessException("Erro ao gerar token de acesso.");
@@ -50,7 +50,7 @@ public class TokenService {
 
     public Instant genExpirationDate(){
         return LocalDateTime.now()
-                .plusDays(1)
+                .plusDays(10)
                 .toInstant(ZoneOffset.of("-03:00"));
     }
 }

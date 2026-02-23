@@ -46,8 +46,8 @@ public class UserQuery {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
     }
 
-    public List<UserResponseDTO> byName(String firstName, UserRole roleFilter){
-        return repository.findByFirstNameAndRole(firstName, roleFilter,Limit.of(5))
+    public List<UserResponseDTO> byName(String firstName, UserRole roleFilter, UUID companyId){
+        return repository.findByFirstNameAndRole(firstName, roleFilter,companyId, Limit.of(5))
                 .stream()
                 .map(UserResponseDTO::new)
                 .toList();

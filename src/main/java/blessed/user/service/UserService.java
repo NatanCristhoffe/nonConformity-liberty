@@ -3,6 +3,7 @@ package blessed.user.service;
 import blessed.application.dto.AdminOnboardingRequestDTO;
 import blessed.auth.dto.RegisterDTO;
 import blessed.company.entity.Company;
+import blessed.company.service.query.CompanyQuery;
 import blessed.exception.BusinessException;
 import blessed.exception.ResourceNotFoundException;
 import blessed.infra.enums.FileType;
@@ -35,20 +36,24 @@ public class UserService{
     private final UserQuery userQuery;
     private final PasswordEncoder passwordEncoder;
     private final SectorQuery sectorQuery;
+    private final CompanyQuery companyQuery;
 
     public UserService(
-            UserQuery userQuery, PasswordEncoder passwordEncoder, SectorQuery sectorQuery
+            UserQuery userQuery, PasswordEncoder passwordEncoder, SectorQuery sectorQuery,
+            CompanyQuery companyQuery
     ){
         this.passwordEncoder = passwordEncoder;
         this.userQuery = userQuery;
         this.sectorQuery = sectorQuery;
+        this.companyQuery = companyQuery;
     }
     public List<UserResponseDTO> getAll(){
          return userQuery.getAll();
     }
 
-    public List<UserResponseDTO> findByFirstName(String firstName, UserRole role) {
-        return userQuery.byName(firstName, role);
+    public List<UserResponseDTO> findByFirstName(
+            String firstName, UserRole role, UUID companyId) {
+        return userQuery.byName(firstName, role, companyId);
     }
 
 
@@ -73,13 +78,20 @@ public class UserService{
 
     @Transactional
     public void register(AdminOnboardingRequestDTO data, Company company, Sector sector){
-        if (this.userQuery.existsByEmail(data.email())){
-            throw new BusinessException("E-mail informado já está em uso.");
-        }
-        if (this.userQuery.existsByPhone(data.phone())){
-            throw new BusinessException("Telefone informado já está em uso.");
-        }
+        validateUsersData(data.email(), data.phone());
 
+        String encryptedPassword = encryptedPassword(data.password());
+
+        User newUser = new User(data, encryptedPassword, sector, company);
+        userQuery.save(newUser, company);
+    }
+
+    @Transactional
+    public void create(RegisterDTO data, UUID companyId){
+        validateUsersData(data.email(), data.phone());
+
+        Company company = companyQuery.byId(companyId);
+        Sector sector = sectorQuery.byId(data.sectorId());
         String encryptedPassword = encryptedPassword(data.password());
 
         User newUser = new User(data, encryptedPassword, sector, company);
@@ -140,6 +152,15 @@ public class UserService{
 
     private String encryptedPassword(String password){
         return passwordEncoder.encode(password);
+    }
+
+    private void validateUsersData(String email, String phone){
+        if (this.userQuery.existsByEmail(email)){
+            throw new BusinessException("E-mail informado já está em uso.");
+        }
+        if (this.userQuery.existsByPhone(phone)){
+            throw new BusinessException("Telefone informado já está em uso.");
+        }
     }
 
 }
