@@ -27,8 +27,10 @@ public class SectorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SectorResponseDTO>> getAll(){
-        List<SectorResponseDTO> sectors = service.getAll();
+    public ResponseEntity<List<SectorResponseDTO>> getAll(
+            @AuthenticationPrincipal User user
+    ){
+        List<SectorResponseDTO> sectors = service.getAll(user.getCompany().getId());
         return ResponseEntity.status(HttpStatus.OK).body(sectors);
 
     }

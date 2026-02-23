@@ -31,8 +31,11 @@ public class SectorService {
         this.companyQuery = companyQuery;
     }
 
-    public List<SectorResponseDTO> getAll(){
-        return sectorQuery.getAll();
+
+    @Transactional
+    public List<SectorResponseDTO> getAll(UUID companyId){
+        Company company = companyQuery.byId(companyId);
+        return sectorQuery.getAll(company.getId());
     }
 
     public List<SectorResponseDTO> getByName(String name, boolean getNotActive, User userRequest){
@@ -50,7 +53,7 @@ public class SectorService {
         if (sectorQuery.countByActive(true) >= 15){
             throw new BusinessException("Número máximo de setores ativos atingido.");
         }
-        System.out.println(companyId);
+
         Company company = companyQuery.byId(companyId);
         Sector sector = new Sector(data, company);
         return sectorQuery.save(sector, companyId);

@@ -13,9 +13,9 @@ public interface SectorRepository extends JpaRepository<Sector, Long> {
     Integer countByActive(boolean active);
 
     @Query("""
-        SELECT s FROM Sector s WHERE s.active = true 
+        SELECT s FROM Sector s WHERE s.active = true AND s.company.id = :companyId
     """)
-    List<Sector> findAllActive();
+    List<Sector> findAllActive(@Param("companyId") UUID companyId);
 
     @Query("""
     SELECT s FROM Sector s

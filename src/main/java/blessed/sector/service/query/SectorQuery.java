@@ -19,8 +19,8 @@ public class SectorQuery {
         this.repository = repository;
     }
 
-    public List<SectorResponseDTO> getAll(){
-        return repository.findAllActive()
+    public List<SectorResponseDTO> getAll(UUID companyId){
+        return repository.findAllActive(companyId)
                 .stream()
                 .map(SectorResponseDTO::new)
                 .toList();
