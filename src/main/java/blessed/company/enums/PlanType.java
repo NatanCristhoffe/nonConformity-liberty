@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum PlanType {
     BASIC(2),
-    PREMIUM(5);
+    PREMIUM(5),
+    ENTERPRISE(10);
 
     private final int maxUsers;
 
