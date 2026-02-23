@@ -1,6 +1,7 @@
 package blessed.sector.service;
 
 import blessed.company.entity.Company;
+import blessed.company.service.query.CompanyQuery;
 import blessed.exception.BusinessException;
 import blessed.sector.entity.Sector;
 import blessed.sector.dto.SectorRequestDTO;
@@ -12,16 +13,22 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class SectorService {
 
     private final SectorQuery sectorQuery;
     private final UserQuery userQuery;
+    private final CompanyQuery companyQuery;
 
-    public  SectorService(SectorQuery sectorQuery, UserQuery userQuery){
+    public  SectorService(
+            SectorQuery sectorQuery, UserQuery userQuery,
+            CompanyQuery companyQuery
+    ){
         this.sectorQuery = sectorQuery;
         this.userQuery = userQuery;
+        this.companyQuery = companyQuery;
     }
 
     public List<SectorResponseDTO> getAll(){
@@ -39,12 +46,14 @@ public class SectorService {
     }
 
     @Transactional
-    public Sector create(SectorRequestDTO data, Company company){
+    public Sector create(SectorRequestDTO data, UUID companyId){
         if (sectorQuery.countByActive(true) >= 15){
             throw new BusinessException("Número máximo de setores ativos atingido.");
         }
+        System.out.println(companyId);
+        Company company = companyQuery.byId(companyId);
         Sector sector = new Sector(data, company);
-        return sectorQuery.save(sector);
+        return sectorQuery.save(sector, companyId);
     }
 
     @Transactional

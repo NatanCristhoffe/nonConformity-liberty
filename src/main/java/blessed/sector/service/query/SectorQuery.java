@@ -9,6 +9,7 @@ import blessed.sector.repository.SectorRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class SectorQuery {
@@ -30,8 +31,8 @@ public class SectorQuery {
                 .orElseThrow(() -> new ResourceNotFoundException("Setor não encontrado!"));
     }
 
-    public Sector save(Sector sector){
-        if (repository.existsByName(sector.getName().toLowerCase())){
+    public Sector save(Sector sector, UUID companyId){
+        if (repository.existsByNameIgnoreCaseAndCompanyId(sector.getName().toLowerCase(), companyId)){
             throw new BusinessException("Você já tem esse setor salvo.");
         }
         return repository.save(sector);

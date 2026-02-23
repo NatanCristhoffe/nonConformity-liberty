@@ -35,12 +35,15 @@ public class SectorController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
-//    public ResponseEntity<SectorResponseDTO> createSector(@Valid @RequestBody SectorRequestDTO data){
-////        Sector sector = service.create(data);
-//        return ResponseEntity
-//                .status(HttpStatus.CREATED)
-//                .body(new SectorResponseDTO(sector));
-//    }
+    public ResponseEntity<SectorResponseDTO> createSector(
+            @Valid @RequestBody SectorRequestDTO data,
+            @AuthenticationPrincipal User user
+    ){
+        Sector sector = service.create(data, user.getCompany().getId());
+       return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new SectorResponseDTO(sector));
+    }
 
     @PutMapping("/{idSector}")
     public ResponseEntity<SectorResponseDTO> update(
