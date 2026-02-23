@@ -50,9 +50,11 @@ public class SectorController {
     @PutMapping("/{idSector}")
     public ResponseEntity<SectorResponseDTO> update(
             @PathVariable Long idSector,
-            @RequestBody @Valid SectorRequestDTO dataUpdate){
+            @RequestBody @Valid SectorRequestDTO dataUpdate,
+            @AuthenticationPrincipal User user
+            ){
 
-        return ResponseEntity.ok(service.update(idSector, dataUpdate));
+        return ResponseEntity.ok(service.update(idSector, dataUpdate, user.getCompany().getId()));
 
     }
 

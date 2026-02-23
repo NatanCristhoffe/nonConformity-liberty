@@ -60,8 +60,13 @@ public class SectorService {
     }
 
     @Transactional
-    public SectorResponseDTO update(Long id, SectorRequestDTO dataUpdate){
+    public SectorResponseDTO update(Long id, SectorRequestDTO dataUpdate, UUID companyId){
         Sector sector = sectorQuery.byId(id);
+        Company company = companyQuery.byId(companyId);
+
+        if (!sector.getCompany().getId().equals(company.getId())){
+            throw new BusinessException("Você não pode atualizar os dados desse setor.");
+        }
 
         sector.setName(dataUpdate.name());
         sector.setDescription(dataUpdate.description());
