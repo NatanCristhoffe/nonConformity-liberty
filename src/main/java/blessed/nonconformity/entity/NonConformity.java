@@ -1,6 +1,7 @@
 package blessed.nonconformity.entity;
 
 
+import blessed.company.entity.Company;
 import blessed.exception.BusinessException;
 import blessed.nonconformity.dto.ActionCompletedRequestDTO;
 import blessed.nonconformity.dto.ActionNotExecutedRequestDTO;
@@ -34,6 +35,11 @@ public class NonConformity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
+
     @Column(length = 150, nullable = false)
     @Size(max = 150)
     private String title;
@@ -119,7 +125,8 @@ public class NonConformity {
 
     public NonConformity(
             NonconformityRequestDTO data, Sector source, Sector responsibleDepartment,
-            User createBy, User dispositionOwner, User effectivenessAnalyst, String urlEvidence
+            User createBy, User dispositionOwner, User effectivenessAnalyst, String urlEvidence,
+            Company company
             ){
         this.title = data.title().toLowerCase();
         this.description = data.description();
@@ -134,6 +141,7 @@ public class NonConformity {
         this.requiresQualityTool = data.requiresQualityTool();
         this.selectedTool = data.selectedTool();
         this.status = NonConformityStatus.PENDING;
+        this.company = company;
         this.createdBy = createBy;
         this.createdAt = LocalDateTime.now();
         addLog(

@@ -22,7 +22,16 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     Page<NonConformity> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
 
-    List<NonConformity> findTop5ByTitleStartingWithIgnoreCase(String title);
+    @Query("""
+    SELECT nc FROM NonConformity nc
+    WHERE LOWER(nc.title) LIKE LOWER(CONCAT(:title, '%'))
+    AND nc.company.id = :companyId
+    """)
+    List<NonConformity> findTopByTitleAndCompany(
+            @Param("title") String title,
+            @Param("companyId") UUID companyId,
+            Pageable pageable
+    );
 
     Page<NonConformity> findByStatus(
             NonConformityStatus status,

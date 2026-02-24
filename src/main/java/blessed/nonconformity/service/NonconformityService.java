@@ -1,5 +1,7 @@
 package blessed.nonconformity.service;
 
+import blessed.company.entity.Company;
+import blessed.company.service.query.CompanyQuery;
 import blessed.infra.enums.FileType;
 import blessed.infra.storage.S3FileStorageService;
 import blessed.nonconformity.dto.ActionResponseDTO;
@@ -24,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -35,19 +38,22 @@ public class NonconformityService {
     private final UserQuery userQuery;
     private final SectorQuery sectorQuery;
     private final S3FileStorageService s3Service;
+    private final CompanyQuery companyQuery;
 
     public NonconformityService(
             QualityToolService qualityToolService,
             NonConformityQuery nonConformityQuery,
             UserQuery userQuery,
             SectorQuery sectorQuery,
-            S3FileStorageService s3Service
+            S3FileStorageService s3Service,
+            CompanyQuery companyQuery
     ) {
         this.qualityToolService = qualityToolService;
         this.nonConformityQuery = nonConformityQuery;
         this.userQuery = userQuery;
         this.sectorQuery = sectorQuery;
         this.s3Service = s3Service;
+        this.companyQuery = companyQuery;
     }
 
     @PreAuthorize("@ncAuth.canAccessNc(#nonconformityId, authentication)")
@@ -90,9 +96,13 @@ public class NonconformityService {
     }
 
     @Transactional
-    public NonConformity create(NonconformityRequestDTO data, User createdByNc, MultipartFile file){
+    public NonConformity create(
+            NonconformityRequestDTO data, User createdByNc,
+            UUID companyId,MultipartFile file
+    ){
         Sector source = sectorQuery.byId(data.sourceDepartmentId());
         Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId());
+        Company company = companyQuery.byId(companyId);
 
         User createBy = userQuery.byId(createdByNc.getId());
         User dispositionOwner = userQuery.byId(data.dispositionOwnerId());
@@ -106,7 +116,8 @@ public class NonconformityService {
 
         NonConformity nc = new NonConformity(
                 data, source, responsibleDepartment, createBy,
-                dispositionOwner,effectivenessAnalyst, urlEvidence
+                dispositionOwner,effectivenessAnalyst, urlEvidence,
+                company
         );
         nonConformityQuery.save(nc);
         return nc;
@@ -130,8 +141,8 @@ public class NonconformityService {
     }
 
 
-    public List<NonconformityResponseDTO> findByTitleStartingWithIgnoreCase(String title) {
-        return  nonConformityQuery.findByTitle(title)
+    public List<NonconformityResponseDTO> findByTitleStartingWithIgnoreCase(String title, UUID companyId) {
+        return  nonConformityQuery.findByTitle(title, companyId)
                 .stream()
                 .map(NonconformityResponseDTO::new)
                 .toList();

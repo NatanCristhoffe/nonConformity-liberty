@@ -43,10 +43,12 @@ public class NonconformityController {
     public ResponseEntity<NonconformityResponseDTO> create(
             @RequestPart("data") @Valid NonconformityRequestDTO data,
             @RequestPart(value = "file", required = false) MultipartFile file,
-            Authentication authentication
+            @AuthenticationPrincipal User user
     ) {
-        User user = (User) authentication.getPrincipal();
-        NonConformity nonconformity = service.create(data, user, file);
+        NonConformity nonconformity = service.create(
+                data, user, user.getCompany().getId(),
+                file
+        );
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new NonconformityResponseDTO(nonconformity));
@@ -72,8 +74,10 @@ public class NonconformityController {
     }
 
     @GetMapping(params = "title")
-    public ResponseEntity<List<NonconformityResponseDTO>> getByTitle(@RequestParam String title){
-        List<NonconformityResponseDTO> nonConformities = service.findByTitleStartingWithIgnoreCase(title);
+    public ResponseEntity<List<NonconformityResponseDTO>> getByTitle(
+            @RequestParam String title, @AuthenticationPrincipal User user
+    ){
+        List<NonconformityResponseDTO> nonConformities = service.findByTitleStartingWithIgnoreCase(title, user.getCompany().getId());
 
         return ResponseEntity.ok(nonConformities);
     }
