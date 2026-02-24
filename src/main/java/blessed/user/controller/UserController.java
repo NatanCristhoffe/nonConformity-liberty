@@ -72,7 +72,7 @@ public class UserController {
     @PutMapping("/{id}/enable")
     public ResponseEntity<Map<String, String>> enable(
             @PathVariable UUID id, @AuthenticationPrincipal User currentUser) {
-        service.enable(id, currentUser);
+        service.enable(id, currentUser, currentUser.getCompany().getId());
         return ResponseEntity.ok(Map.of("success", "Usuário habilitado."));
     }
 
@@ -82,7 +82,7 @@ public class UserController {
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser
     ) {
-        service.disable(id, currentUser);
+        service.disable(id, currentUser, currentUser.getId());
         return ResponseEntity.ok(Map.of("success", "Usuário desabilitado."));
     }
 

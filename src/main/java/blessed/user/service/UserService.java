@@ -58,21 +58,20 @@ public class UserService{
 
 
     @Transactional
-    public void enable(UUID userId, User currentUser) {
+    public void enable(UUID userId, User currentUser, UUID companyId) {
         User user = userQuery.byId(userId);
-        if (user.getId().equals(currentUser.getId())){
-            throw new BusinessException("Operação não permitida: não é possível habilitar o próprio usuário.");
-        }
+        validateNotSelOfOperation(user, currentUser);
+        validateIfUserPertenceCompany(companyId, user);
 
         user.enable();
     }
 
     @Transactional
-    public void disable(UUID userId, User currentUser){
+    public void disable(UUID userId, User currentUser, UUID companyId){
         User user = userQuery.byId(userId);
-        if (user.getId().equals(currentUser.getId())){
-            throw new BusinessException("Operação não permitida: não é possível desabilitar o próprio usuário.");
-        }
+        validateNotSelOfOperation(user, currentUser);
+        validateIfUserPertenceCompany(companyId, user);
+
         user.disable();
     }
 
@@ -160,6 +159,20 @@ public class UserService{
         }
         if (this.userQuery.existsByPhone(phone)){
             throw new BusinessException("Telefone informado já está em uso.");
+        }
+    }
+
+    private void validateNotSelOfOperation(User user, User currentUser){
+        if (user.getId().equals(currentUser.getId())){
+            throw new BusinessException(
+                    "Operação não permitida: não é possível habilitar ou desabilitar o próprio usuário."
+            );
+        }
+    }
+
+    private void validateIfUserPertenceCompany(UUID companyId, User user){
+        if (!companyId.equals(user.getCompany().getId())){
+            throw new BusinessException("Você não pode atualizar os dados desse usuário.");
         }
     }
 
