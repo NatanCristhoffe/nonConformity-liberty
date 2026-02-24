@@ -1,301 +1,263 @@
-Blessed
-Enterprise Non-Conformity Management System (SaaS – Multi-Tenant)
-Blessed é uma API REST SaaS desenvolvida com Java + Spring Boot, projetada para gestão corporativa de não conformidades com arquitetura multi-tenant isolada por empresa, autenticação segura via JWT e infraestrutura hospedada na AWS.
+# Blessed
 
-O sistema foi projetado com foco em:
+![Java](https://img.shields.io/badge/Java-17-red)
+![Spring Boot](https://img.shields.io/badge/SpringBoot-3.x-brightgreen)
+![Spring Security](https://img.shields.io/badge/Security-JWT-blue)
+![MySQL](https://img.shields.io/badge/Database-MySQL-orange)
+![AWS](https://img.shields.io/badge/Cloud-AWS-yellow)
+![Architecture](https://img.shields.io/badge/Architecture-Multi--Tenant-purple)
+![Status](https://img.shields.io/badge/Status-Production%20Ready-success)
 
-Segurança
+> Enterprise Non-Conformity Management System (SaaS – Multi-Tenant)
 
-Escalabilidade
+Blessed é uma API REST SaaS desenvolvida com **Java + Spring Boot**, projetada para gestão corporativa de não conformidades com arquitetura **multi-tenant isolada por empresa**, autenticação segura via JWT e infraestrutura hospedada na AWS.
 
-Isolamento de dados
+---
 
-Governança corporativa
+## 🚀 Visão Geral
 
-Auditoria e rastreabilidade
+O sistema permite que múltiplas empresas utilizem a mesma aplicação com isolamento completo de dados.
 
-🏢 Arquitetura Geral
+### Objetivos principais
 
-Blessed opera como um sistema multi-tenant SaaS, onde múltiplas empresas utilizam a mesma aplicação com isolamento completo de dados.
+- 🔐 Segurança robusta
+- 🏢 Isolamento por empresa (Multi-Tenancy)
+- ☁️ Infraestrutura Cloud na AWS
+- 📊 Auditoria e rastreabilidade
+- 📁 Upload seguro de evidências
 
-🔐 Estratégia de Multi-Tenancy
+---
 
-O isolamento é feito via:
+## 🏗 Arquitetura Multi-Tenant
 
-companyId embutido no JWT
+O isolamento é realizado utilizando o `companyId` embutido no JWT.
 
-Validação contextual no Service Layer
+### 🔑 Fluxo de Autenticação
 
-Regras explícitas de autorização por role
-
-Cada requisição autenticada:
-
-Extrai o token JWT
-
-Recupera:
-
-userId
-
-companyId
-
-role
-
-Valida:
-
-Se o usuário pertence à empresa correta
-
-Se possui permissão para executar a ação
+1. Usuário realiza login via `/auth/login`
+2. Se credenciais válidas:
+   - Geração de JWT contendo:
+     - `userId`
+     - `companyId`
+     - `role`
+3. Toda requisição autenticada valida:
+   - Se o usuário pertence à empresa correta
+   - Se possui permissão adequada
 
 Isso impede qualquer acesso cross-tenant.
 
-🔒 Segurança
+---
 
-Spring Security
+## 🔒 Segurança
 
-JWT Stateless Authentication
-
-Expiração de Token com retorno automático de 401
-
-Autorização baseada em Roles (USER / ADMIN)
-
-Validações de acesso no Service Layer
-
-Controle de permissões por empresa
-
-Exception Handler Global
-
-Soft Delete para integridade histórica
+- Spring Security
+- JWT Stateless Authentication
+- Expiração automática com retorno HTTP 401
+- Autorização baseada em Roles (USER / ADMIN)
+- Validações de autorização no Service Layer
+- Exception Handler Global
+- Soft Delete para preservação histórica
 
 Quando o token expira:
+- A API retorna HTTP 401
+- O front-end pode invalidar a sessão automaticamente
 
-A API retorna HTTP 401
+---
 
-O front-end pode invalidar sessão automaticamente
+## ☁️ Infraestrutura AWS
 
-☁️ Infraestrutura Cloud (AWS)
+A aplicação foi projetada para ambiente produtivo em nuvem.
 
-O sistema foi projetado para ambiente produtivo em nuvem.
+### 🖥 Aplicação
+- Amazon EC2
 
-🖥 Aplicação
+### 🗄 Banco de Dados
+- Amazon RDS
+- MySQL
 
-Hospedada em instância Amazon EC2
+### 📦 Armazenamento de Arquivos
+- Amazon S3
 
-🗄 Banco de Dados
+Utilizado para:
 
-Amazon RDS
-
-MySQL
-
-Banco isolado por ambiente
-
-📦 Armazenamento de Arquivos
-
-Amazon S3
-
-Armazenamento centralizado para:
-
-Evidências de abertura de não conformidades
-
-Evidências de ações corretivas
-
-Documentações anexadas
-
-(Futuro) Fotos de perfil de usuários
+- Evidências de abertura de não conformidades
+- Evidências de ações corretivas
+- Documentações anexadas
+- (Futuro) Foto de perfil de usuários
 
 Arquitetura preparada para expansão de storage sem impacto estrutural.
 
-📦 Tecnologias Utilizadas
+---
 
-Java 17
+## 🧰 Tecnologias Utilizadas
 
-Spring Boot
+- Java 17
+- Spring Boot
+- Spring Security
+- JWT
+- JPA / Hibernate
+- MySQL
+- Lombok
+- Maven
+- AWS EC2
+- AWS RDS
+- AWS S3
 
-Spring Security
+---
 
-JWT
+## 📌 Principais Funcionalidades
 
-JPA / Hibernate
+### 👥 Gestão de Empresas
 
-MySQL
-
-Lombok
-
-Maven
-
-AWS EC2
-
-AWS RDS
-
-AWS S3
-
-📌 Módulos do Sistema
-👥 Gestão de Empresas
+```http
 POST /company
-Permite criação de nova empresa dentro do ambiente multi-tenant.
+```
 
-👤 Gestão de Usuários
+Permite criação de novas empresas no ambiente multi-tenant.
 
-Criar usuário
+---
 
-Atualizar dados
+### 👤 Gestão de Usuários
 
-Atualizar role (PATCH)
-
-Desativar usuário (soft disable)
-
-Validação de tenant antes de qualquer operação
+- Criar usuário
+- Atualizar dados
+- Atualizar role (PATCH)
+- Desativar usuário (soft disable)
+- Validação de tenant antes de qualquer operação
 
 Regras:
 
-Apenas administradores podem gerenciar usuários
+- Apenas administradores podem gerenciar usuários
+- Administradores só podem gerenciar usuários da própria empresa
 
-Administrador só pode gerenciar usuários da própria empresa
+---
 
-📋 Gestão de Não Conformidades
+### 📋 Gestão de Não Conformidades
 
-O núcleo do sistema.
+#### ➕ Criar Não Conformidade
 
-➕ Criar Não Conformidade
+```http
 POST /non-conformity
+Content-Type: multipart/form-data
+```
 
-Consome:
+Permite envio de:
 
-multipart/form-data
-Estrutura da requisição:
-
-data → JSON com informações estruturadas
-
-file → Arquivo de evidência (imagem ou documento)
+- `data` → JSON estruturado
+- `file` → Arquivo de evidência (imagem, PDF, etc.)
 
 Exemplo de uso:
 
-Incidente estrutural
+- Incidente estrutural
+- Falha de processo
+- Evento de segurança
+- Desvio operacional
 
-Falha de processo
+---
 
-Evento de segurança
+### 🔍 Consultas Disponíveis
 
-Desvio operacional
-
-🔍 Consultas Disponíveis
-
-GET todas (por usuário autenticado)
-
-GET por ID
-
-GET por título (autocomplete)
-
-GET por status
-
-GET por status com includeAll (ADMIN only)
-
-Paginação via:
-
-page
-
-size (default configurado)
+- GET todas (por usuário autenticado)
+- GET por ID
+- GET por título (autocomplete)
+- GET por status
+- Paginação via `page` e `size`
 
 Usuários comuns:
-
-Visualizam apenas suas não conformidades
+- Visualizam apenas suas não conformidades
 
 Administradores:
+- Visualizam todas da empresa
 
-Visualizam todas da empresa
+---
 
-🔁 Atualizações
+### 🔁 Atualizações
 
-PUT → Atualização completa
-
-PATCH → Atualizações parciais
-
-Cancelamento ao invés de DELETE
+- PUT → Atualização completa
+- PATCH → Atualização parcial
+- Cancelamento ao invés de DELETE
 
 Nenhuma não conformidade é removida permanentemente, garantindo rastreabilidade histórica.
 
-🧩 Fluxo de Ações Corretivas
+---
+
+## 🧩 Fluxo de Ações Corretivas
 
 Cada não conformidade pode conter:
 
-Causa Raiz
-
-Plano de Ação
-
-Execução de Ação
-
-Evidência da Ação (upload S3)
-
-Análise de Eficácia
-
-Aprovação Administrativa
+- Causa Raiz
+- Plano de Ação
+- Execução da Ação
+- Evidência da Ação (upload S3)
+- Análise de Eficácia
+- Aprovação Administrativa
 
 Isso cria um ciclo completo de gestão corretiva.
 
-📊 Auditoria e Logs
+---
+
+## 📊 Auditoria e Logs
 
 O sistema mantém registro de:
 
-Atualizações relevantes
+- Mudanças de status
+- Execução de ações
+- Aprovações
+- Correções
+- Atualizações críticas
 
-Mudanças de status
+Projetado para ambientes corporativos que exigem rastreabilidade.
 
-Ações executadas
+---
 
-Aprovações
+## ▶️ Como Executar Localmente
 
-Correções
-
-Projetado para atender ambientes corporativos que exigem rastreabilidade.
-
-🧠 Decisões Técnicas
-
-Multi-tenancy implementado via contexto JWT
-
-Regras críticas protegidas no Service Layer
-
-Soft deletion para preservar histórico
-
-Upload desacoplado via S3
-
-Arquitetura organizada em Controller / Service / Repository
-
-DTOs para isolamento da camada de domínio
-
-▶️ Como Executar Localmente
+```bash
 git clone https://github.com/seu-usuario/blessed
 cd blessed
 mvn spring-boot:run
+```
 
-Configurar application.yml com:
+Configurar `application.yml` com:
 
-MySQL
+- Banco MySQL
+- Secret JWT
+- Credenciais AWS (S3)
 
-Secret JWT
+---
 
-Configurações AWS (S3)
+## 🧠 Decisões Técnicas
 
-🚀 Roadmap Futuro
+- Multi-tenancy baseado em contexto JWT
+- Regras críticas protegidas no Service Layer
+- Upload desacoplado via S3
+- DTOs para isolamento da camada de domínio
+- Arquitetura organizada em Controller / Service / Repository
 
-Refresh Token
+---
 
-Dockerização completa
+## 🚀 Roadmap
 
-Testes automatizados (JUnit + Mockito)
+- Refresh Token
+- Dockerização
+- Testes automatizados
+- Swagger/OpenAPI
+- Observabilidade
+- Sistema granular de permissões
 
-Observabilidade (CloudWatch)
+---
 
-Rate Limiting
+## 💼 Diferenciais do Projeto
 
-API Documentation com Swagger/OpenAPI
+✔ Arquitetura SaaS real  
+✔ Multi-tenancy robusto  
+✔ Segurança JWT  
+✔ Infraestrutura AWS  
+✔ Upload seguro via S3  
+✔ Controle de acesso por empresa e role  
 
-Sistema de permissões granular
+---
 
-💼 Diferenciais do Projeto
+## 👨‍💻 Autor
 
-✔ Arquitetura SaaS real
-✔ Multi-tenancy com isolamento forte
-✔ Segurança JWT robusta
-✔ Infraestrutura AWS profissional
-✔ Upload seguro em S3
-✔ Controle de acesso por empresa e role
-✔ Ciclo completo de gestão de não conformidade
+Desenvolvido por **Natan Carvalho**
