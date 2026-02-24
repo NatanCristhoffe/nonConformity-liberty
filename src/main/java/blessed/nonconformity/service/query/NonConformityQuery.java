@@ -37,8 +37,8 @@ public class NonConformityQuery {
                 );
     }
 
-    public Page<NonConformity> getAll(Pageable pageable){
-         return nonconformityRepository.findAllByOrderByCreatedAtDesc(pageable);
+    public Page<NonConformity> getAll(UUID companyId, Pageable pageable){
+         return nonconformityRepository.findAllByCompanyIdOrderByCreatedAtDesc(companyId, pageable);
     }
 
     public Page<NonConformity> getAllNonconformitiesByUser(UUID user, UUID companyId,Pageable pageable){

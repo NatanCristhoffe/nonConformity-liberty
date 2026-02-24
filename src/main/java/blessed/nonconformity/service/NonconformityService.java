@@ -90,7 +90,7 @@ public class NonconformityService {
         User user = userQuery.byId(userRequest.getId());
 
         if(getAll && user.isAdmin()){
-            return nonConformityQuery.getAll(pageable)
+            return nonConformityQuery.getAll(user.getCompany().getId(),pageable)
                     .map(NonconformityResponseDTO::new);
         }
 

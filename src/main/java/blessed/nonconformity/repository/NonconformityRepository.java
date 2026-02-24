@@ -17,7 +17,11 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
 
     @Query("""
     SELECT nc FROM NonConformity nc
-    WHERE nc.createdBy.id = :userId OR nc.dispositionOwner.id = :userId OR nc.effectivenessAnalyst.id = :userId
+    WHERE (
+        nc.createdBy.id = :userId OR
+        nc.dispositionOwner.id = :userId OR
+        nc.effectivenessAnalyst.id = :userId
+            )
     AND nc.company.id = :companyId
     """)
     Page<NonConformity> findByUser(
@@ -25,8 +29,10 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
             @Param("companyId") UUID companyId,
             Pageable pageable);
 
-    Page<NonConformity> findAllByOrderByCreatedAtDesc(Pageable pageable);
-
+    Page<NonConformity> findAllByCompanyIdOrderByCreatedAtDesc(
+            UUID companyId,
+            Pageable pageable
+    );
 
     @Query("""
     SELECT nc FROM NonConformity nc
@@ -60,6 +66,7 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     GROUP BY nc.status
     """)
     List<Object[]> countByStatus();
+
     @Query("""
     SELECT nc.priorityLevel, COUNT(nc)
     FROM NonConformity nc
@@ -74,6 +81,7 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     GROUP BY d.id, d.name
     """)
     List<Object[]> countByDepartment();
+
     @Query("""
     SELECT 
         FUNCTION('DATE_FORMAT', nc.createdAt, '%Y-%m'),
