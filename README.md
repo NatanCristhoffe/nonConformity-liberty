@@ -236,17 +236,6 @@ Configurar `application.yml` com:
 
 ---
 
-## 🚀 Roadmap
-
-- Refresh Token
-- Dockerização
-- Testes automatizados
-- Swagger/OpenAPI
-- Observabilidade
-- Sistema granular de permissões
-
----
-
 ## 💼 Diferenciais do Projeto
 
 ✔ Arquitetura SaaS real  
