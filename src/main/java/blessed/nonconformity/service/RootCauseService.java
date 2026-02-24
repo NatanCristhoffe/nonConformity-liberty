@@ -37,7 +37,7 @@ public class RootCauseService {
     @Transactional
     public RootCause create(Long nonconformityId, RootCauseRequestDTO data, User user){
 
-        NonConformity nc = nonConformityQuery.byId(nonconformityId);
+        NonConformity nc = nonConformityQuery.byId(nonconformityId, user.getCompany().getId());
         User userRequest = userQuery.byId(user.getId());
 
         RootCause rootCause = new RootCause(data, userRequest);

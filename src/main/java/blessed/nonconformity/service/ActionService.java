@@ -42,7 +42,7 @@ public class ActionService {
     @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
     @Transactional
     public Action create(Long nonconformityId, ActionRequestDTO data, User userRequest){
-        NonConformity nc = nonConformityQuery.byId(nonconformityId);
+        NonConformity nc = nonConformityQuery.byId(nonconformityId, userRequest.getCompany().getId());
         User responsibleUser = userQuery.byId(data.responsibleUserId());
 
         Action action = new Action(data);
@@ -73,7 +73,7 @@ public class ActionService {
     @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
     @Transactional
     public NonConformity closeActionStage(Long nonconformityId, User userRequest){
-        NonConformity nc = nonConformityQuery.byId(nonconformityId);
+        NonConformity nc = nonConformityQuery.byId(nonconformityId, userRequest.getCompany().getId());
         nc.closedAction(userRequest);
         nc.closedDisposition(userRequest);
         return nc;

@@ -1,5 +1,6 @@
 package blessed.nonconformity.service.query;
 
+import blessed.company.entity.Company;
 import blessed.exception.ResourceNotFoundException;
 import blessed.nonconformity.dto.NonconformityResponseDTO;
 import blessed.nonconformity.entity.NonConformity;
@@ -25,14 +26,12 @@ public class NonConformityQuery {
         this.nonconformityRepository =nonconformityRepository;
     }
 
-    public NonConformity byId(Long id){
-        return  nonconformityRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Não conformidade não encontrada. Verifique o ID informado e tente novamente."));
-
+    public NonConformity byId(Long id, UUID companyId){
+        return  nonconformityRepository.findByIdAndCompanyId(id, companyId);
     };
 
-    public NonConformity byIdWithAll(Long id){
-        return nonconformityRepository.findByIdWithAll(id)
+    public NonConformity byIdWithAll(Long id, UUID companyId){
+        return nonconformityRepository.findByIdWithAll(id, companyId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Não conformidade não encontrada.")
                 );
@@ -66,10 +65,11 @@ public class NonConformityQuery {
     public Page<NonConformity> findMyByStatus(
             NonConformityStatus status,
             UUID userId,
+            UUID companyId,
             Pageable pageable
     ) {
         return nonconformityRepository
-                .findMyNonconformitiesByStatus(status, userId, pageable);
+                .findMyNonconformitiesByStatus(status, userId, companyId, pageable);
     }
 
     public boolean existsByIdAndDispositionOwnerId(Long ncId, UUID idUSer){

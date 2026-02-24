@@ -37,7 +37,7 @@ public class EffectivenessAnalysisService {
     @PreAuthorize("@ncAuth.isEffectivenessAnalystOrAdmin(#nonconformityId, authentication)")
     @Transactional
     public void addEffectivenessAnalysis(Long nonconformityId,EffectivenessAnalysisRequestDTO data, User userRequest) {
-        NonConformity nc = nonConformityQuery.byId(nonconformityId);
+        NonConformity nc = nonConformityQuery.byId(nonconformityId, userRequest.getCompany().getId());
         User user = userQuery.byId(userRequest.getId());
 
         EffectivenessAnalysis effectiveness = new EffectivenessAnalysis(data, nc, user);

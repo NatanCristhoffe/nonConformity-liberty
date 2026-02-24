@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface NonconformityRepository extends JpaRepository<NonConformity, Long> {
+    NonConformity findByIdAndCompanyId(Long  id, UUID companyId);
+
     @Query("""
     SELECT n FROM NonConformity n
     WHERE n.createdBy.id = :userId OR n.dispositionOwner.id = :userId OR n.effectivenessAnalyst.id = :userId
@@ -24,7 +26,7 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
 
     @Query("""
     SELECT nc FROM NonConformity nc
-    WHERE LOWER(nc.title) LIKE LOWER(CONCAT(:title, '%'))
+    WHERE LOWER(nc.title) LIKE LOWER(CONCAT('%', :title, '%'))
     AND nc.company.id = :companyId
     """)
     List<NonConformity> findTopByTitleAndCompany(
@@ -94,27 +96,33 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     left join fetch a.finalizedBy
     left join fetch nc.effectivenessAnalysis
     where nc.id = :id
+    and nc.company.id = :companyId
     """)
-    Optional<NonConformity> findByIdWithAll(@Param("id") Long id);
+    Optional<NonConformity> findByIdWithAll(
+            @Param("id") Long id,
+            @Param("companyId") UUID companyId
+    );
 
     @Query("""
-    select distinct nc
-    from NonConformity nc
-    left join nc.actions a
-    where nc.status = :status
-    and (
-        nc.createdBy.id = :userId
-        or nc.dispositionOwner.id = :userId
-        or nc.effectivenessAnalyst.id = :userId
-        or (
-            a.responsibleUser.id = :userId
-            and a.status = 'PENDING'
+        select distinct nc
+        from NonConformity nc
+        left join nc.actions a
+        where nc.company.id = :companyId
+        and nc.status = :status
+        and (
+            nc.createdBy.id = :userId
+            or nc.dispositionOwner.id = :userId
+            or nc.effectivenessAnalyst.id = :userId
+            or (
+                a.responsibleUser.id = :userId
+                and a.status = 'PENDING'
+            )
         )
-    )
-""")
+    """)
     Page<NonConformity> findMyNonconformitiesByStatus(
             @Param("status") NonConformityStatus status,
             @Param("userId") UUID userId,
+            @Param("companyId") UUID companyId,
             Pageable pageable
     );
 

@@ -57,10 +57,12 @@ public class NonconformityService {
     }
 
     @PreAuthorize("@ncAuth.canAccessNc(#nonconformityId, authentication)")
-    public NonconformityResponseDTO getNcById(Long nonconformityId, boolean includeAll){
+    public NonconformityResponseDTO getNcById(
+            Long nonconformityId, boolean includeAll, UUID companyId){
+
         NonConformity nonConformity = includeAll
-                ? nonConformityQuery.byIdWithAll(nonconformityId)
-                : nonConformityQuery.byId(nonconformityId);
+                ? nonConformityQuery.byIdWithAll(nonconformityId, companyId)
+                : nonConformityQuery.byId(nonconformityId, companyId);
 
         String presignedUrl = s3Service.generatePresignedUrl(nonConformity.getUrlEvidence());
 
@@ -125,7 +127,7 @@ public class NonconformityService {
 
     @Transactional
     public void approve(Long id, User user){
-        NonConformity nonConformity = nonConformityQuery.byId(id);
+        NonConformity nonConformity = nonConformityQuery.byId(id, user.getCompany().getId());
 
         nonConformity.approve(user);
 
@@ -136,7 +138,7 @@ public class NonconformityService {
 
     @Transactional
     public  void sendToCorrection(Long id, User user){
-        NonConformity nonConformity = nonConformityQuery.byId(id);
+        NonConformity nonConformity = nonConformityQuery.byId(id, user.getCompany().getId());
         nonConformity.correction(user);
     }
 
@@ -165,14 +167,14 @@ public class NonconformityService {
         }
 
         return nonConformityQuery
-                .findMyByStatus(status, user.getId(), pageable)
+                .findMyByStatus(status, user.getId(), companyId,pageable)
                 .map(NonconformityResponseDTO::new);
     }
 
     @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
     @Transactional
     public void update(Long id, NonconformityUpdateDTO data, User userRequest, MultipartFile file){
-        NonConformity nonConformity = nonConformityQuery.byId(id);
+        NonConformity nonConformity = nonConformityQuery.byId(id, userRequest.getCompany().getId());
 
         String oldEvidence = nonConformity.getUrlEvidence();
 

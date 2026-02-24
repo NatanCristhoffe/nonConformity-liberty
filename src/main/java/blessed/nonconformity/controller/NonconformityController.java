@@ -68,9 +68,10 @@ public class NonconformityController {
     @GetMapping("/{id}")
     public ResponseEntity<NonconformityResponseDTO> getNcById(
             @PathVariable Long id,
-            @RequestParam(defaultValue = "false") boolean includeAll
+            @RequestParam(defaultValue = "false") boolean includeAll,
+            @AuthenticationPrincipal User user
         ){
-        return ResponseEntity.ok(service.getNcById(id, includeAll));
+        return ResponseEntity.ok(service.getNcById(id, includeAll, user.getCompany().getId()));
     }
 
     @GetMapping(params = "title")
@@ -86,9 +87,13 @@ public class NonconformityController {
     public ResponseEntity<PageResponseDTO<NonconformityResponseDTO>> getByStatus(
             @RequestParam NonConformityStatus status,
             @RequestParam(defaultValue = "false") boolean includeAll,
-            @PageableDefault(size = 20) Pageable pageable,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal User user,
+            @PageableDefault(size = 20) Pageable pageable
+
     ) {
+        if (user.getCompany() == null || user.getCompany().getId() == null) {
+            throw new RuntimeException("Usuário sem empresa vinculada");
+        }
         Page<NonconformityResponseDTO> page =
                 service.getMyNonconformitiesByStatus(
                         status,
