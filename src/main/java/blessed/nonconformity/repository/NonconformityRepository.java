@@ -16,10 +16,14 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     NonConformity findByIdAndCompanyId(Long  id, UUID companyId);
 
     @Query("""
-    SELECT n FROM NonConformity n
-    WHERE n.createdBy.id = :userId OR n.dispositionOwner.id = :userId OR n.effectivenessAnalyst.id = :userId
+    SELECT nc FROM NonConformity nc
+    WHERE nc.createdBy.id = :userId OR nc.dispositionOwner.id = :userId OR nc.effectivenessAnalyst.id = :userId
+    AND nc.company.id = :companyId
     """)
-    Page<NonConformity> findByUser(@Param("userId") UUID userId, Pageable pageable);
+    Page<NonConformity> findByUser(
+            @Param("userId") UUID userId,
+            @Param("companyId") UUID companyId,
+            Pageable pageable);
 
     Page<NonConformity> findAllByOrderByCreatedAtDesc(Pageable pageable);
 

@@ -94,7 +94,7 @@ public class NonconformityService {
                     .map(NonconformityResponseDTO::new);
         }
 
-        return nonConformityQuery.getAllUser(user.getId(), pageable).map(NonconformityResponseDTO::new);
+        return nonConformityQuery.getAllNonconformitiesByUser(user.getId(), user.getCompany().getId(),pageable).map(NonconformityResponseDTO::new);
     }
 
     @Transactional
