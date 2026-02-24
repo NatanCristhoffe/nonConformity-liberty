@@ -33,8 +33,14 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
             Pageable pageable
     );
 
+    @Query("""
+    SELECT nc FROM NonConformity nc
+    WHERE nc.company.id = :companyId
+    AND nc.status = :status
+    """)
     Page<NonConformity> findByStatus(
-            NonConformityStatus status,
+            @Param("status") NonConformityStatus status,
+            @Param("companyId") UUID companyId,
             Pageable pageable
     );
 

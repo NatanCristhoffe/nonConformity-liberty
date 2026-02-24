@@ -53,9 +53,10 @@ public class NonConformityQuery {
 
     public Page<NonConformity> findAllByStatus(
             NonConformityStatus status,
+            UUID companyId,
             Pageable pageable
     ) {
-        return nonconformityRepository.findByStatus(status, pageable);
+        return nonconformityRepository.findByStatus(status, companyId,pageable);
     }
 
 

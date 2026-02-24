@@ -151,6 +151,7 @@ public class NonconformityService {
     public Page<NonconformityResponseDTO> getMyNonconformitiesByStatus(
             NonConformityStatus status,
             User user,
+            UUID companyId,
             boolean includeAll,
             Pageable pageable
     ) {
@@ -159,7 +160,7 @@ public class NonconformityService {
 
         if (includeAll && isAdmin) {
             return nonConformityQuery
-                    .findAllByStatus(status, pageable)
+                    .findAllByStatus(status, companyId,pageable)
                     .map(NonconformityResponseDTO::new);
         }
 

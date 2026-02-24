@@ -93,6 +93,7 @@ public class NonconformityController {
                 service.getMyNonconformitiesByStatus(
                         status,
                         user,
+                        user.getCompany().getId(),
                         includeAll,
                         pageable
                 );
