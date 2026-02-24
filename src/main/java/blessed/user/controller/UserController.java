@@ -50,7 +50,9 @@ public class UserController {
     ){
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(service.updateDataUser(id, newData, userRequest, userRequest.getCompany().getId()));
+                .body(
+                        service.updateDataUser(id, newData, userRequest, userRequest.getCompany().getId())
+                );
     }
 
     @GetMapping()
@@ -80,24 +82,25 @@ public class UserController {
     @PutMapping("/{id}/disable")
     public ResponseEntity<Map<String, String>> disable(
             @PathVariable UUID id,
-            @AuthenticationPrincipal User currentUser
+            @AuthenticationPrincipal User user
     ) {
-        service.disable(id, currentUser, currentUser.getId());
+        service.disable(id, user, user.getCompany().getId());
         return ResponseEntity.ok(Map.of("success", "Usuário desabilitado."));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/promote")
-    public ResponseEntity<Map<String, String>> promote(@PathVariable UUID id, @AuthenticationPrincipal User userRequest){
-        service.changeRole(id, UserRole.ADMIN, userRequest);
+    public ResponseEntity<Map<String, String>> promote(@PathVariable UUID id, @AuthenticationPrincipal User user){
+        service.changeRole(
+                id, UserRole.ADMIN, user, user.getCompany().getId());
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "Usuário promovido com sucesso"));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/demote")
-    public ResponseEntity<Map<String, String>> demote(@PathVariable UUID id, @AuthenticationPrincipal User userRequest){
-        service.changeRole(id, UserRole.USER, userRequest);
+    public ResponseEntity<Map<String, String>> demote(@PathVariable UUID id, @AuthenticationPrincipal User user){
+        service.changeRole(id, UserRole.USER, user, user.getCompany().getId());
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "Usuário definido como user com sucesso"));
     }

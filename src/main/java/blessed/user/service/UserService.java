@@ -137,8 +137,9 @@ public class UserService{
     }
 
     @Transactional
-    public void changeRole(UUID userId, UserRole newRole, User userRequest){
+    public void changeRole(UUID userId, UserRole newRole, User userRequest, UUID companyId){
         User user = userQuery.byId(userId);
+        validateIfUserPertenceCompany(companyId, user);
 
         if (user.getId().equals(userRequest.getId())){
             throw  new BusinessException("Você não pode alterar sua própria role");
