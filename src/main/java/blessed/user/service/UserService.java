@@ -99,12 +99,14 @@ public class UserService{
 
 
     @Transactional
-    public UserResponseDTO updateDataUser(UUID userUpdateId, UpdateUserDTO newData, User userRequest){
+    public UserResponseDTO updateDataUser(
+            UUID userUpdateId, UpdateUserDTO newData, User userRequest,
+            UUID companyId
+    ){
         User user = userQuery.byId(userUpdateId);
 
-        if (!user.getId().equals(userRequest.getId())){
-            throw new BusinessException("Usuário não autorizado.");
-        }
+        validateIfUserPertenceCompany(companyId, user);
+        validateUserOwnership(user, userRequest);
 
         Sector sector =  sectorQuery.byId(newData.sectorId());
 
@@ -173,6 +175,11 @@ public class UserService{
     private void validateIfUserPertenceCompany(UUID companyId, User user){
         if (!companyId.equals(user.getCompany().getId())){
             throw new BusinessException("Você não pode atualizar os dados desse usuário.");
+        }
+    }
+    private void validateUserOwnership(User user, User currentUser){
+        if (!user.getId().equals(currentUser.getId())){
+            throw new BusinessException("Usuário não autorizado.");
         }
     }
 

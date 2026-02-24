@@ -50,7 +50,7 @@ public class UserController {
     ){
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(service.updateDataUser(id, newData, userRequest));
+                .body(service.updateDataUser(id, newData, userRequest, userRequest.getCompany().getId()));
     }
 
     @GetMapping()
