@@ -136,8 +136,7 @@ public class UserService{
 
     @Transactional
     public void changeRole(UUID userId, UserRole newRole, User userRequest, UUID companyId){
-        User user = userQuery.byId(companyId,userId);
-        validateIfUserPertenceCompany(companyId, user);
+        User user = userQuery.byId(companyId, userId);
 
         if (user.getId().equals(userRequest.getId())){
             throw  new BusinessException("Você não pode alterar sua própria role");
@@ -171,11 +170,6 @@ public class UserService{
         }
     }
 
-    private void validateIfUserPertenceCompany(UUID companyId, User user){
-        if (!companyId.equals(user.getCompany().getId())){
-            throw new BusinessException("Você não pode atualizar os dados desse usuário.");
-        }
-    }
     private void validateUserOwnership(User user, User currentUser){
         if (!user.getId().equals(currentUser.getId())){
             throw new BusinessException("Usuário não autorizado.");
