@@ -34,7 +34,7 @@ public class AuthenticationService {
         var auth  = this.authenticationManager.authenticate(usernamePassword);
         User userLogin = (User) auth.getPrincipal();
 
-        User user = userQuery.byId(userLogin.getId());
+        User user = userQuery.byId(userLogin.getCompany().getId(), userLogin.getId());
         String token = tokenService.generateToken(user);
 
         return new LoginResponseDTO(token, user);

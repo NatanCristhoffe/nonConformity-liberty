@@ -43,7 +43,7 @@ public class ActionService {
     @Transactional
     public Action create(Long nonconformityId, ActionRequestDTO data, User userRequest){
         NonConformity nc = nonConformityQuery.byId(nonconformityId, userRequest.getCompany().getId());
-        User responsibleUser = userQuery.byId(data.responsibleUserId());
+        User responsibleUser = userQuery.byId(userRequest.getCompany().getId(),data.responsibleUserId());
 
         Action action = new Action(data);
         nc.addAction(action, responsibleUser, userRequest);
@@ -89,7 +89,7 @@ public class ActionService {
             urlEvidence = s3Service.uploadFile(file, "actions-evidence", FileType.EVIDENCE);
         }
 
-        User user = userQuery.byId(authUser.getId());
+        User user = userQuery.byId(authUser.getCompany().getId(),authUser.getId());
         Action action = actionQuery.getActionPendingById(actionId);
         NonConformity nonConformity = action.getNonconformity();
 

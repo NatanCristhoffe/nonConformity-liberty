@@ -15,8 +15,17 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByEmail(String email);
+    List<User> findAllByCompanyId(UUID companyId);
     boolean existsByEmail(String email);
     boolean existsByPhone(String phone);
+
+
+    @Query("""
+    SELECT u FROM users u
+    WHERE u.company.id = :companyId
+    AND u.id = :userId
+    """)
+    Optional<User> findById(@Param("companyId") UUID companyId, @Param("userId") UUID userId);
 
 
     @Query("""

@@ -47,8 +47,8 @@ public class UserService{
         this.sectorQuery = sectorQuery;
         this.companyQuery = companyQuery;
     }
-    public List<UserResponseDTO> getAll(){
-         return userQuery.getAll();
+    public List<UserResponseDTO> getAll(User user){
+         return userQuery.getAll(user.getCompany().getId());
     }
 
     public List<UserResponseDTO> findByFirstName(
@@ -58,19 +58,18 @@ public class UserService{
 
 
     @Transactional
-    public void enable(UUID userId, User currentUser, UUID companyId) {
-        User user = userQuery.byId(userId);
+    public void enable(UUID userId, User currentUser) {
+        User user = userQuery.byId(currentUser.getCompany().getId(), userId);
         validateNotSelOfOperation(user, currentUser);
-        validateIfUserPertenceCompany(companyId, user);
 
         user.enable();
     }
 
     @Transactional
-    public void disable(UUID userId, User currentUser, UUID companyId){
-        User user = userQuery.byId(userId);
+    public void disable(UUID userId, User currentUser){
+        User user = userQuery.byId(currentUser.getCompany().getId(), userId);
+        System.out.println("User -> " + user);
         validateNotSelOfOperation(user, currentUser);
-        validateIfUserPertenceCompany(companyId, user);
 
         user.disable();
     }
@@ -103,7 +102,7 @@ public class UserService{
             UUID userUpdateId, UpdateUserDTO newData, User userRequest,
             UUID companyId
     ){
-        User user = userQuery.byId(userUpdateId);
+        User user = userQuery.byId(companyId, userUpdateId);
 
         validateIfUserPertenceCompany(companyId, user);
         validateUserOwnership(user, userRequest);
@@ -138,7 +137,7 @@ public class UserService{
 
     @Transactional
     public void changeRole(UUID userId, UserRole newRole, User userRequest, UUID companyId){
-        User user = userQuery.byId(userId);
+        User user = userQuery.byId(companyId,userId);
         validateIfUserPertenceCompany(companyId, user);
 
         if (user.getId().equals(userRequest.getId())){

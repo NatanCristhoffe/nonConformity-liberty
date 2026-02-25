@@ -87,7 +87,7 @@ public class NonconformityService {
             Pageable pageable
     ){
 
-        User user = userQuery.byId(userRequest.getId());
+        User user = userQuery.byId(userRequest.getCompany().getId(),userRequest.getId());
 
         if(getAll && user.isAdmin()){
             return nonConformityQuery.getAll(user.getCompany().getId(),pageable)
@@ -106,9 +106,9 @@ public class NonconformityService {
         Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId());
         Company company = companyQuery.byId(companyId);
 
-        User createBy = userQuery.byId(createdByNc.getId());
-        User dispositionOwner = userQuery.byId(data.dispositionOwnerId());
-        User effectivenessAnalyst = userQuery.byId(data.effectivenessAnalystId());
+        User createBy = userQuery.byId(createdByNc.getCompany().getId(), createdByNc.getId());
+        User dispositionOwner = userQuery.byId(createdByNc.getCompany().getId(), data.dispositionOwnerId());
+        User effectivenessAnalyst = userQuery.byId(createdByNc.getCompany().getId(), data.effectivenessAnalystId());
 
         String urlEvidence = null; // Começa nulo
 
@@ -189,8 +189,8 @@ public class NonconformityService {
         Sector sourceDepartment = sectorQuery.byId(data.sourceDepartmentId());
         Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId());
 
-        User dispositionUser = userQuery.byId(data.dispositionOwnerId());
-        User effectivenessUser = userQuery.byId(data.effectivenessAnalystId());
+        User dispositionUser = userQuery.byId(userRequest.getCompany().getId(),data.dispositionOwnerId());
+        User effectivenessUser = userQuery.byId(userRequest.getCompany().getId(), data.effectivenessAnalystId());
 
         nonConformity.update(
                 data,sourceDepartment, responsibleDepartment,

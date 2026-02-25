@@ -38,7 +38,7 @@ public class EffectivenessAnalysisService {
     @Transactional
     public void addEffectivenessAnalysis(Long nonconformityId,EffectivenessAnalysisRequestDTO data, User userRequest) {
         NonConformity nc = nonConformityQuery.byId(nonconformityId, userRequest.getCompany().getId());
-        User user = userQuery.byId(userRequest.getId());
+        User user = userQuery.byId(userRequest.getCompany().getId(), userRequest.getId());
 
         EffectivenessAnalysis effectiveness = new EffectivenessAnalysis(data, nc, user);
         nc.addEffectivenessAnalysis(effectiveness, userRequest);

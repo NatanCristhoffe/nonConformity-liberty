@@ -66,15 +66,15 @@ public class UserController {
             return ResponseEntity.ok(users);
         }
 
-        return  ResponseEntity.ok(service.getAll());
+        return  ResponseEntity.ok(service.getAll(user));
 
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/enable")
     public ResponseEntity<Map<String, String>> enable(
-            @PathVariable UUID id, @AuthenticationPrincipal User currentUser) {
-        service.enable(id, currentUser, currentUser.getCompany().getId());
+            @PathVariable UUID id, @AuthenticationPrincipal User user) {
+        service.enable(id, user);
         return ResponseEntity.ok(Map.of("success", "Usuário habilitado."));
     }
 
@@ -84,7 +84,7 @@ public class UserController {
             @PathVariable UUID id,
             @AuthenticationPrincipal User user
     ) {
-        service.disable(id, user, user.getCompany().getId());
+        service.disable(id, user);
         return ResponseEntity.ok(Map.of("success", "Usuário desabilitado."));
     }
 

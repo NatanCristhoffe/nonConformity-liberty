@@ -21,15 +21,17 @@ public class UserQuery {
 
     private final UserRepository repository;
 
-    public List<UserResponseDTO> getAll(){
-        return repository.findAll()
-                .stream()
-                .map(UserResponseDTO::new)
-                .toList();
-    }
 
     public UserQuery(UserRepository repository){
         this.repository = repository;
+    }
+
+
+    public List<UserResponseDTO> getAll(UUID companyId){
+        return repository.findAllByCompanyId(companyId)
+                .stream()
+                .map(UserResponseDTO::new)
+                .toList();
     }
 
     public void save(User newUser, Company company){
@@ -41,9 +43,9 @@ public class UserQuery {
         repository.save(newUser);
     }
 
-    public User byId(UUID id){
-        return repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+    public User byId(UUID companyId,UUID userId){
+        return repository.findById(companyId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
     }
 
     public List<UserResponseDTO> byName(String firstName, UserRole roleFilter, UUID companyId){

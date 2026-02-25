@@ -38,7 +38,7 @@ public class SectorService {
     }
 
     public List<SectorResponseDTO> getByName(String name, boolean getNotActive, User userRequest, UUID companyId){
-        User user = userQuery.byId(userRequest.getId());
+        User user = userQuery.byId(userRequest.getCompany().getId(),userRequest.getId());
 
         boolean includeInactive = user.isAdmin() && getNotActive;
         return sectorQuery.getByName(name, includeInactive, companyId);
