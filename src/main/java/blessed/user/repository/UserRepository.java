@@ -22,11 +22,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("""
         SELECT u FROM users u
         WHERE u.company.id = :companyId
-        AND LOWER(u.firstName) LIKE LOWER(CONCAT(:firstName, "%"))
+        AND (
+                LOWER(u.firstName) LIKE LOWER(CONCAT('%', :name, '%'))
+                OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :name, '%'))
+            )
         AND (:role IS NULL OR u.role = :role)
         """)
     List<User> findByFirstNameAndRole(
-            @Param("firstName") String firstName,
+            @Param("name") String name,
             @Param("role") UserRole role,
             @Param("companyId") UUID companyId,
             Limit limit
