@@ -63,24 +63,27 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     @Query("""
     SELECT nc.status, COUNT(nc)
     FROM NonConformity nc
+    WHERE nc.company.id = :companyId
     GROUP BY nc.status
     """)
-    List<Object[]> countByStatus();
+    List<Object[]> countByStatus(@Param("companyId") UUID companyId);
 
     @Query("""
     SELECT nc.priorityLevel, COUNT(nc)
     FROM NonConformity nc
+    WHERE nc.company.id = :companyId
     GROUP BY nc.priorityLevel
     """)
-    List<Object[]> countByPriority();
+    List<Object[]> countByPriority(@Param("companyId") UUID companyId);
 
     @Query("""
     SELECT d.id, d.name, COUNT (nc)
     FROM NonConformity  nc
     JOIN nc.responsibleDepartment d
+    WHERE nc.company.id = :companyId
     GROUP BY d.id, d.name
     """)
-    List<Object[]> countByDepartment();
+    List<Object[]> countByDepartment(@Param("companyId") UUID companyId);
 
     @Query("""
     SELECT 
@@ -88,17 +91,19 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
         COUNT(nc),
         SUM(CASE WHEN nc.status = 'CLOSED' THEN 1 ELSE 0 END)
     FROM NonConformity nc
+    WHERE nc.company.id = :companyId
     GROUP BY FUNCTION('DATE_FORMAT', nc.createdAt, '%Y-%m')
     ORDER BY 1 DESC
     """)
-    List<Object[]> trend();
+    List<Object[]> trend(@Param("companyId") UUID companyId);
 
     @Query("""
     SELECT AVG(DATEDIFF(nc.closedAt, nc.createdAt))
     FROM NonConformity nc
-    WHERE nc.closedAt IS NOT NULL
+    WHERE nc.company.id = :companyId
+    AND nc.closedAt IS NOT NULL
     """)
-    Double averageResolutionDays();
+    Double averageResolutionDays(@Param("companyId") UUID companyId);
 
     @Query("""
     select distinct nc

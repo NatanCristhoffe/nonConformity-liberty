@@ -1,5 +1,6 @@
 package blessed.nonconformity.service;
 
+import blessed.company.entity.Company;
 import blessed.nonconformity.dto.DashboardIndicatorsResponse;
 import blessed.nonconformity.dto.SummaryDTO;
 import blessed.nonconformity.enums.NonConformityStatus;
@@ -7,6 +8,7 @@ import blessed.nonconformity.service.query.DashboardQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class DashboardService {
@@ -17,22 +19,22 @@ public class DashboardService {
         this.dashboardQuery = dashboardQuery;
     }
 
-    public DashboardIndicatorsResponse getIndicators(){
+    public DashboardIndicatorsResponse getIndicators(UUID companyId){
         DashboardIndicatorsResponse response = new DashboardIndicatorsResponse();
 
-        response.setSummary(buildSummary());
-        response.setByPriority(dashboardQuery.countByPriority());
-        response.setByDepartment(dashboardQuery.countByDepartment());
-        response.setTrend(dashboardQuery.trend());
-        response.setAverageResolutionDays(dashboardQuery.averageResolutionDays());
+        response.setSummary(buildSummary(companyId));
+        response.setByPriority(dashboardQuery.countByPriority(companyId));
+        response.setByDepartment(dashboardQuery.countByDepartment(companyId));
+        response.setTrend(dashboardQuery.trend(companyId));
+        response.setAverageResolutionDays(dashboardQuery.averageResolutionDays(companyId));
 
         return response;
     }
 
-    private SummaryDTO buildSummary() {
+    private SummaryDTO buildSummary(UUID companyId) {
 
         Map<NonConformityStatus, Long> byStatus =
-                dashboardQuery.countByStatus();
+                dashboardQuery.countByStatus(companyId);
 
         long total = byStatus.values()
                 .stream()
