@@ -26,9 +26,9 @@ public class SectorQuery {
                 .toList();
     }
 
-    public Sector byId(Long idSector){
-        return repository.findById(idSector)
-                .orElseThrow(() -> new ResourceNotFoundException("Setor não encontrado!"));
+    public Sector byId(Long sectorId, UUID companyId){
+        return repository.findByIdAndCompanyId(sectorId, companyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Setor não encontrado"));
     }
 
     public Sector save(Sector sector, UUID companyId){

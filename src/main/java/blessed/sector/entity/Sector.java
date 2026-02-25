@@ -49,5 +49,10 @@ public class Sector extends AuditableEntity {
         this.active = false;
     }
 
+    public void update(SectorRequestDTO data){
+        this.name = data.name().toLowerCase();
+        this.description = data.description().toLowerCase();
+    }
+
 }
 

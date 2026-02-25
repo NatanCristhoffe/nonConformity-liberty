@@ -57,37 +57,22 @@ public class SectorService {
 
     @Transactional
     public SectorResponseDTO update(Long id, SectorRequestDTO dataUpdate, UUID companyId){
-        Sector sector = sectorQuery.byId(id);
-        verifyIfSectorPercentTheCompany(companyId, sector);
-
-        sector.setName(dataUpdate.name());
-        sector.setDescription(dataUpdate.description());
+        Sector sector = sectorQuery.byId(id, companyId);
+        sector.update(dataUpdate);
 
         return new SectorResponseDTO(sector);
     }
 
     @Transactional
     public void enable(Long id, UUID companyId){
-        Sector sector = sectorQuery.byId(id);
-        verifyIfSectorPercentTheCompany(companyId, sector);
+        Sector sector = sectorQuery.byId(id, companyId);
         sector.enable();
     }
 
     @Transactional
     public void disable(Long id, UUID companyId){
-        Sector sector = sectorQuery.byId(id);
-        verifyIfSectorPercentTheCompany(companyId, sector);
+        Sector sector = sectorQuery.byId(id, companyId);
 
         sector.disable();
     }
-
-    private void verifyIfSectorPercentTheCompany(UUID companyId, Sector sector){
-        Company company = companyQuery.byId(companyId);
-
-        if (!sector.getCompany().getId().equals(company.getId())){
-            throw new BusinessException("Você não pode atualizar os dados desse setor.");
-        }
-    }
-
-
 }

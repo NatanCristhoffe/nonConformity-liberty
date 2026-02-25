@@ -6,11 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface SectorRepository extends JpaRepository<Sector, Long> {
     boolean existsByNameIgnoreCaseAndCompanyId(String name, UUID companyId);
     Integer countByActive(boolean active);
+
+    Optional<Sector> findByIdAndCompanyId(Long sectorId, UUID companyId);
 
     @Query("""
         SELECT s FROM Sector s WHERE s.active = true AND s.company.id = :companyId
