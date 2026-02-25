@@ -72,7 +72,7 @@ public class User implements UserDetails{
     private LocalDateTime updateAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sector_id", nullable = true)
+    @JoinColumn(name = "sector_id", nullable = false)
     private Sector sector;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -131,8 +131,8 @@ public class User implements UserDetails{
     }
 
     public void update(UpdateUserDTO newData, Sector newSector, String newPassword){
-        this.firstName = newData.firstName();
-        this.lastName = newData.lastName();
+        this.firstName = newData.firstName().toLowerCase();
+        this.lastName = newData.lastName().toLowerCase();
         this.phone = newData.phone();
         this.sector =  newSector;
 

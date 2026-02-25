@@ -18,4 +18,5 @@ public record SectorResponseDTO(
                 entity.getCreatedAt()
         );
     }
+
 }

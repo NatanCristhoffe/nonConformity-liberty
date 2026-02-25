@@ -104,7 +104,6 @@ public class UserService{
     ){
         User user = userQuery.byId(companyId, userUpdateId);
 
-        validateIfUserPertenceCompany(companyId, user);
         validateUserOwnership(user, userRequest);
 
         Sector sector =  sectorQuery.byId(newData.sectorId());

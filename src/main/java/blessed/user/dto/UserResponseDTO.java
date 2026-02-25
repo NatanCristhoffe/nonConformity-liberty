@@ -1,5 +1,6 @@
 package blessed.user.dto;
 
+import blessed.sector.dto.SectorResponseDTO;
 import blessed.sector.entity.Sector;
 import blessed.user.entity.User;
 import blessed.user.enums.UserRole;
@@ -17,7 +18,7 @@ public class UserResponseDTO {
     private String fullName;
     private String email;
     private String phone;
-    private Sector sector;
+    private SectorResponseDTO sector;
     private UserRole role;
     private boolean enable;
     private LocalDateTime createdAt;
@@ -27,7 +28,7 @@ public class UserResponseDTO {
         this.fullName = user.getFirstName() + " " + user.getLastName();
         this.email = user.getEmail();
         this.phone = user.getPhone();
-        this.sector = user.getSector();
+        this.sector = new SectorResponseDTO(user.getSector());
         this.role = user.getRole();
         this.enable = user.isEnabled();
         this.createdAt = user.getCreatedAt();
