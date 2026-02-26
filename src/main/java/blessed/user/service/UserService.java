@@ -89,7 +89,7 @@ public class UserService{
         validateUsersData(data.email(), data.phone());
 
         Company company = companyQuery.byId(companyId);
-        Sector sector = sectorQuery.byId(data.sectorId());
+        Sector sector = sectorQuery.byId(data.sectorId(), companyId);
         String encryptedPassword = encryptedPassword(data.password());
 
         User newUser = new User(data, encryptedPassword, sector, company);
@@ -106,7 +106,7 @@ public class UserService{
 
         validateUserOwnership(user, userRequest);
 
-        Sector sector =  sectorQuery.byId(newData.sectorId());
+        Sector sector =  sectorQuery.byId(newData.sectorId(), companyId);
 
         String newPassword =  null;
         boolean isTryingToChangePassword =

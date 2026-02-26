@@ -102,8 +102,8 @@ public class NonconformityService {
             NonconformityRequestDTO data, User createdByNc,
             UUID companyId,MultipartFile file
     ){
-        Sector source = sectorQuery.byId(data.sourceDepartmentId());
-        Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId());
+        Sector source = sectorQuery.byId(data.sourceDepartmentId(), companyId);
+        Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId(), companyId);
         Company company = companyQuery.byId(companyId);
 
         User createBy = userQuery.byId(createdByNc.getCompany().getId(), createdByNc.getId());
@@ -186,8 +186,8 @@ public class NonconformityService {
             newUrlEvidence = null;
         }
 
-        Sector sourceDepartment = sectorQuery.byId(data.sourceDepartmentId());
-        Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId());
+        Sector sourceDepartment = sectorQuery.byId(data.sourceDepartmentId(), userRequest.getCompany().getId());
+        Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId(), userRequest.getCompany().getId());
 
         User dispositionUser = userQuery.byId(userRequest.getCompany().getId(),data.dispositionOwnerId());
         User effectivenessUser = userQuery.byId(userRequest.getCompany().getId(), data.effectivenessAnalystId());
