@@ -87,9 +87,9 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
 
     @Query("""
     SELECT 
-        FUNCTION('DATE_FORMAT', nc.createdAt, '%Y-%m'),
-        COUNT(nc),
-        SUM(CASE WHEN nc.status = 'CLOSED' THEN 1 ELSE 0 END)
+    FUNCTION('DATE_FORMAT', nc.createdAt, '%Y-%m'),
+    COUNT(nc),
+    SUM(CASE WHEN nc.status = 'CLOSED' THEN 1 ELSE 0 END)
     FROM NonConformity nc
     WHERE nc.company.id = :companyId
     GROUP BY FUNCTION('DATE_FORMAT', nc.createdAt, '%Y-%m')

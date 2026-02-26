@@ -99,18 +99,18 @@ public class NonconformityService {
 
     @Transactional
     public NonConformity create(
-            NonconformityRequestDTO data, User createdByNc,
+            NonconformityRequestDTO data, User user,
             UUID companyId,MultipartFile file
     ){
         Sector source = sectorQuery.byId(data.sourceDepartmentId(), companyId);
         Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId(), companyId);
         Company company = companyQuery.byId(companyId);
 
-        User createBy = userQuery.byId(createdByNc.getCompany().getId(), createdByNc.getId());
-        User dispositionOwner = userQuery.byId(createdByNc.getCompany().getId(), data.dispositionOwnerId());
-        User effectivenessAnalyst = userQuery.byId(createdByNc.getCompany().getId(), data.effectivenessAnalystId());
+        User createBy = userQuery.byId(companyId, user.getId());
+        User dispositionOwner = userQuery.byId(companyId, data.dispositionOwnerId());
+        User effectivenessAnalyst = userQuery.byId(companyId, data.effectivenessAnalystId());
 
-        String urlEvidence = null; // Começa nulo
+        String urlEvidence = null;
 
         if (file != null && !file.isEmpty()) {
             urlEvidence = s3Service.uploadFile(file, "evidencias", FileType.EVIDENCE);
