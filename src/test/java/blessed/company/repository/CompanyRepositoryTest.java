@@ -3,6 +3,7 @@ package blessed.company.repository;
 import blessed.company.entity.Company;
 import blessed.company.enums.PlanType;
 import blessed.company.enums.TypeDocument;
+import blessed.util.TestDataFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -16,12 +17,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 class CompanyRepositoryTest {
 
+    private final CompanyRepository companyRepository;
     @Autowired
-    private CompanyRepository companyRepository;
+    CompanyRepositoryTest(CompanyRepository companyRepository){
+        this.companyRepository = companyRepository;
+    }
 
     @Test
     void shouldReturnTrueWhenDocumentExists(){
-        createCompany();
+        companyRepository.save(TestDataFactory.createCompany());
+
         boolean exists = companyRepository.existsByDocument("12345678000199");
 
         assertTrue(exists);
@@ -36,35 +41,17 @@ class CompanyRepositoryTest {
 
     @Test
     void shouldReturnFalseWhenPhoneDoesNotExists(){
-        createCompany();
+
         boolean phoneExists = companyRepository.existsByPhone("4100000001");
         assertFalse(phoneExists);
     }
 
     @Test
     void shouldReturnTrueWhenPhoneExists(){
-        createCompany();
+        companyRepository.save(TestDataFactory.createCompany());
+
         boolean phoneExists = companyRepository.existsByPhone("4100000000");
         assertTrue(phoneExists);
     }
 
-
-    private void createCompany() {
-        Company company = new Company();
-        company.setCompanyName("teste company");
-        company.setDocument("12345678000199");
-        company.setPlanType(PlanType.ENTERPRISE);
-        company.setTypeDocument(TypeDocument.CNPJ);
-        company.setPhone("4100000000");
-        company.setEmail("test@test.com");
-        company.setStreet("rua teste");
-        company.setNumberStreet(241);
-        company.setCity("São José");
-        company.setState("PR");
-        company.setActive(true);
-        company.setCreateAt(LocalDateTime.now());
-        company.setUpdateAt(LocalDateTime.now());
-
-        companyRepository.save(company);
-    }
 }
