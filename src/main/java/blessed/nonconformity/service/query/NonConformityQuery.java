@@ -1,6 +1,7 @@
 package blessed.nonconformity.service.query;
 
 import blessed.company.entity.Company;
+import blessed.exception.BusinessException;
 import blessed.exception.ResourceNotFoundException;
 import blessed.nonconformity.dto.NonconformityResponseDTO;
 import blessed.nonconformity.entity.NonConformity;
@@ -27,7 +28,8 @@ public class NonConformityQuery {
     }
 
     public NonConformity byId(Long id, UUID companyId){
-        return  nonconformityRepository.findByIdAndCompanyId(id, companyId);
+        return  nonconformityRepository.findByIdAndCompanyId(id, companyId)
+                .orElseThrow(() -> new BusinessException("Não conformidade não encontrada"));
     };
 
     public NonConformity byIdWithAll(Long id, UUID companyId){

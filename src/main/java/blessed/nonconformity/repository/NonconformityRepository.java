@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface NonconformityRepository extends JpaRepository<NonConformity, Long> {
-    NonConformity findByIdAndCompanyId(Long  id, UUID companyId);
+    Optional<NonConformity> findByIdAndCompanyId(Long  id, UUID companyId);
 
     @Query("""
     SELECT nc FROM NonConformity nc
