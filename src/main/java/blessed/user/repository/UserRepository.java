@@ -23,7 +23,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("""
     SELECT u FROM users u
     WHERE u.company.id = :companyId
-    AND u.id = :userId
+    AND u.id = :userId AND u.enabled = true
     """)
     Optional<User> findById(@Param("companyId") UUID companyId, @Param("userId") UUID userId);
 
