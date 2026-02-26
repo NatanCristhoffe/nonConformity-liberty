@@ -98,12 +98,18 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     List<Object[]> trend(@Param("companyId") UUID companyId);
 
     @Query("""
-    SELECT AVG(DATEDIFF(nc.closedAt, nc.createdAt))
+    SELECT AVG(
+        CAST(
+            FUNCTION('timestampdiff', DAY, nc.createdAt, nc.closedAt)
+            AS double
+        )
+    )
     FROM NonConformity nc
     WHERE nc.company.id = :companyId
     AND nc.closedAt IS NOT NULL
     """)
     Double averageResolutionDays(@Param("companyId") UUID companyId);
+
 
     @Query("""
     select distinct nc
