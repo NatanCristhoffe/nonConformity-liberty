@@ -5,6 +5,7 @@ import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.enums.NonConformityPriorityLevel;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.enums.QualityToolType;
+import blessed.sector.dto.SectorResponseDTO;
 import blessed.sector.entity.Sector;
 import blessed.user.dto.UserResponseDTO;
 
@@ -30,8 +31,8 @@ public record NonconformityResponseDTO(
 
         LinkedRncDTO linkedRnc,
 
-        Sector sourceDepartment,
-        Sector responsibleDepartment,
+        SectorResponseDTO sourceDepartment,
+        SectorResponseDTO responsibleDepartment,
 
         Boolean requiresQualityTool,
         QualityToolType selectedTool,
@@ -75,8 +76,8 @@ public record NonconformityResponseDTO(
                         ? new LinkedRncDTO(entity.getLinkedRnc())
                         : null,
 
-                entity.getSourceDepartment(),
-                entity.getResponsibleDepartment(),
+                new SectorResponseDTO(entity.getSourceDepartment()),
+                new SectorResponseDTO(entity.getResponsibleDepartment()),
 
                 entity.getRequiresQualityTool(),
                 entity.getSelectedTool(),

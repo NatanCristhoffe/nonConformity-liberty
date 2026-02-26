@@ -2,6 +2,7 @@ package blessed.nonconformity.service;
 
 import blessed.company.entity.Company;
 import blessed.company.service.query.CompanyQuery;
+import blessed.exception.BusinessException;
 import blessed.infra.enums.FileType;
 import blessed.infra.storage.S3FileStorageService;
 import blessed.nonconformity.dto.ActionResponseDTO;
@@ -98,7 +99,7 @@ public class NonconformityService {
     }
 
     @Transactional
-    public NonConformity create(
+    public NonconformityResponseDTO create(
             NonconformityRequestDTO data, User user,
             UUID companyId,MultipartFile file
     ){
@@ -109,6 +110,10 @@ public class NonconformityService {
         User createBy = userQuery.byId(companyId, user.getId());
         User dispositionOwner = userQuery.byId(companyId, data.dispositionOwnerId());
         User effectivenessAnalyst = userQuery.byId(companyId, data.effectivenessAnalystId());
+
+        if (!effectivenessAnalyst.isAdmin()){
+            throw new BusinessException("Usuário não possui permissão para realizar a análise de eficácia.");
+        }
 
         String urlEvidence = null;
 
@@ -122,7 +127,7 @@ public class NonconformityService {
                 company
         );
         nonConformityQuery.save(nc);
-        return nc;
+        return new NonconformityResponseDTO(nc);
     }
 
     @Transactional

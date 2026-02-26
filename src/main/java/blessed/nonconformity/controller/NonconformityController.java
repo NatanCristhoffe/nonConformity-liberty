@@ -45,13 +45,13 @@ public class NonconformityController {
             @RequestPart(value = "file", required = false) MultipartFile file,
             @AuthenticationPrincipal User user
     ) {
-        NonConformity nonconformity = service.create(
+        NonconformityResponseDTO nonconformity = service.create(
                 data, user, user.getCompany().getId(),
                 file
         );
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new NonconformityResponseDTO(nonconformity));
+                .body(nonconformity);
     }
 
     @GetMapping
@@ -121,9 +121,8 @@ public class NonconformityController {
     @PutMapping("/{id}/approve")
     public ResponseEntity<Void> approve(
             @PathVariable Long id,
-            Authentication authentication)
+            @AuthenticationPrincipal User user)
     {
-        User user = (User) authentication.getPrincipal();
         service.approve(id, user);
 
         return ResponseEntity.noContent().build();
