@@ -1,5 +1,6 @@
 package blessed.auth.dto;
 
+import blessed.company.dto.CompanyResponseDTO;
 import blessed.sector.dto.SectorResponseDTO;
 import blessed.sector.entity.Sector;
 import blessed.user.entity.User;
@@ -19,6 +20,7 @@ public record LoginResponseDTO(
         String phone,
         UserRole role,
         SectorResponseDTO sector,
+        CompanyResponseDTO company,
         Boolean enable
 ) {
     public LoginResponseDTO(String token, User user){
@@ -31,6 +33,9 @@ public record LoginResponseDTO(
                 user.getRole(),
                 user.getSector() != null
                     ? new SectorResponseDTO(user.getSector())
+                    : null,
+                user.getCompany() != null
+                    ? new CompanyResponseDTO(user.getCompany())
                     : null,
                 user.isEnabled()
         );

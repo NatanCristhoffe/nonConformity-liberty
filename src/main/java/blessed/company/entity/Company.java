@@ -80,7 +80,7 @@ public class Company {
 
 
         public Company(CompanyRequestDTO data, TypeDocument typeDocument){
-                this.companyName = data.companyName();
+                this.companyName = data.companyName().toLowerCase();
                 this.planType = data.planType();
                 this.document = data.document();
                 this.typeDocument = typeDocument;
