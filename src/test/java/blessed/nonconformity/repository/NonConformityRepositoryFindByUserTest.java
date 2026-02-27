@@ -92,12 +92,38 @@ public class NonConformityRepositoryFindByUserTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         Page<NonConformity> found = nonconformityRepository.findByUser(
-                user.getId(), UUID.randomUUID(), pageable
+                UUID.randomUUID(), user.getCompany().getId(), pageable
         );
 
         assertTrue(found.isEmpty());
     }
 
+    @Test
+    void shouldReturnEmptyWhenCompanyNotLinked(){
+        Company company = companyRepository.save(
+                TestDataFactory.createCompany()
+        );
+        Sector sector = sectorRepository.save(
+                TestDataFactory.createSector(company)
+        );
+        User user = userRepository.save(
+                TestDataFactory.createUser(company, sector)
+        );
 
+        NonConformity nonConformity = TestDataFactory.createNonConformity(
+                company,
+                sector,
+                user
+        );
+        nonconformityRepository.save(nonConformity);
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<NonConformity> found = nonconformityRepository.findByUser(
+                user.getId(), UUID.randomUUID(), pageable
+        );
+
+        assertTrue(found.isEmpty());
+    }
 
 }
