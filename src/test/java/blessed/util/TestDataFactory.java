@@ -3,6 +3,13 @@ package blessed.util;
 import blessed.company.entity.Company;
 import blessed.company.enums.PlanType;
 import blessed.company.enums.TypeDocument;
+import blessed.nonconformity.entity.FiveWhy;
+import blessed.nonconformity.entity.NonConformity;
+import blessed.nonconformity.entity.RootCause;
+import blessed.nonconformity.enums.NonConformityPriorityLevel;
+import blessed.nonconformity.enums.NonConformityStatus;
+import blessed.nonconformity.enums.QualityToolType;
+import blessed.nonconformity.tools.FiveWhyTool;
 import blessed.sector.entity.Sector;
 import blessed.user.entity.User;
 import blessed.user.enums.UserRole;
@@ -55,4 +62,63 @@ public class TestDataFactory {
 
         return  sector;
     }
+
+    public static NonConformity createNonConformity(
+            Company company,
+            Sector sector,
+            User user
+    ) {
+
+        NonConformity nonConformity = new NonConformity();
+
+        nonConformity.setCompany(company);
+
+        nonConformity.setTitle("RNC - Falha no processo produtivo");
+        nonConformity.setDescription("Descrição detalhada da não conformidade identificada durante auditoria interna.");
+        nonConformity.setHasAccidentRisk(false);
+
+        nonConformity.setPriorityLevel(NonConformityPriorityLevel.MEDIUM);
+        nonConformity.setStatus(NonConformityStatus.PENDING);
+
+        nonConformity.setDispositionDate(LocalDateTime.now().plusDays(7));
+        nonConformity.setCreatedAt(LocalDateTime.now());
+
+        nonConformity.setUrlEvidence("https://example.com/evidence.jpg");
+
+        nonConformity.setDispositionOwner(user);
+        nonConformity.setEffectivenessAnalyst(user);
+        nonConformity.setCreatedBy(user);
+
+        nonConformity.setSourceDepartment(sector);
+        nonConformity.setResponsibleDepartment(sector);
+
+        nonConformity.setRequiresQualityTool(true);
+        nonConformity.setSelectedTool(QualityToolType.FIVE_WHYS);
+
+
+        return nonConformity;
+    }
+
+    public static RootCause createRootCause(NonConformity nc, User user){
+        RootCause rootCause = new RootCause();
+        rootCause.setNonconformity(nc);
+        rootCause.setDescription("Falta de treinamento adequado do operador.");
+        rootCause.setUserCreated(user);
+
+        return rootCause;
+    }
+
+    public static FiveWhyTool createFiveWhy(NonConformity nc){
+        FiveWhyTool fiveWhyTool = new FiveWhyTool();
+        fiveWhyTool.setNonconformity(nc);
+        fiveWhyTool.addWhy(new FiveWhy(1, "Erro operacional.", fiveWhyTool));
+        fiveWhyTool.addWhy(new FiveWhy(2,"Operador não conhecia o procedimento.", fiveWhyTool));
+        fiveWhyTool.addWhy(new FiveWhy(3,"Treinamento não foi realizado.",fiveWhyTool));
+        fiveWhyTool.addWhy(new FiveWhy(4,"Falha no planejamento de integração.", fiveWhyTool));
+        fiveWhyTool.addWhy(new FiveWhy(5,"Ausência de checklist de onboarding.", fiveWhyTool));
+
+        return fiveWhyTool;
+    }
+
+
 }
