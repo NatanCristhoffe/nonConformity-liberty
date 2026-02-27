@@ -17,6 +17,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -42,7 +44,7 @@ public class NonConformityRepositoryFindByUserTest {
 
 
     @Test
-    void shouldReturnTrueWhenFindUser(){
+    void shouldReturnNonConformityWhenUserIsLinked(){
         Company company = companyRepository.save(
                 TestDataFactory.createCompany()
         );
@@ -66,6 +68,34 @@ public class NonConformityRepositoryFindByUserTest {
 
         assertFalse(found.isEmpty());
         assertEquals(1, found.getTotalElements());
+    }
+
+    @Test
+    void shouldReturnEmptyWhenUserNotLinked(){
+        Company company = companyRepository.save(
+                TestDataFactory.createCompany()
+        );
+        Sector sector = sectorRepository.save(
+                TestDataFactory.createSector(company)
+        );
+        User user = userRepository.save(
+                TestDataFactory.createUser(company, sector)
+        );
+
+        NonConformity nonConformity = TestDataFactory.createNonConformity(
+                company,
+                sector,
+                user
+        );
+        nonconformityRepository.save(nonConformity);
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<NonConformity> found = nonconformityRepository.findByUser(
+                user.getId(), UUID.randomUUID(), pageable
+        );
+
+        assertTrue(found.isEmpty());
     }
 
 
