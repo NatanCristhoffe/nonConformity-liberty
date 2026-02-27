@@ -23,27 +23,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class NonConformityRepositoryTest {
+public class NonConformityRepositoryFindByIdAndCompanyIdTest {
 
     private final NonconformityRepository nonconformityRepository;
     private final SectorRepository sectorRepository;
     private final UserRepository userRepository;
-    private final RootCauseRepository rootCauseRepository;
-    private final FiveWhyToolRepository fiveWhyToolRepository;
     private final CompanyRepository companyRepository;
 
     @Autowired
-    NonConformityRepositoryTest(
+    NonConformityRepositoryFindByIdAndCompanyIdTest(
             NonconformityRepository nonconformityRepository,
-            RootCauseRepository rootCauseRepository,
-            FiveWhyToolRepository fiveWhyToolRepository,
             CompanyRepository companyRepository,
             SectorRepository sectorRepository,
             UserRepository userRepository
     ){
         this.nonconformityRepository = nonconformityRepository;
-        this.rootCauseRepository = rootCauseRepository;
-        this.fiveWhyToolRepository = fiveWhyToolRepository;
         this.companyRepository = companyRepository;
         this.sectorRepository = sectorRepository;
         this.userRepository = userRepository;
@@ -62,8 +56,23 @@ public class NonConformityRepositoryTest {
         assertTrue(found.isPresent());
         assertEquals(nonConformity.getId(), found.get().getId());
     }
+
     @Test
-    void shouldReturnFalseWhenFindByIdAndCompanyId(){
+    void shouldReturnEmptyWhenCompanyDoesNotMatch(){
+        NonConformity nc = nonconformityRepository.save(
+                create()
+        );
+
+        Optional<NonConformity> found = nonconformityRepository.findByIdAndCompanyId(
+                nc.getId(),
+                UUID.randomUUID()
+        );
+
+        assertTrue(found.isEmpty());
+    }
+
+    @Test
+    void shouldReturnFalseWhenNotFindNonConformity(){
         Optional<NonConformity> found = nonconformityRepository.findByIdAndCompanyId(
                 198L,
                 UUID.randomUUID()
@@ -71,10 +80,6 @@ public class NonConformityRepositoryTest {
 
         assertFalse(found.isPresent());
     }
-
-
-
-
 
 
 
