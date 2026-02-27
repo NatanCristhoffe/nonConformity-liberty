@@ -1,5 +1,6 @@
 package blessed.nonconformity.repository;
 
+
 import blessed.company.entity.Company;
 import blessed.company.repository.CompanyRepository;
 import blessed.nonconformity.entity.NonConformity;
@@ -11,25 +12,23 @@ import blessed.util.TestDataFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 @DataJpaTest
 @ActiveProfiles("test")
-public class NonConformityRepositoryFindByIdAndCompanyIdTest {
-
+public class NonConformityRepositoryFindByUserTest {
     private final NonconformityRepository nonconformityRepository;
     private final SectorRepository sectorRepository;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
 
     @Autowired
-    NonConformityRepositoryFindByIdAndCompanyIdTest(
+    NonConformityRepositoryFindByUserTest(
             NonconformityRepository nonconformityRepository,
             CompanyRepository companyRepository,
             SectorRepository sectorRepository,
@@ -41,8 +40,9 @@ public class NonConformityRepositoryFindByIdAndCompanyIdTest {
         this.userRepository = userRepository;
     }
 
+
     @Test
-    void shouldReturnTrueWhenFindByIdAndCompanyId(){
+    void shouldReturnTrueWhenFindUser(){
         Company company = companyRepository.save(
                 TestDataFactory.createCompany()
         );
@@ -60,50 +60,14 @@ public class NonConformityRepositoryFindByIdAndCompanyIdTest {
         );
         nonconformityRepository.save(nonConformity);
 
-        Optional<NonConformity> found = nonconformityRepository.findByIdAndCompanyId(
-                nonConformity.getId(),
-                nonConformity.getCompany().getId()
-        );
+        Pageable pageable = PageRequest.of(0, 10);
 
-        assertTrue(found.isPresent());
-        assertEquals(nonConformity.getId(), found.get().getId());
+        Page<NonConformity> found = nonconformityRepository.findByUser(user.getId(), company.getId(), pageable);
+
+        assertFalse(found.isEmpty());
+        assertEquals(1, found.getTotalElements());
     }
 
-    @Test
-    void shouldReturnEmptyWhenCompanyDoesNotMatch(){
-        Company company = companyRepository.save(
-                TestDataFactory.createCompany()
-        );
-        Sector sector = sectorRepository.save(
-                TestDataFactory.createSector(company)
-        );
-        User user = userRepository.save(
-                TestDataFactory.createUser(company, sector)
-        );
-
-        NonConformity nc = TestDataFactory.createNonConformity(
-                company,
-                sector,
-                user
-        );
-
-        Optional<NonConformity> found = nonconformityRepository.findByIdAndCompanyId(
-                nc.getId(),
-                UUID.randomUUID()
-        );
-
-        assertTrue(found.isEmpty());
-    }
-
-    @Test
-    void shouldReturnFalseWhenNotFindNonConformity(){
-        Optional<NonConformity> found = nonconformityRepository.findByIdAndCompanyId(
-                198L,
-                UUID.randomUUID()
-        );
-
-        assertFalse(found.isPresent());
-    }
 
 
 }

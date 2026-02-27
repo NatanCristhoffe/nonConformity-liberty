@@ -3,16 +3,22 @@ package blessed.util;
 import blessed.company.entity.Company;
 import blessed.company.enums.PlanType;
 import blessed.company.enums.TypeDocument;
+import blessed.company.repository.CompanyRepository;
 import blessed.nonconformity.entity.FiveWhy;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.entity.RootCause;
 import blessed.nonconformity.enums.NonConformityPriorityLevel;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.enums.QualityToolType;
+import blessed.nonconformity.repository.NonconformityRepository;
+import blessed.nonconformity.repository.RootCauseRepository;
 import blessed.nonconformity.tools.FiveWhyTool;
 import blessed.sector.entity.Sector;
+import blessed.sector.repository.SectorRepository;
 import blessed.user.entity.User;
 import blessed.user.enums.UserRole;
+import blessed.user.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 
@@ -63,7 +69,15 @@ public class TestDataFactory {
         return  sector;
     }
 
-    public static NonConformity createNonConformity(
+//    public static NonConformity createValidNonConformity(){
+//        Company company = createCompany();
+//        Sector sector = createSector(company);
+//        User user = createUser(company, sector);
+//
+//        return  createNonConformity(company, sector, user);
+//    }
+
+    public static NonConformity  createNonConformity(
             Company company,
             Sector sector,
             User user
@@ -92,9 +106,7 @@ public class TestDataFactory {
         nonConformity.setSourceDepartment(sector);
         nonConformity.setResponsibleDepartment(sector);
 
-        nonConformity.setRequiresQualityTool(true);
-        nonConformity.setSelectedTool(QualityToolType.FIVE_WHYS);
-
+        nonConformity.setRequiresQualityTool(false);
 
         return nonConformity;
     }
@@ -119,6 +131,7 @@ public class TestDataFactory {
 
         return fiveWhyTool;
     }
+
 
 
 }
