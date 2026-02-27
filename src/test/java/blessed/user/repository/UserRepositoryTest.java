@@ -11,9 +11,14 @@ import blessed.util.TestDataFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.data.domain.Limit;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,6 +55,61 @@ class UserRepositoryTest {
         assertEquals("test@test.com", user.getEmail());
     }
 
+    @Test
+    void shouldReturnFalseWhenIdAndCompanyDoesNotExist(){
+        Optional<User> user = userRepository.findById(UUID.randomUUID(), UUID.randomUUID());
+
+        assertTrue(user.isEmpty());
+    }
+
+
+    @Test
+    void shouldReturnListUsersWhenNameAndRoleAllExist(){
+        User userNew = createUser();
+
+        List<User> users = userRepository.findByFirstNameAndRole(
+                userNew.getFirstName(),
+                userNew.getRole(),
+                userNew.getCompany().getId(),
+                Limit.of(5)
+        );
+
+        assertFalse(users.isEmpty());
+        assertEquals(1, users.size());
+
+        User foundUser = users.get(0);
+
+        assertEquals(userNew.getFirstName(), foundUser.getFirstName());
+        assertEquals(userNew.getRole(), foundUser.getRole());
+        assertEquals(userNew.getCompany().getId(), foundUser.getCompany().getId());
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNameDoesNotExist(){
+        User userNew = createUser();
+
+        List<User> users = userRepository.findByFirstNameAndRole(
+                "user-not-found",
+                userNew.getRole(),
+                userNew.getCompany().getId(),
+                Limit.of(5)
+        );
+
+        assertTrue(users.isEmpty());
+    }
+
+
+    @Test
+    void shouldReturnTotalActiveUsersByCompany(){
+
+        User user = createUser();
+
+        Long total = userRepository.countActiveUsersByCompany(
+                user.getCompany().getId()
+        );
+
+        assertEquals(1L, total);
+    }
 
 
     private User createUser(){
