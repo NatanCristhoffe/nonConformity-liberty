@@ -69,14 +69,6 @@ public class TestDataFactory {
         return  sector;
     }
 
-//    public static NonConformity createValidNonConformity(){
-//        Company company = createCompany();
-//        Sector sector = createSector(company);
-//        User user = createUser(company, sector);
-//
-//        return  createNonConformity(company, sector, user);
-//    }
-
     public static NonConformity  createNonConformity(
             Company company,
             Sector sector,
