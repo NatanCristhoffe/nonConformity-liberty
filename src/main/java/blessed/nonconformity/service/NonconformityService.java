@@ -15,6 +15,7 @@ import blessed.nonconformity.service.query.NonConformityQuery;
 import blessed.sector.service.query.SectorQuery;
 import blessed.sector.entity.Sector;
 import blessed.user.entity.User;
+import blessed.user.service.UserService;
 import blessed.user.service.query.UserQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -36,7 +37,7 @@ public class NonconformityService {
 
     private final QualityToolService qualityToolService;
     private final NonConformityQuery nonConformityQuery;
-    private final UserQuery userQuery;
+    private final UserService userService;
     private final SectorQuery sectorQuery;
     private final S3FileStorageService s3Service;
     private final CompanyQuery companyQuery;
@@ -44,14 +45,14 @@ public class NonconformityService {
     public NonconformityService(
             QualityToolService qualityToolService,
             NonConformityQuery nonConformityQuery,
-            UserQuery userQuery,
+            UserService userService,
             SectorQuery sectorQuery,
             S3FileStorageService s3Service,
             CompanyQuery companyQuery
     ) {
         this.qualityToolService = qualityToolService;
         this.nonConformityQuery = nonConformityQuery;
-        this.userQuery = userQuery;
+        this.userService = userService;
         this.sectorQuery = sectorQuery;
         this.s3Service = s3Service;
         this.companyQuery = companyQuery;
@@ -88,7 +89,7 @@ public class NonconformityService {
             Pageable pageable
     ){
 
-        User user = userQuery.byId(userRequest.getCompany().getId(),userRequest.getId());
+        User user = userService.getById(userRequest.getCompany().getId(),userRequest.getId());
 
         if(getAll && user.isAdmin()){
             return nonConformityQuery.getAll(user.getCompany().getId(),pageable)
@@ -107,9 +108,9 @@ public class NonconformityService {
         Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId(), companyId);
         Company company = companyQuery.byId(companyId);
 
-        User createBy = userQuery.byId(companyId, user.getId());
-        User dispositionOwner = userQuery.byId(companyId, data.dispositionOwnerId());
-        User effectivenessAnalyst = userQuery.byId(companyId, data.effectivenessAnalystId());
+        User createBy = userService.getById(companyId, user.getId());
+        User dispositionOwner = userService.getById(companyId, data.dispositionOwnerId());
+        User effectivenessAnalyst = userService.getById(companyId, data.effectivenessAnalystId());
 
         if (!effectivenessAnalyst.isAdmin()){
             throw new BusinessException("Usuário não possui permissão para realizar a análise de eficácia.");
@@ -194,8 +195,8 @@ public class NonconformityService {
         Sector sourceDepartment = sectorQuery.byId(data.sourceDepartmentId(), userRequest.getCompany().getId());
         Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId(), userRequest.getCompany().getId());
 
-        User dispositionUser = userQuery.byId(userRequest.getCompany().getId(),data.dispositionOwnerId());
-        User effectivenessUser = userQuery.byId(userRequest.getCompany().getId(), data.effectivenessAnalystId());
+        User dispositionUser = userService.getById(userRequest.getCompany().getId(),data.dispositionOwnerId());
+        User effectivenessUser = userService.getById(userRequest.getCompany().getId(), data.effectivenessAnalystId());
 
         nonConformity.update(
                 data,sourceDepartment, responsibleDepartment,

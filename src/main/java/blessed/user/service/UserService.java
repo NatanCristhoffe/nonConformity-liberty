@@ -65,6 +65,10 @@ public class UserService{
         user.enable();
     }
 
+    public User getById(UUID companyId, UUID userId){
+        return userQuery.byId(companyId, userId);
+    }
+
     @Transactional
     public void disable(UUID userId, User currentUser){
         User user = userQuery.byId(currentUser.getCompany().getId(), userId);

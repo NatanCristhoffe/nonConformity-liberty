@@ -21,6 +21,7 @@ import blessed.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class TestDataFactory {
 
@@ -49,7 +50,7 @@ public class TestDataFactory {
         user.setEmail("test@test.com");
         user.setPassword("123456789");
         user.setPhone("4100000000");
-        user.setRole(UserRole.USER);
+        user.setRole(UserRole.ADMIN);
         user.setEnabled(true);
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdateAt(LocalDateTime.now());
