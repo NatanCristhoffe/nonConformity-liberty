@@ -72,6 +72,16 @@ public class SectorService {
     @Transactional
     public void disable(Long id, UUID companyId){
         Sector sector = sectorQuery.byId(id, companyId);
+        if(!sector.isActive()){
+            throw  new BusinessException("O setor já está desabilitado");
+        }
+
+        Long activeSectors = sectorQuery.countByCompany(companyId);
+        if(activeSectors <= 1){
+          throw  new BusinessException("A empresa deve possuir pelo menos um setor ativo");
+        }
+
+
 
         sector.disable();
     }

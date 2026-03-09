@@ -31,6 +31,10 @@ public class SectorQuery {
                 .orElseThrow(() -> new ResourceNotFoundException("Setor não encontrado"));
     }
 
+    public Long countByCompany(UUID companyId){
+        return repository.countByCompanyIdAndActiveTrue(companyId);
+    };
+
     public Sector save(Sector sector, UUID companyId){
         if (repository.existsByNameIgnoreCaseAndCompanyId(sector.getName().toLowerCase(), companyId)){
             throw new BusinessException("Você já tem esse setor salvo.");
