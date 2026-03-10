@@ -7,6 +7,13 @@ public enum NotificationType {
         }
     },
 
+
+    NON_CONFORMITY_APPROVED {
+        public String buildMessage(String reference){
+            return "A não conformidade '" + reference + "' foi aprovada e seguirá para a próxima etapa do tratamento.";
+        }
+    },
+
     NON_CONFORMITY_RETURNED_FOR_CORRECTION {
         public String buildMessage(String reference){
             return "A não conformidade '" + reference + "' foi enviada para correção. Verifique os ajustes solicitados.";

@@ -117,10 +117,7 @@ public class NonconformityService {
         User createBy = userService.getById(companyId, user.getId());
 
         User dispositionOwner = userService.getById(companyId, data.dispositionOwnerId());
-        System.out.println(data.dispositionOwnerId() + " - " + companyId);
-
         User effectivenessAnalyst = userService.getById(companyId, data.effectivenessAnalystId());
-        System.out.println(data.effectivenessAnalystId() + " - " + companyId);
 
         if (!effectivenessAnalyst.isAdmin()){
             throw new BusinessException("Usuário não possui permissão para realizar a análise de eficácia.");
@@ -157,6 +154,7 @@ public class NonconformityService {
     @Transactional
     public void approve(Long id, User user){
         NonConformity nonConformity = nonConformityQuery.byId(id, user.getCompany().getId());
+        UUID companyId = user.getCompany().getId();
 
         nonConformity.approve(user);
 
@@ -166,7 +164,7 @@ public class NonconformityService {
             notificationService.notifyIfNotSameUser(
                     nonConformity.getDispositionOwner().getId(),
                     user.getId(),
-                    user.getCompany().getId(),
+                    companyId,
                     NotificationType.QUALITY_TOOL_REQUIRED,
                     nonConformity.getTitle()
             );
@@ -175,11 +173,19 @@ public class NonconformityService {
             notificationService.notifyIfNotSameUser(
                     nonConformity.getDispositionOwner().getId(),
                     user.getId(),
-                    user.getCompany().getId(),
+                    companyId,
                     NotificationType.ROOT_CAUSE_REQUIRED,
                     nonConformity.getTitle()
             );
         }
+
+        notificationService.notifyIfNotSameUser(
+                nonConformity.getCreatedBy().getId(),
+                user.getId(),
+                companyId,
+                NotificationType.NON_CONFORMITY_APPROVED,
+                nonConformity.getTitle()
+        );
     }
 
     @Transactional
@@ -187,8 +193,9 @@ public class NonconformityService {
         NonConformity nonConformity = nonConformityQuery.byId(id, user.getCompany().getId());
         nonConformity.correction(user);
 
-        notificationService.notifyByUser(
+        notificationService.notifyIfNotSameUser(
                 nonConformity.getCreatedBy().getId(),
+                user.getId(),
                 user.getCompany().getId(),
                 NotificationType.NON_CONFORMITY_RETURNED_FOR_CORRECTION,
                 nonConformity.getTitle()
