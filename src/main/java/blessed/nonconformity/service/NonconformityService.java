@@ -162,6 +162,21 @@ public class NonconformityService {
 
         if (nonConformity.getRequiresQualityTool()){
             qualityToolService.initializeTool(nonConformity);
+
+            notificationService.notifyByUser(
+                    nonConformity.getDispositionOwner().getId(),
+                    user.getCompany().getId(),
+                    NotificationType.QUALITY_TOOL_REQUIRED,
+                    nonConformity.getTitle()
+            );
+
+        } else {
+            notificationService.notifyByUser(
+                    nonConformity.getDispositionOwner().getId(),
+                    user.getCompany().getId(),
+                    NotificationType.ROOT_CAUSE_REQUIRED,
+                    nonConformity.getTitle()
+            );
         }
     }
 
@@ -169,6 +184,13 @@ public class NonconformityService {
     public  void sendToCorrection(Long id, User user){
         NonConformity nonConformity = nonConformityQuery.byId(id, user.getCompany().getId());
         nonConformity.correction(user);
+
+        notificationService.notifyByUser(
+                nonConformity.getCreatedBy().getId(),
+                user.getCompany().getId(),
+                NotificationType.NON_CONFORMITY_RETURNED_FOR_CORRECTION,
+                nonConformity.getTitle()
+        );
     }
 
 
