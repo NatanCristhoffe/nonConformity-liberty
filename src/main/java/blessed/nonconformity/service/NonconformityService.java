@@ -13,6 +13,7 @@ import blessed.nonconformity.dto.NonconformityRequestDTO;
 import blessed.nonconformity.dto.NonconformityResponseDTO;
 import blessed.nonconformity.service.query.NonConformityQuery;
 import blessed.notification.entity.Notification;
+import blessed.notification.enums.NotificationType;
 import blessed.notification.service.NotificationService;
 import blessed.sector.service.query.SectorQuery;
 import blessed.sector.entity.Sector;
@@ -141,7 +142,14 @@ public class NonconformityService {
         notificationService.notifyByUser(
                 dispositionOwner.getId(),
                 companyId,
-                "Você foi definido como responsavel de eficaci no registro " + nc.getTitle() + "!"
+                NotificationType.DISPOSITION_OWNER_ASSIGNED,
+                nc.getTitle()
+        );
+        notificationService.notifyByUser(
+                effectivenessAnalyst.getId(),
+                companyId,
+                NotificationType.EFFECTIVENESS_ANALYST_ASSIGNED,
+                nc.getTitle()
         );
         return new NonconformityResponseDTO(nc);
     }

@@ -36,11 +36,9 @@ public class NotificationService {
     }
 
     @Transactional
-    public void notifyByUser(UUID userId, UUID companyId,String message){
+    public void notifyByUser(UUID userId, UUID companyId, NotificationType type, String reference){
         User user = userQuery.byId(companyId, userId);
-        Notification notification = new Notification(message, user, NotificationType.NON_CONFORMITY_CREATED);
-
-        System.out.println("Connected users: " + simpUserRegistry.getUsers());
+        Notification notification = new Notification(user, type, reference);
 
         messagingTemplate.convertAndSendToUser(
                 user.getEmail(),

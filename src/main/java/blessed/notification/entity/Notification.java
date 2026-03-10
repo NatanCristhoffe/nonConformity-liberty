@@ -42,11 +42,11 @@ public class Notification {
     private NotificationType type;
 
     public Notification(
-            String message, User user,
-            NotificationType type
+            User user,
+            NotificationType type, String reference
     ){
         this.user = user;
-        this.message = message;
+        this.message = type.buildMessage(reference);
         this.isRead = false;
         this.type = type;
         this.createdAt = LocalDateTime.now();
