@@ -10,7 +10,10 @@ import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.repository.FiveWhyRepository;
 import blessed.nonconformity.repository.FiveWhyToolRepository;
 import blessed.nonconformity.repository.NonconformityRepository;
+import blessed.nonconformity.service.query.NonConformityQuery;
 import blessed.nonconformity.tools.FiveWhyTool;
+import blessed.notification.enums.NotificationType;
+import blessed.notification.service.NotificationService;
 import blessed.user.entity.User;
 import blessed.user.service.query.UserQuery;
 import blessed.utils.DataTimeUtils;
@@ -21,27 +24,23 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
 public class FiveWhyService {
-    private final UserQuery userQuery;
-    private final NonconformityRepository ncRepository;
+    private final NonConformityQuery ncRepository;
     private final FiveWhyRepository fiveWhyRepository;
-    private final FiveWhyToolRepository fiveWhyToolRepository;
-    private final AuthenticationManager authenticationManager;
+    private final NotificationService notificationService;
 
     public FiveWhyService(
-            NonconformityRepository ncRepository,
-            FiveWhyToolRepository fiveWhyToolRepository,
+            NonConformityQuery ncRepository,
             FiveWhyRepository fiveWhyRepository,
-            UserQuery userQuery,
-            AuthenticationManager authenticationManager){
-        this.fiveWhyToolRepository = fiveWhyToolRepository;
+            NotificationService notificationService
+            ){
         this.fiveWhyRepository = fiveWhyRepository;
         this.ncRepository = ncRepository;
-        this.userQuery = userQuery;
-        this.authenticationManager = authenticationManager;
+        this.notificationService = notificationService;
     }
 
     @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
@@ -52,10 +51,8 @@ public class FiveWhyService {
             FiveWhyAnswerRequestDTO answer,
             User user
     ) {
-        NonConformity nc = ncRepository.findById(nonconformityId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Não conformidade não encontrada.")
-                );
+        UUID companyId = user.getCompany().getId();
+        NonConformity nc = ncRepository.byId(nonconformityId, companyId);
 
         FiveWhy fiveWhy = fiveWhyRepository.findById(fiveWhyId)
                 .orElseThrow(() ->
@@ -67,6 +64,14 @@ public class FiveWhyService {
 
         if (fiveWhy.areAllWhysAnswered()) {
             nc.concludeFiveWhyTool(user);
+
+            notificationService.notifyIfNotSameUser(
+                nc.getCreatedBy().getId(),
+                user.getId(),
+                companyId,
+                NotificationType.FIVE_WHY_COMPLETED,
+                nc.getTitle()
+            );
         }
     }
 

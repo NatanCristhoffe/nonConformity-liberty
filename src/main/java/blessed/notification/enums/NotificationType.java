@@ -13,6 +13,12 @@ public enum NotificationType {
         }
     },
 
+    FIVE_WHY_COMPLETED {
+        public String buildMessage(String reference){
+            return "A ferramenta de análise de causa (5 Porquês) da não conformidade '" + reference + "' foi concluída.";
+        }
+    },
+
     DISPOSITION_OWNER_ASSIGNED {
         public String buildMessage(String reference){
             return "Você foi definido como responsável da disposição no registro: " + reference;

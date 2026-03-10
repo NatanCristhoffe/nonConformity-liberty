@@ -163,16 +163,18 @@ public class NonconformityService {
         if (nonConformity.getRequiresQualityTool()){
             qualityToolService.initializeTool(nonConformity);
 
-            notificationService.notifyByUser(
+            notificationService.notifyIfNotSameUser(
                     nonConformity.getDispositionOwner().getId(),
+                    user.getId(),
                     user.getCompany().getId(),
                     NotificationType.QUALITY_TOOL_REQUIRED,
                     nonConformity.getTitle()
             );
 
         } else {
-            notificationService.notifyByUser(
+            notificationService.notifyIfNotSameUser(
                     nonConformity.getDispositionOwner().getId(),
+                    user.getId(),
                     user.getCompany().getId(),
                     NotificationType.ROOT_CAUSE_REQUIRED,
                     nonConformity.getTitle()

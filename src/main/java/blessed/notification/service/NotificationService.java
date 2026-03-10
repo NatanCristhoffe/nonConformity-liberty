@@ -35,6 +35,18 @@ public class NotificationService {
         this.userQuery = userQuery;
     }
 
+    public void notifyIfNotSameUser(
+            UUID receiverId,
+            UUID senderId,
+            UUID companyId,
+            NotificationType type,
+            String reference
+    ){
+        if (!receiverId.equals(senderId)){
+            notifyByUser(receiverId, companyId, type, reference);
+        }
+    }
+
     @Transactional
     public void notifyByUser(UUID userId, UUID companyId, NotificationType type, String reference){
         User user = userQuery.byId(companyId, userId);
