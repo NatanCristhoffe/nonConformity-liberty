@@ -1,12 +1,12 @@
 package blessed.notification.enums;
 
 public enum NotificationType {
+
     NON_CONFORMITY_CREATED {
         public String buildMessage(String reference){
             return "Uma nova não conformidade foi criada: " + reference;
         }
     },
-
 
     NON_CONFORMITY_APPROVED {
         public String buildMessage(String reference){
@@ -20,15 +20,9 @@ public enum NotificationType {
         }
     },
 
-    FIVE_WHY_COMPLETED {
-        public String buildMessage(String reference){
-            return "A ferramenta de análise de causa (5 Porquês) da não conformidade '" + reference + "' foi concluída.";
-        }
-    },
-
     DISPOSITION_OWNER_ASSIGNED {
         public String buildMessage(String reference){
-            return "Você foi definido como responsável da disposição no registro: " + reference;
+            return "Você foi definido como responsável pela disposição no registro: " + reference;
         }
     },
 
@@ -44,9 +38,57 @@ public enum NotificationType {
         }
     },
 
+    QUALITY_TOOL_COMPLETED {
+        public String buildMessage(String reference){
+            return "A ferramenta de qualidade da não conformidade '" + reference + "' foi concluída.";
+        }
+    },
+
     ROOT_CAUSE_REQUIRED {
         public String buildMessage(String reference){
             return "A não conformidade '" + reference + "' foi aprovada. Insira a causa raiz para continuar o tratamento.";
+        }
+    },
+
+    ROOT_CAUSE_COMPLETED {
+        public String buildMessage(String reference){
+            return "A causa raiz da não conformidade '" + reference + "' foi registrada.";
+        }
+    },
+
+    ACTION_ASSIGNED {
+        public String buildMessage(String reference){
+            return "Uma nova ação foi atribuída a você: " + reference;
+        }
+    },
+
+    ACTION_COMPLETED {
+        public String buildMessage(String reference){
+            return "Uma ação foi concluída no registro '" + reference + "'.";
+        }
+    },
+
+    ACTION_NOT_COMPLETED {
+        public String buildMessage(String reference){
+            return "Uma ação foi marcada como não realizada no registro '" + reference + "'.";
+        }
+    },
+
+    DISPOSITION_COMPLETED {
+        public String buildMessage(String reference){
+            return "A disposição da não conformidade '" + reference + "' foi concluída. O registro já está disponível para análise de eficácia.";
+        }
+    },
+
+    EFFECTIVENESS_APPROVED {
+        public String buildMessage(String reference){
+            return "A análise de eficácia da não conformidade '" + reference + "' foi concluída como EFICAZ.";
+        }
+    },
+
+    EFFECTIVENESS_REJECTED {
+        public String buildMessage(String reference){
+            return "A análise de eficácia da não conformidade '" + reference + "' foi concluída como NÃO EFICAZ.";
         }
     };
 

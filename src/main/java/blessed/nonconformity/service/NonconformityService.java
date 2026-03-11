@@ -29,6 +29,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -136,6 +137,7 @@ public class NonconformityService {
         );
         nonConformityQuery.save(nc);
 
+
         notificationService.notifyByUser(
                 dispositionOwner.getId(),
                 companyId,
@@ -157,12 +159,25 @@ public class NonconformityService {
         UUID companyId = user.getCompany().getId();
 
         nonConformity.approve(user);
+        Set<UUID> usersId = new HashSet<UUID>();
+
+        usersId.add(nonConformity.getCreatedBy().getId());
+        usersId.add(nonConformity.getDispositionOwner().getId());
+        usersId.add(nonConformity.getEffectivenessAnalyst().getId());
+
+        notificationService.notifyIfNotSameUser(
+                usersId,
+                user.getId(),
+                companyId,
+                NotificationType.NON_CONFORMITY_APPROVED,
+                nonConformity.getTitle()
+        );
 
         if (nonConformity.getRequiresQualityTool()){
             qualityToolService.initializeTool(nonConformity);
 
             notificationService.notifyIfNotSameUser(
-                    nonConformity.getDispositionOwner().getId(),
+                    usersId,
                     user.getId(),
                     companyId,
                     NotificationType.QUALITY_TOOL_REQUIRED,
@@ -171,21 +186,13 @@ public class NonconformityService {
 
         } else {
             notificationService.notifyIfNotSameUser(
-                    nonConformity.getDispositionOwner().getId(),
+                    usersId,
                     user.getId(),
                     companyId,
                     NotificationType.ROOT_CAUSE_REQUIRED,
                     nonConformity.getTitle()
             );
         }
-
-        notificationService.notifyIfNotSameUser(
-                nonConformity.getCreatedBy().getId(),
-                user.getId(),
-                companyId,
-                NotificationType.NON_CONFORMITY_APPROVED,
-                nonConformity.getTitle()
-        );
     }
 
     @Transactional
@@ -193,8 +200,14 @@ public class NonconformityService {
         NonConformity nonConformity = nonConformityQuery.byId(id, user.getCompany().getId());
         nonConformity.correction(user);
 
+        Set<UUID> usersId = new HashSet<UUID>();
+        usersId.add(nonConformity.getCreatedBy().getId());
+        usersId.add(nonConformity.getDispositionOwner().getId());
+        usersId.add(nonConformity.getEffectivenessAnalyst().getId());
+
+
         notificationService.notifyIfNotSameUser(
-                nonConformity.getCreatedBy().getId(),
+                usersId,
                 user.getId(),
                 user.getCompany().getId(),
                 NotificationType.NON_CONFORMITY_RETURNED_FOR_CORRECTION,

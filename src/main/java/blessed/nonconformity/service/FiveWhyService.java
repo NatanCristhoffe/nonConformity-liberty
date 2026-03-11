@@ -23,7 +23,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -65,11 +67,16 @@ public class FiveWhyService {
         if (fiveWhy.areAllWhysAnswered()) {
             nc.concludeFiveWhyTool(user);
 
+            Set<UUID> usersId = new HashSet<UUID>();
+
+            usersId.add(nc.getCreatedBy().getId());
+            usersId.add(nc.getEffectivenessAnalyst().getId());
+
             notificationService.notifyIfNotSameUser(
-                nc.getCreatedBy().getId(),
+                usersId,
                 user.getId(),
                 companyId,
-                NotificationType.FIVE_WHY_COMPLETED,
+                NotificationType.QUALITY_TOOL_COMPLETED,
                 nc.getTitle()
             );
         }

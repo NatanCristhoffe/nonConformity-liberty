@@ -14,6 +14,7 @@ import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -36,14 +37,16 @@ public class NotificationService {
     }
 
     public void notifyIfNotSameUser(
-            UUID receiverId,
+            Set<UUID> usersId,
             UUID senderId,
             UUID companyId,
             NotificationType type,
             String reference
     ){
-        if (!receiverId.equals(senderId)){
-            notifyByUser(receiverId, companyId, type, reference);
+        for (UUID userId : usersId){
+            if (!userId.equals(senderId)){
+                notifyByUser(userId, companyId, type, reference);
+            }
         }
     }
 
