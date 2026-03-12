@@ -31,13 +31,11 @@ public class UserController {
         this.service = service;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> register(
-            @RequestPart("data")RegisterDTO data,
-            @AuthenticationPrincipal User user
-            ){
-        service.create(data, user.getCompany().getId());
+            @RequestPart("data")RegisterDTO data
+    ){
+        service.create(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 Map.of("success", "usuário criado com sucesso.")
         );
@@ -45,64 +43,55 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> update(
-            @PathVariable UUID id, @RequestBody @Valid UpdateUserDTO newData,
-            @AuthenticationPrincipal User userRequest
+            @PathVariable UUID id,
+            @RequestBody @Valid UpdateUserDTO newData
     ){
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(
-                        service.updateDataUser(id, newData, userRequest, userRequest.getCompany().getId())
+                        service.updateDataUser(id, newData)
                 );
     }
 
     @GetMapping()
     public ResponseEntity<List<UserResponseDTO>> getByFirstName(
             @RequestParam(required = false) String firstName,
-            @RequestParam(required = false) UserRole role,
-            @AuthenticationPrincipal User user
+            @RequestParam(required = false) UserRole role
     ){
         if (firstName != null){
-            List<UserResponseDTO> users = service.findByFirstName(firstName, role, user.getCompany().getId());
+            List<UserResponseDTO> users = service.findByFirstName(firstName, role);
             return ResponseEntity.ok(users);
         }
 
-        return  ResponseEntity.ok(service.getAll(user));
+        return  ResponseEntity.ok(service.getAll());
 
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/enable")
-    public ResponseEntity<Map<String, String>> enable(
-            @PathVariable UUID id, @AuthenticationPrincipal User user) {
-        service.enable(id, user);
+    public ResponseEntity<Map<String, String>> enable(@PathVariable UUID id){
+        service.enable(id);
         return ResponseEntity.ok(Map.of("success", "Usuário habilitado."));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/disable")
     public ResponseEntity<Map<String, String>> disable(
-            @PathVariable UUID id,
-            @AuthenticationPrincipal User user
+            @PathVariable UUID id
     ) {
-        service.disable(id, user);
+        service.disable(id);
         return ResponseEntity.ok(Map.of("success", "Usuário desabilitado."));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/promote")
-    public ResponseEntity<Map<String, String>> promote(@PathVariable UUID id, @AuthenticationPrincipal User user){
-        service.changeRole(
-                id, UserRole.ADMIN, user, user.getCompany().getId());
+    public ResponseEntity<Map<String, String>> promote(@PathVariable UUID id){
+        service.changeRole(id, UserRole.ADMIN);
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "Usuário promovido com sucesso"));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/demote")
-    public ResponseEntity<Map<String, String>> demote(@PathVariable UUID id, @AuthenticationPrincipal User user){
-        service.changeRole(id, UserRole.USER, user, user.getCompany().getId());
+    public ResponseEntity<Map<String, String>> demote(@PathVariable UUID id){
+        service.changeRole(id, UserRole.USER);
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "Usuário definido como user com sucesso"));
     }
-
 }

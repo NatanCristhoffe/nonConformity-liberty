@@ -2,6 +2,7 @@ package blessed.user.service;
 
 import blessed.application.dto.AdminOnboardingRequestDTO;
 import blessed.auth.dto.RegisterDTO;
+import blessed.auth.utils.CurrentUser;
 import blessed.company.entity.Company;
 import blessed.company.service.query.CompanyQuery;
 import blessed.exception.BusinessException;
@@ -37,44 +38,49 @@ public class UserService{
     private final PasswordEncoder passwordEncoder;
     private final SectorQuery sectorQuery;
     private final CompanyQuery companyQuery;
+    private final CurrentUser currentUser;
 
     public UserService(
-            UserQuery userQuery, PasswordEncoder passwordEncoder, SectorQuery sectorQuery,
-            CompanyQuery companyQuery
+            UserQuery userQuery,
+            PasswordEncoder passwordEncoder, SectorQuery sectorQuery,
+            CompanyQuery companyQuery, CurrentUser currentUser
     ){
         this.passwordEncoder = passwordEncoder;
         this.userQuery = userQuery;
         this.sectorQuery = sectorQuery;
         this.companyQuery = companyQuery;
+        this.currentUser = currentUser;
     }
-    public List<UserResponseDTO> getAll(User user){
-         return userQuery.getAll(user.getCompany().getId());
+    public List<UserResponseDTO> getAll(){
+         return userQuery.getAll(currentUser.getCompanyId());
     }
 
     public List<UserResponseDTO> findByFirstName(
-            String firstName, UserRole role, UUID companyId) {
-        return userQuery.byName(firstName, role, companyId);
+            String firstName, UserRole role) {
+        return userQuery.byName(firstName, role, currentUser.getCompanyId());
     }
 
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public void enable(UUID userId, User currentUser) {
-        User user = userQuery.byId(currentUser.getCompany().getId(), userId);
-        validateNotSelOfOperation(user, currentUser);
+    public void enable(UUID userId) {
+        User user = userQuery.getUserDisabled(currentUser.getCompanyId(), userId);
+        validateNotSelOfOperation(user);
 
         user.enable();
     }
 
-    public User getById(UUID companyId, UUID userId){
-        return userQuery.byId(companyId, userId);
+    public User getById(UUID userId){
+        return userQuery.byId(currentUser.getCompanyId(), userId);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public void disable(UUID userId, User currentUser){
-        User user = userQuery.byId(currentUser.getCompany().getId(), userId);
+    public void disable(UUID userId){
+        User user = userQuery.byId(currentUser.getCompanyId(), userId);
 
-        validateNotSelOfOperation(user, currentUser);
-        validateLastAdmin(user,user.getCompany().getId());
+        validateNotSelOfOperation(user);
+        validateLastAdmin(user);
 
         user.disable();
     }
@@ -89,12 +95,13 @@ public class UserService{
         userQuery.save(newUser, company);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public void create(RegisterDTO data, UUID companyId){
-        validateUsersData(data.email(), data.phone());
+    public void create(RegisterDTO data){
 
-        Company company = companyQuery.byId(companyId);
-        Sector sector = sectorQuery.byId(data.sectorId(), companyId);
+        validateUsersData(data.email(), data.phone());
+        Company company = companyQuery.byId(currentUser.getCompanyId());
+        Sector sector = sectorQuery.byId(data.sectorId(), company.getId());
         String encryptedPassword = encryptedPassword(data.password());
 
         User newUser = new User(data, encryptedPassword, sector, company);
@@ -103,13 +110,11 @@ public class UserService{
 
 
     @Transactional
-    public UserResponseDTO updateDataUser(
-            UUID userUpdateId, UpdateUserDTO newData, User userRequest,
-            UUID companyId
-    ){
+    public UserResponseDTO updateDataUser(UUID userUpdateId, UpdateUserDTO newData){
+        UUID companyId = currentUser.getCompanyId();
         User user = userQuery.byId(companyId, userUpdateId);
 
-        validateUserOwnership(user, userRequest);
+        validateUserOwnership(user);
 
         Sector sector =  sectorQuery.byId(newData.sectorId(), companyId);
 
@@ -139,11 +144,12 @@ public class UserService{
         return new UserResponseDTO(user);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public void changeRole(UUID userId, UserRole newRole, User userRequest, UUID companyId){
-        User user = userQuery.byId(companyId, userId);
+    public void changeRole(UUID userId, UserRole newRole){
+        User user = userQuery.byId(currentUser.getCompanyId(), userId);
 
-        if (user.getId().equals(userRequest.getId())){
+        if (user.getId().equals(currentUser.get().getId())){
             throw  new BusinessException("Você não pode alterar sua própria role");
         }
 
@@ -167,18 +173,18 @@ public class UserService{
         }
     }
 
-    private void validateNotSelOfOperation(User user, User currentUser){
-        if (user.getId().equals(currentUser.getId())){
+    private void validateNotSelOfOperation(User user){
+        if (user.getId().equals(currentUser.get().getId())){
             throw new BusinessException(
                     "Operação não permitida: não é possível habilitar ou desabilitar o próprio usuário."
             );
         }
     }
 
-    private void validateLastAdmin(User user, UUID companyId){
+    private void validateLastAdmin(User user){
         if (user.getRole() == UserRole.ADMIN){
             boolean existAnotherAdmin = userQuery.validLastAdmin(
-                    companyId,
+                    currentUser.getCompanyId(),
                     user.getRole(),
                     user.getId()
             );
@@ -192,8 +198,8 @@ public class UserService{
 
     }
 
-    private void validateUserOwnership(User user, User currentUser){
-        if (!user.getId().equals(currentUser.getId())){
+    private void validateUserOwnership(User user){
+        if (!user.getId().equals(currentUser.get().getId())){
             throw new BusinessException("Usuário não autorizado.");
         }
     }

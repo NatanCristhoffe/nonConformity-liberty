@@ -97,7 +97,7 @@ public class NonconformityService {
             Pageable pageable
     ){
 
-        User user = userService.getById(userRequest.getCompany().getId(),userRequest.getId());
+        User user = userService.getById(userRequest.getId());
 
         if(getAll && user.isAdmin()){
             return nonConformityQuery.getAll(user.getCompany().getId(),pageable)
@@ -116,10 +116,10 @@ public class NonconformityService {
         Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId(), companyId);
         Company company = companyQuery.byId(companyId);
 
-        User createBy = userService.getById(companyId, user.getId());
+        User createBy = userService.getById(user.getId());
 
-        User dispositionOwner = userService.getById(companyId, data.dispositionOwnerId());
-        User effectivenessAnalyst = userService.getById(companyId, data.effectivenessAnalystId());
+        User dispositionOwner = userService.getById(data.dispositionOwnerId());
+        User effectivenessAnalyst = userService.getById(data.effectivenessAnalystId());
 
         if (!effectivenessAnalyst.isAdmin()){
             throw new BusinessException("Usuário não possui permissão para realizar a análise de eficácia.");
@@ -269,8 +269,8 @@ public class NonconformityService {
         Sector sourceDepartment = sectorQuery.byId(data.sourceDepartmentId(), userRequest.getCompany().getId());
         Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId(), userRequest.getCompany().getId());
 
-        User dispositionUser = userService.getById(userRequest.getCompany().getId(),data.dispositionOwnerId());
-        User effectivenessUser = userService.getById(userRequest.getCompany().getId(), data.effectivenessAnalystId());
+        User dispositionUser = userService.getById(data.dispositionOwnerId());
+        User effectivenessUser = userService.getById(data.effectivenessAnalystId());
 
         nonConformity.update(
                 data,sourceDepartment, responsibleDepartment,

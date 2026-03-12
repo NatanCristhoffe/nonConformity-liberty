@@ -62,7 +62,7 @@ class NonconformityServiceTest {
         Sector sector = TestDataFactory.createSector(company);
         User user = TestDataFactory.createUser(company, sector);
 
-        when(userService.getById(user.getCompany().getId(), user.getId())).thenReturn(user);
+        when(userService.getById(user.getId())).thenReturn(user);
         when(sectorQuery.byId(sector.getId(), company.getId())).thenReturn(sector);
         when(companyQuery.byId(company.getId())).thenReturn(company);
 
@@ -113,7 +113,7 @@ class NonconformityServiceTest {
                 null
         );
 
-        when(userService.getById(user.getCompany().getId(), user.getId())).thenReturn(user);
+        when(userService.getById(user.getId())).thenReturn(user);
         when(sectorQuery.byId(sector.getId(), company.getId())).thenReturn(sector);
         when(companyQuery.byId(company.getId())).thenReturn(company);
 

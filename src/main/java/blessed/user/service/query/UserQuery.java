@@ -48,6 +48,11 @@ public class UserQuery {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
     }
 
+    public User getUserDisabled(UUID companyId,UUID userId){
+        return repository.findByIdDisabled(companyId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+    }
+
     public List<UserResponseDTO> byName(String firstName, UserRole roleFilter, UUID companyId){
         return repository.findByFirstNameAndRole(firstName, roleFilter,companyId, Limit.of(5))
                 .stream()

@@ -33,6 +33,12 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     """)
     Optional<User> findById(@Param("companyId") UUID companyId, @Param("userId") UUID userId);
 
+    @Query("""
+    SELECT u FROM users u
+    WHERE u.company.id = :companyId
+    AND u.id = :userId AND u.enabled = false
+    """)
+    Optional<User> findByIdDisabled(@Param("companyId") UUID companyId, @Param("userId") UUID userId);
 
     @Query("""
         SELECT u FROM users u
