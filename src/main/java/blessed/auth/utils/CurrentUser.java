@@ -26,6 +26,10 @@ public class CurrentUser {
         return user.getCompany().getId();
     }
 
+    public UUID getId(){
+        return  get().getId();
+    }
+
     public Company getCompany(){
         return get().getCompany();
     }

@@ -1,12 +1,10 @@
 package blessed.nonconformity.service;
 
 
+import blessed.auth.utils.CurrentUser;
 import blessed.infra.enums.FileType;
 import blessed.infra.storage.S3FileStorageService;
-import blessed.nonconformity.dto.ActionCompletedRequestDTO;
-import blessed.nonconformity.dto.ActionNotExecutedRequestDTO;
-import blessed.nonconformity.dto.ActionRequestDTO;
-import blessed.nonconformity.dto.ActionResponseDTO;
+import blessed.nonconformity.dto.*;
 import blessed.nonconformity.entity.Action;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.service.query.ActionQuery;
@@ -32,6 +30,7 @@ public class ActionService {
     private final NonConformityQuery nonConformityQuery;
     private final S3FileStorageService s3Service;
     private final NotificationService notificationService;
+    private final CurrentUser currentUser;
 
 
     public ActionService(
@@ -39,21 +38,25 @@ public class ActionService {
             ActionQuery actionQuery,
             NonConformityQuery nonConformityQuery,
             S3FileStorageService s3Service,
-            NotificationService notificationService
+            NotificationService notificationService,
+            CurrentUser currentUser
     ) {
         this.userQuery = userQuery;
         this.actionQuery = actionQuery;
         this.nonConformityQuery = nonConformityQuery;
         this.s3Service = s3Service;
         this.notificationService = notificationService;
+        this.currentUser = currentUser;
     }
 
 
-    @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
+    @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId)")
     @Transactional
-    public Action create(Long nonconformityId, ActionRequestDTO data, User userRequest){
-        NonConformity nc = nonConformityQuery.byId(nonconformityId, userRequest.getCompany().getId());
-        User responsibleUser = userQuery.byId(userRequest.getCompany().getId(),data.responsibleUserId());
+    public Action create(Long nonconformityId, ActionRequestDTO data){
+        NonConformity nc = nonConformityQuery.byId(nonconformityId, currentUser.getCompanyId());
+        User responsibleUser = userQuery.byId(currentUser.getCompanyId(), data.responsibleUserId());
+
+        User userRequest = userQuery.byId(currentUser.getCompanyId(),currentUser.getId());
 
         Action action = new Action(data);
         nc.addAction(action, responsibleUser, userRequest);
@@ -65,8 +68,8 @@ public class ActionService {
 
         notificationService.notifyIfNotSameUser(
                 notifyUser,
-                userRequest.getId(),
-                userRequest.getCompany().getId(),
+                currentUser.getId(),
+                currentUser.getCompanyId(),
                 NotificationType.ACTION_ASSIGNED,
                 action.getTitle()
         );
@@ -75,47 +78,56 @@ public class ActionService {
         return action;
     }
 
-    @PreAuthorize("@actionAuth.isResponsibleOrAdmin(#actionId, authentication)")
+    @PreAuthorize("@actionAuth.isResponsibleOrAdmin(#actionId)")
     @Transactional
     public ActionResponseDTO completeAction(
-            Long actionId, ActionCompletedRequestDTO data,
-            User user, MultipartFile file) {
-
+            Long actionId,
+            ActionCompletedRequestDTO data,
+            MultipartFile file
+    ) {
         Action action = actionQuery.getActionPendingById(actionId);
-
+        User user = userQuery.byId(currentUser.getCompanyId(), currentUser.getId());
 
         var context = prepareActionContext(action, user, file);
-        context
-                .nonConformity()
-                .completeAction(context.action(), data, context.user(), context.urlEvidence());
+        context.nonConformity().completeAction(
+                context.action(),
+                data,
+                context.user(),
+                context.urlEvidence()
+        );
+
         Set<UUID> notifyUser = Set.of(
                 action.getNonconformity().getDispositionOwner().getId()
         );
         notificationService.notifyIfNotSameUser(
                 notifyUser,
                 user.getId(),
-                user.getCompany().getId(),
+                currentUser.getCompanyId(),
                 NotificationType.ACTION_COMPLETED,
                 action.getNonconformity().getTitle()
         );
         return new ActionResponseDTO(context.action());
     }
 
-    @PreAuthorize("@actionAuth.isResponsibleOrAdmin(#actionId, authentication)")
+    @PreAuthorize("@actionAuth.isResponsibleOrAdmin(#actionId)")
     @Transactional
-    public ActionResponseDTO markAsNotExecuted(Long actionId, ActionNotExecutedRequestDTO data, User user, MultipartFile file) {
+    public ActionResponseDTO markAsNotExecuted(Long actionId, ActionNotExecutedRequestDTO data, MultipartFile file) {
         Action action = actionQuery.getActionPendingById(actionId);
+        User user = userQuery.byId(currentUser.getCompanyId(), currentUser.getId());
 
         var context = prepareActionContext(action, user, file);
-        context.nonConformity().notExecutedAction(context.action(), data, context.user(), context.urlEvidence());
+        context.nonConformity().notExecutedAction(
+                context.action(), data, context.user(), context.urlEvidence()
+        );
 
         Set<UUID> notifyUser = Set.of(
                 action.getNonconformity().getDispositionOwner().getId()
         );
+
         notificationService.notifyIfNotSameUser(
                 notifyUser,
-                user.getId(),
-                user.getCompany().getId(),
+                currentUser.getId(),
+                currentUser.getCompanyId(),
                 NotificationType.ACTION_NOT_COMPLETED,
                 action.getNonconformity().getTitle()
         );
@@ -123,13 +135,16 @@ public class ActionService {
         return new ActionResponseDTO(context.action());
     }
 
-    @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
+    @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId)")
     @Transactional
-    public NonConformity closeActionStage(Long nonconformityId, User userRequest){
-        UUID companyId = userRequest.getCompany().getId();
+    public NonconformityResponseDTO closeActionStage(Long nonconformityId){
+
+        UUID companyId = currentUser.getCompanyId();
+        User user = userQuery.byId(companyId, currentUser.getId());
+
         NonConformity nc = nonConformityQuery.byId(nonconformityId, companyId);
-        nc.closedAction(userRequest);
-        nc.closedDisposition(userRequest);
+        nc.closedAction(user);
+        nc.closedDisposition(user);
 
         Set<UUID> notifyUser = new HashSet<UUID>();
         notifyUser.add(nc.getCreatedBy().getId());
@@ -137,26 +152,25 @@ public class ActionService {
 
         notificationService.notifyIfNotSameUser(
                 notifyUser,
-                userRequest.getId(),
+                currentUser.getId(),
                 companyId,
                 NotificationType.DISPOSITION_COMPLETED,
                 nc.getTitle()
         );
 
-        return nc;
+        return new NonconformityResponseDTO(nc);
     }
 
 
 
     private record ActionContext(Action action, NonConformity nonConformity, User user, String urlEvidence){};
 
-    private ActionContext prepareActionContext(Action action, User authUser, MultipartFile file){
+    private ActionContext prepareActionContext(Action action, User user, MultipartFile file){
         String urlEvidence = null;
         if (file != null && !file.isEmpty()) {
             urlEvidence = s3Service.uploadFile(file, "actions-evidence", FileType.EVIDENCE);
         }
 
-        User user = userQuery.byId(authUser.getCompany().getId(),authUser.getId());
         NonConformity nonConformity = action.getNonconformity();
 
         return new ActionContext(action, nonConformity, user, urlEvidence);

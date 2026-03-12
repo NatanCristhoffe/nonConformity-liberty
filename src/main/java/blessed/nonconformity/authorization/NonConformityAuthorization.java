@@ -1,5 +1,6 @@
 package blessed.nonconformity.authorization;
 
+import blessed.auth.utils.CurrentUser;
 import blessed.nonconformity.entity.NonConformity;
 import blessed.nonconformity.service.query.NonConformityQuery;
 import blessed.user.entity.User;
@@ -14,20 +15,23 @@ import java.util.UUID;
 public class NonConformityAuthorization {
 
     private final NonConformityQuery nonConformityQuery;
+    private final CurrentUser currentUser;
 
-    public NonConformityAuthorization(NonConformityQuery nonConformityQuery) {
+    public NonConformityAuthorization(
+            NonConformityQuery nonConformityQuery,
+            CurrentUser currentUser
+    ) {
         this.nonConformityQuery = nonConformityQuery;
+        this.currentUser = currentUser;
     }
 
-    public boolean isDispositionOwnerOrAdmin(Long nonconformityId, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-
-        if (user.isAdmin()) {
+    public boolean isDispositionOwnerOrAdmin(Long nonconformityId) {
+        if (currentUser.isAdmin()){
             return true;
         }
 
         return nonConformityQuery
-                .existsByIdAndDispositionOwnerId(nonconformityId, user.getId());
+                .existsByIdAndDispositionOwnerIdAndCompanyId(nonconformityId, currentUser.getId(), currentUser.getCompanyId());
     }
 
     public boolean isEffectivenessAnalystOrAdmin(Long nonconformityId, Authentication authentication){
