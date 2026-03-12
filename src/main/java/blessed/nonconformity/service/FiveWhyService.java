@@ -1,5 +1,6 @@
 package blessed.nonconformity.service;
 
+import blessed.auth.utils.CurrentUser;
 import blessed.exception.BusinessException;
 import blessed.exception.ResourceNotFoundException;
 import blessed.nonconformity.dto.FiveWhyAnswerRequestDTO;
@@ -10,6 +11,7 @@ import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.repository.FiveWhyRepository;
 import blessed.nonconformity.repository.FiveWhyToolRepository;
 import blessed.nonconformity.repository.NonconformityRepository;
+import blessed.nonconformity.service.query.FiveWhyQuery;
 import blessed.nonconformity.service.query.NonConformityQuery;
 import blessed.nonconformity.tools.FiveWhyTool;
 import blessed.notification.enums.NotificationType;
@@ -32,37 +34,39 @@ import java.util.UUID;
 @Service
 public class FiveWhyService {
     private final NonConformityQuery ncRepository;
-    private final FiveWhyRepository fiveWhyRepository;
+    private final FiveWhyQuery fiveWhyQuery;
+    private final UserQuery userQuery;
     private final NotificationService notificationService;
+    private final CurrentUser currentUser;
 
     public FiveWhyService(
             NonConformityQuery ncRepository,
-            FiveWhyRepository fiveWhyRepository,
-            NotificationService notificationService
+            FiveWhyQuery fiveWhyQuery,
+            UserQuery userQuery,
+            NotificationService notificationService,
+            CurrentUser currentUser
             ){
-        this.fiveWhyRepository = fiveWhyRepository;
+        this.fiveWhyQuery = fiveWhyQuery;
         this.ncRepository = ncRepository;
+        this.userQuery = userQuery;
         this.notificationService = notificationService;
+        this.currentUser = currentUser;
     }
 
-    @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
+    @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId)")
     @Transactional
     public void addAnswer(
             Long nonconformityId,
             Long fiveWhyId,
-            FiveWhyAnswerRequestDTO answer,
-            User user
+            FiveWhyAnswerRequestDTO answer
     ) {
-        UUID companyId = user.getCompany().getId();
+        UUID companyId = currentUser.getCompanyId();
         NonConformity nc = ncRepository.byId(nonconformityId, companyId);
+        User user = userQuery.byId(companyId, currentUser.getId());
 
-        FiveWhy fiveWhy = fiveWhyRepository.findById(fiveWhyId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Porquês não encontrado.")
-                );
+        FiveWhy fiveWhy = fiveWhyQuery.byId(fiveWhyId);
 
         fiveWhy.addAnswer(answer, nc);
-        fiveWhyRepository.save(fiveWhy);
 
         if (fiveWhy.areAllWhysAnswered()) {
             nc.concludeFiveWhyTool(user);
@@ -74,7 +78,7 @@ public class FiveWhyService {
 
             notificationService.notifyIfNotSameUser(
                 usersId,
-                user.getId(),
+                currentUser.getId(),
                 companyId,
                 NotificationType.QUALITY_TOOL_COMPLETED,
                 nc.getTitle()

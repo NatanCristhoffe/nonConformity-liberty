@@ -25,10 +25,9 @@ public class FiveWhyController {
     public ResponseEntity<Void> addAnswer(
             @PathVariable Long nonconformityId,
             @PathVariable Long fiveWhyId,
-            @RequestBody @Valid FiveWhyAnswerRequestDTO data,
-            @AuthenticationPrincipal User user
+            @RequestBody @Valid FiveWhyAnswerRequestDTO data
             ){
-        service.addAnswer(nonconformityId, fiveWhyId, data, user);
+        service.addAnswer(nonconformityId, fiveWhyId, data);
         return ResponseEntity.noContent().build();
     }
 }
