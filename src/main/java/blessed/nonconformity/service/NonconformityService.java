@@ -226,14 +226,9 @@ public class NonconformityService {
     }
 
 
-    public List<NonconformityResponseDTO> findByTitleStartingWithIgnoreCase(
-            String title,
-            UUID companyId,
-            User authentication
-    ) {
-
+    public List<NonconformityResponseDTO> findByTitleStartingWithIgnoreCase(String title) {
         return nonConformityQuery
-                .findByTitle(title, companyId, authentication)
+                .findByTitle(title, currentUser.getCompanyId(), currentUser.get())
                 .stream()
                 .map(NonconformityResponseDTO::new)
                 .toList();

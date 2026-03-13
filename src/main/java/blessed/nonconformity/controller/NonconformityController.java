@@ -71,16 +71,10 @@ public class NonconformityController {
     }
 
     @GetMapping(params = "title")
-    public ResponseEntity<List<NonconformityResponseDTO>> getByTitle(
-            @RequestParam String title, @AuthenticationPrincipal User user
-    ){
-        List<NonconformityResponseDTO> nonConformities = service.findByTitleStartingWithIgnoreCase(
-                title,
-                user.getCompany().getId(),
-                user
+    public ResponseEntity<List<NonconformityResponseDTO>> getByTitle(@RequestParam String title){
+        return ResponseEntity.ok(
+                service.findByTitleStartingWithIgnoreCase(title)
         );
-
-        return ResponseEntity.ok(nonConformities);
     }
 
     @GetMapping("/by-status")
