@@ -253,10 +253,13 @@ public class NonconformityService {
                 .map(NonconformityResponseDTO::new);
     }
 
-    @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId, authentication)")
+    @PreAuthorize("@ncAuth.isDispositionOwnerOrAdmin(#nonconformityId)")
     @Transactional
-    public void update(Long id, NonconformityUpdateDTO data, User userRequest, MultipartFile file){
-        NonConformity nonConformity = nonConformityQuery.byId(id, userRequest.getCompany().getId());
+    public void update(Long id, NonconformityUpdateDTO data, MultipartFile file){
+        UUID companyId = currentUser.getCompanyId();
+        User user = currentUser.get();
+
+        NonConformity nonConformity = nonConformityQuery.byId(id, companyId);
 
         String oldEvidence = nonConformity.getUrlEvidence();
 
@@ -268,15 +271,15 @@ public class NonconformityService {
             newUrlEvidence = null;
         }
 
-        Sector sourceDepartment = sectorQuery.byId(data.sourceDepartmentId(), userRequest.getCompany().getId());
-        Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId(), userRequest.getCompany().getId());
+        Sector sourceDepartment = sectorQuery.byId(data.sourceDepartmentId(), companyId);
+        Sector responsibleDepartment = sectorQuery.byId(data.responsibleDepartmentId(), companyId);
 
         User dispositionUser = userService.getById(data.dispositionOwnerId());
         User effectivenessUser = userService.getById(data.effectivenessAnalystId());
 
         nonConformity.update(
                 data,sourceDepartment, responsibleDepartment,
-                dispositionUser, effectivenessUser, userRequest, newUrlEvidence
+                dispositionUser, effectivenessUser, user, newUrlEvidence
         );
 
         TransactionSynchronizationManager.registerSynchronization(
@@ -288,6 +291,19 @@ public class NonconformityService {
                         }
                     }
                 }
+        );
+
+        Set<UUID> notifyUsers = new HashSet<UUID>();
+        notifyUsers.add(nonConformity.getCreatedBy().getId());
+        notifyUsers.add(nonConformity.getDispositionOwner().getId());
+        notifyUsers.add(nonConformity.getEffectivenessAnalyst().getId());
+
+        notificationService.notifyIfNotSameUser(
+                notifyUsers,
+                user.getId(),
+                companyId,
+                NotificationType.NON_CONFORMITY_RESUBMITTED_FOR_APPROVAL,
+                nonConformity.getTitle()
         );
 
     }

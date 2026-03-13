@@ -98,11 +98,12 @@ public class NonconformityController {
     public ResponseEntity<Map<String, String>> updateNonconformity(
             @PathVariable Long id,
             @Valid @RequestPart("data") NonconformityUpdateDTO data,
-            @RequestPart(value = "file", required = false)  MultipartFile file,
-            @AuthenticationPrincipal User userRequest
-            ){
-        service.update(id, data, userRequest, file);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("Success", "Nc atualizada com sucesso."));
+            @RequestPart(value = "file", required = false)  MultipartFile file
+    ){
+        service.update(id, data, file);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(Map.of("Success", "Nc atualizada com sucesso."));
     }
 
     @PutMapping("/{id}/approve")

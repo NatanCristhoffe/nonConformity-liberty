@@ -20,6 +20,12 @@ public enum NotificationType {
         }
     },
 
+    NON_CONFORMITY_RESUBMITTED_FOR_APPROVAL {
+        public String buildMessage(String reference){
+            return "A não conformidade '" + reference + "' foi corrigida e reenviada para aprovação.";
+        }
+    },
+
     DISPOSITION_OWNER_ASSIGNED {
         public String buildMessage(String reference){
             return "Você foi definido como responsável pela disposição no registro: " + reference;
