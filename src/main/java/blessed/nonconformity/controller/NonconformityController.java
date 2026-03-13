@@ -117,13 +117,9 @@ public class NonconformityController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("Success", "Nc atualizada com sucesso."));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/approve")
-    public ResponseEntity<Void> approve(
-            @PathVariable Long id,
-            @AuthenticationPrincipal User user)
-    {
-        service.approve(id, user);
+    public ResponseEntity<Void> approve(@PathVariable Long id){
+        service.approve(id);
 
         return ResponseEntity.noContent().build();
     }

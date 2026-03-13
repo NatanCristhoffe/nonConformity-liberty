@@ -157,10 +157,14 @@ public class NonconformityService {
         return new NonconformityResponseDTO(nc);
     }
 
+
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public void approve(Long id, User user){
-        NonConformity nonConformity = nonConformityQuery.byId(id, user.getCompany().getId());
-        UUID companyId = user.getCompany().getId();
+    public void approve(Long id){
+        UUID companyId = currentUser.getCompanyId();
+        User user = currentUser.get();
+
+        NonConformity nonConformity = nonConformityQuery.byId(id, companyId);
 
         nonConformity.approve(user);
         Set<UUID> usersId = new HashSet<UUID>();

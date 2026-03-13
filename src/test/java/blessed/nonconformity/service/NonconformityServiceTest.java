@@ -119,7 +119,7 @@ class NonconformityServiceTest {
 
         BusinessException exception = assertThrows(
                 BusinessException.class,
-                () -> nonconformityService.create(request, user, company.getId(), null)
+                () -> nonconformityService.create(request, null)
         );
 
         assertEquals(
@@ -137,7 +137,7 @@ class NonconformityServiceTest {
 
         when(nonConformityQuery.byId(nc.getId(), company.getId())).thenReturn(nc);
 
-        nonconformityService.approve(nc.getId(), user);
+        nonconformityService.approve(nc.getId());
         verify(nonConformityQuery, times(1))
                 .byId(nc.getId(), company.getId()
         );
