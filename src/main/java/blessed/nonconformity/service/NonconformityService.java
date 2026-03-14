@@ -258,8 +258,11 @@ public class NonconformityService {
 
         NonConformity nonConformity = nonConformityQuery.byId(id, companyId);
 
-        String oldEvidence = nonConformity.getUrlEvidence();
+        if (!nonConformity.getEffectivenessAnalyst().isAdmin()){
+            throw new BusinessException("Usuário não possui permissão para realizar a análise de eficácia.");
+        }
 
+        String oldEvidence = nonConformity.getUrlEvidence();
         String newUrlEvidence;
 
         if (file != null && !file.isEmpty()) {
