@@ -1,5 +1,6 @@
 package blessed.sector.service.query;
 
+import blessed.auth.utils.CurrentUser;
 import blessed.exception.BusinessException;
 import blessed.exception.ResourceNotFoundException;
 import blessed.sector.dto.SectorRequestDTO;
@@ -15,7 +16,8 @@ import java.util.UUID;
 public class SectorQuery {
 
     private final SectorRepository repository;
-    public SectorQuery(SectorRepository repository){
+
+    public SectorQuery(SectorRepository repository, CurrentUser currentUser){
         this.repository = repository;
     }
 
@@ -42,8 +44,8 @@ public class SectorQuery {
         return repository.save(sector);
     }
 
-    public Integer countByActive(boolean active){
-        return  repository.countByActive(active);
+    public Integer countByActive(boolean active, UUID companyId){
+        return  repository.countByActiveAndCompanyId(active, companyId);
     }
 
     public List<SectorResponseDTO> getByName(

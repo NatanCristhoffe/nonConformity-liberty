@@ -47,7 +47,7 @@ public class SectorService {
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public Sector create(SectorRequestDTO data){
-        if (sectorQuery.countByActive(true) >= 15){
+        if (sectorQuery.countByActive(true, currentUser.getCompanyId()) >= 20){
             throw new BusinessException("Número máximo de setores ativos atingido.");
         }
         Sector sector = new Sector(data, currentUser.getCompany());
@@ -66,7 +66,7 @@ public class SectorService {
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void enable(Long id){
-        if (sectorQuery.countByActive(true) >= 15){
+        if (sectorQuery.countByActive(true, currentUser.getCompanyId()) >= 20){
             throw new BusinessException("Número máximo de setores ativos atingido.");
         }
         Sector sector = sectorQuery.byId(id, currentUser.getCompanyId());

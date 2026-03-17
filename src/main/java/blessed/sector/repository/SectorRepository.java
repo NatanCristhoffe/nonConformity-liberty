@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface SectorRepository extends JpaRepository<Sector, Long> {
     boolean existsByNameIgnoreCaseAndCompanyId(String name, UUID companyId);
-    Integer countByActive(boolean active);
+    Integer countByActiveAndCompanyId(boolean active, UUID companyId);
 
     Optional<Sector> findByIdAndCompanyId(Long sectorId, UUID companyId);
     Long countByCompanyIdAndActiveTrue(UUID companyId);
