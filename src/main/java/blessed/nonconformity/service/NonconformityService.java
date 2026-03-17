@@ -309,4 +309,11 @@ public class NonconformityService {
         );
 
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public void cancel(Long id){
+        NonConformity nc = nonConformityQuery.byId(id, currentUser.getCompanyId());
+        nc.cancelNonConformity(currentUser.get());
+    }
 }

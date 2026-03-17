@@ -33,9 +33,10 @@ public class RootCause {
     @JoinColumn(name = "nonconformity_id")
     private NonConformity nonconformity;
 
-    public RootCause(RootCauseRequestDTO data, User user){
+    public RootCause(NonConformity nc,RootCauseRequestDTO data, User user){
         this.description = data.description().toLowerCase();
         this.userCreated = user;
+        this.nonconformity = nc;
     }
 
 }

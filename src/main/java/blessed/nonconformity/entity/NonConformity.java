@@ -376,4 +376,21 @@ public class NonConformity {
 
     }
 
+    public void cancelNonConformity(User user){
+        if (this.status == NonConformityStatus.CANCELED){
+            throw new BusinessException("Não conformidade já está cancelada.");
+        }
+
+        if (this.status == NonConformityStatus.CLOSED){
+            throw new BusinessException("Não é possível cancelar uma não conformidade finalizada.");
+        }
+
+        this.status = NonConformityStatus.CANCELED;
+        addLog(
+                "[NC] Cancelamento de Registro" +
+                " | Usuário: " + user.getFirstName() + " " + user.getLastName() +
+                " | Data/Hora: " + DataTimeUtils.formatNow()
+        );
+    }
+
 }

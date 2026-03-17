@@ -53,11 +53,11 @@ public class RootCauseService {
 
         UUID companyId = currentUser.getCompanyId();
         User user = userQuery.byId(companyId, currentUser.getId());
+        NonConformity nc = nonConformityQuery.byId(nonconformityId, companyId);
 
-        RootCause rootCause = new RootCause(data, user);
+        RootCause rootCause = new RootCause(nc, data, user);
         rootCauseQuery.save(rootCause);
 
-        NonConformity nc = nonConformityQuery.byId(nonconformityId, companyId);
         nc.addRootCause(rootCause, user);
 
         Set<UUID> usersToNotify = new HashSet<>();

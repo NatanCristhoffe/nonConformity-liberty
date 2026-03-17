@@ -26,7 +26,7 @@ public class DashboardIndicatorsResponse {
     private Map<NonConformityPriorityLevel, Long> byPriority;
     private List<DepartmentIndicatorDTO> byDepartment;
     private List<TrendDTO> trend;
-    private Double averageResolutionDays;
+    private String averageResolutionDays;
     private Double effectivenessRate;
     private Long withAccidentRisk;
 }

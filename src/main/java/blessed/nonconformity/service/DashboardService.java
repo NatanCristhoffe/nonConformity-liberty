@@ -6,9 +6,11 @@ import blessed.nonconformity.dto.DashboardIndicatorsResponse;
 import blessed.nonconformity.dto.SummaryDTO;
 import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.service.query.DashboardQuery;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,24 +26,28 @@ public class DashboardService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public DashboardIndicatorsResponse getIndicators(){
+    public DashboardIndicatorsResponse getIndicators(LocalDateTime startDate, LocalDateTime endDate){
         UUID companyId = currentUser.getCompanyId();
         DashboardIndicatorsResponse response = new DashboardIndicatorsResponse();
 
 
-        response.setSummary(buildSummary());
-        response.setByPriority(dashboardQuery.countByPriority(companyId));
-        response.setByDepartment(dashboardQuery.countByDepartment(companyId));
-        response.setTrend(dashboardQuery.trend(companyId));
-        response.setAverageResolutionDays(dashboardQuery.averageResolutionDays(companyId));
+        response.setSummary(buildSummary(companyId, startDate, endDate));
+        response.setByPriority(dashboardQuery.countByPriority(companyId, startDate, endDate));
+        response.setByDepartment(dashboardQuery.countByDepartment(companyId, startDate, endDate));
+        response.setTrend(dashboardQuery.trend(companyId, startDate, endDate));
+        Double avg = dashboardQuery.averageResolutionDays(companyId, startDate, endDate);
+
+        String formatted = formatAverageDays(avg);
+
+        response.setAverageResolutionDays(formatted);
 
         return response;
     }
 
-    private SummaryDTO buildSummary() {
+    private SummaryDTO buildSummary(UUID companyId,LocalDateTime startDate, LocalDateTime endDate) {
 
         Map<NonConformityStatus, Long> byStatus =
-                dashboardQuery.countByStatus(currentUser.getCompanyId());
+                dashboardQuery.countByStatus(companyId, startDate, endDate);
 
         long total = byStatus.values()
                 .stream()
@@ -55,5 +61,22 @@ public class DashboardService {
         return summary;
     }
 
+    public String formatAverageDays(Double avgDays) {
+        if (avgDays == null || avgDays == 0) return "0 dias";
+
+        int days = avgDays.intValue();
+        int hours = (int) Math.round((avgDays - days) * 24);
+
+        if (days == 0) {
+            return hours + "h";
+        }
+
+        if (hours == 0) {
+            return days + (days == 1 ? " dia" : " dias");
+        }
+
+        return days + (days == 1 ? " dia" : " dias") +
+                " e " + hours + "h";
+    }
 
 }

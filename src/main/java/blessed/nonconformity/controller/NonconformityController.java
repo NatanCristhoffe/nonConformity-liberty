@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,7 +50,7 @@ public class NonconformityController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
             ){
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         return ResponseEntity.ok(service.getAllOrGetByUser(getAll, pageable));
     }
 
@@ -107,6 +108,14 @@ public class NonconformityController {
     public ResponseEntity<Void> correction(@PathVariable Long id){
         service.sendToCorrection(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<Map<String, String>> cancel(
+            @PathVariable Long id
+    ){
+        service.cancel(id);
+        return ResponseEntity.ok(Map.of("Success", "Não conformidade cancelada com sucesso."));
     }
 
 }

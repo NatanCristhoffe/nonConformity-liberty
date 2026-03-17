@@ -7,6 +7,7 @@ import blessed.nonconformity.enums.NonConformityStatus;
 import blessed.nonconformity.repository.NonconformityRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,8 +23,8 @@ public class DashboardQuery {
     }
 
 
-    public Map<NonConformityStatus, Long> countByStatus(UUID companyId){
-        return nonconformityRepository.countByStatus(companyId)
+    public Map<NonConformityStatus, Long> countByStatus(UUID companyId, LocalDateTime startDate, LocalDateTime endDate){
+        return nonconformityRepository.countByStatus(companyId, startDate, endDate)
                 .stream()
                 .collect(Collectors.toMap(
                         r -> (NonConformityStatus) r[0],
@@ -31,8 +32,8 @@ public class DashboardQuery {
                 ));
     }
 
-    public Map<NonConformityPriorityLevel, Long> countByPriority(UUID companyId){
-        return nonconformityRepository.countByPriority(companyId)
+    public Map<NonConformityPriorityLevel, Long> countByPriority(UUID companyId, LocalDateTime startDate, LocalDateTime endDate){
+        return nonconformityRepository.countByPriority(companyId, startDate, endDate)
                 .stream()
                 .collect(Collectors.toMap(
                         r -> (NonConformityPriorityLevel) r[0],
@@ -40,8 +41,8 @@ public class DashboardQuery {
                 ));
     }
 
-    public List<DepartmentIndicatorDTO> countByDepartment(UUID companyId){
-        return nonconformityRepository.countByDepartment(companyId)
+    public List<DepartmentIndicatorDTO> countByDepartment(UUID companyId, LocalDateTime startDate, LocalDateTime endDate){
+        return nonconformityRepository.countByDepartment(companyId, startDate, endDate)
                 .stream()
                 .map(r -> new DepartmentIndicatorDTO(
                         (Long) r[0],
@@ -51,8 +52,8 @@ public class DashboardQuery {
                 .toList();
     }
 
-    public List<TrendDTO> trend(UUID companyId) {
-        return nonconformityRepository.trend(companyId)
+    public List<TrendDTO> trend(UUID companyId, LocalDateTime startDate, LocalDateTime endDate) {
+        return nonconformityRepository.trend(companyId, startDate, endDate)
                 .stream()
                 .map(r -> new TrendDTO(
                         (String) r[0],
@@ -63,8 +64,8 @@ public class DashboardQuery {
     }
 
 
-    public Double averageResolutionDays(UUID companyId) {
-        return Optional.ofNullable(nonconformityRepository.averageResolutionDays(companyId))
+    public Double averageResolutionDays(UUID companyId, LocalDateTime startDate, LocalDateTime endDate) {
+        return Optional.ofNullable(nonconformityRepository.averageResolutionDays(companyId, startDate, endDate))
                 .orElse(0.0);
     }
 

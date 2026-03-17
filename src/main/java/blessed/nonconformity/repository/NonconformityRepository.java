@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -72,26 +73,44 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     SELECT nc.status, COUNT(nc)
     FROM NonConformity nc
     WHERE nc.company.id = :companyId
+    AND (:startDate IS NULL OR nc.createdAt >= :startDate)
+    AND (:endDate IS NULL OR nc.createdAt <= :endDate)
     GROUP BY nc.status
     """)
-    List<Object[]> countByStatus(@Param("companyId") UUID companyId);
+        List<Object[]> countByStatus(
+                @Param("companyId") UUID companyId,
+                @Param("startDate") LocalDateTime startDate,
+                @Param("endDate") LocalDateTime endDate
+        );
 
     @Query("""
     SELECT nc.priorityLevel, COUNT(nc)
     FROM NonConformity nc
     WHERE nc.company.id = :companyId
+    AND (:startDate IS NULL OR nc.createdAt >= :startDate)
+    AND (:endDate IS NULL OR nc.createdAt <= :endDate)
     GROUP BY nc.priorityLevel
     """)
-    List<Object[]> countByPriority(@Param("companyId") UUID companyId);
+    List<Object[]> countByPriority(
+            @Param("companyId") UUID companyId,
+            @Param("startDate")LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 
     @Query("""
-    SELECT d.id, d.name, COUNT (nc)
-    FROM NonConformity  nc
+    SELECT d.id, d.name, COUNT(nc)
+    FROM NonConformity nc
     JOIN nc.responsibleDepartment d
     WHERE nc.company.id = :companyId
+    AND (:startDate IS NULL OR nc.createdAt >= :startDate)
+    AND (:endDate IS NULL OR nc.createdAt <= :endDate)
     GROUP BY d.id, d.name
     """)
-    List<Object[]> countByDepartment(@Param("companyId") UUID companyId);
+    List<Object[]> countByDepartment(
+            @Param("companyId") UUID companyId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 
     @Query("""
     SELECT 
@@ -100,10 +119,16 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     SUM(CASE WHEN nc.status = 'CLOSED' THEN 1 ELSE 0 END)
     FROM NonConformity nc
     WHERE nc.company.id = :companyId
+    AND (:startDate IS NULL OR nc.createdAt >= :startDate)
+    AND (:endDate IS NULL OR nc.createdAt <= :endDate)
     GROUP BY FUNCTION('DATE_FORMAT', nc.createdAt, '%Y-%m')
-    ORDER BY 1 DESC
+    ORDER BY 1 ASC
     """)
-    List<Object[]> trend(@Param("companyId") UUID companyId);
+    List<Object[]> trend(
+            @Param("companyId") UUID companyId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 
     @Query("""
     SELECT AVG(
@@ -115,8 +140,14 @@ public interface NonconformityRepository extends JpaRepository<NonConformity, Lo
     FROM NonConformity nc
     WHERE nc.company.id = :companyId
     AND nc.closedAt IS NOT NULL
+    AND (:startDate IS NULL OR nc.closedAt >= :startDate)
+    AND (:endDate IS NULL OR nc.closedAt <= :endDate)
     """)
-    Double averageResolutionDays(@Param("companyId") UUID companyId);
+    Double averageResolutionDays(
+            @Param("companyId") UUID companyId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 
 
     @Query("""
