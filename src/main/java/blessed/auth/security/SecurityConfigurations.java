@@ -67,11 +67,15 @@ public class SecurityConfigurations {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
 
-        configuration.setAllowedMethods(Arrays.asList("GET", "PATCH","POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://app.blessedts.com.br",
+                "http://localhost:5173"
+        ));
+
+        configuration.setAllowedMethods(Arrays.asList("GET", "PATCH", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-
+        configuration.setExposedHeaders(Arrays.asList("Authorization")); // Importante se você envia o Token no Header
 
         configuration.setAllowCredentials(true);
 

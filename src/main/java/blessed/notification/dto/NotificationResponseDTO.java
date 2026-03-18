@@ -10,9 +10,10 @@ public record NotificationResponseDTO(
         UUID id,
         String message,
         NotificationType type,
+        boolean read,
         LocalDateTime createdAt
 ) {
     public NotificationResponseDTO(Notification data) {
-        this(data.getId(), data.getMessage(), data.getType(), data.getCreatedAt());
+        this(data.getId(), data.getMessage(), data.getType(), data.isRead(),data.getCreatedAt());
     }
 }
