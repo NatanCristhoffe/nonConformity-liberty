@@ -26,7 +26,7 @@ public class FiveWhyTool {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "nonconformity_id", nullable = false)
+    @JoinColumn(name = "non_conformity_id", nullable = false)
     private NonConformity nonconformity;
 
     @OneToMany(
